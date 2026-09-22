@@ -1,18 +1,49 @@
 <script>
+	import orcsTavern from '$lib/assets/wallpapers/orcs-tavern.png';
+	import trollsTavern from '$lib/assets/wallpapers/trolls-tavern.png';
+
+	import hearthsideLullaby from '$lib/assets/music/hearthside-lullaby.mp3';
+	import tavernBeforeBattle from '$lib/assets/music/tavern-before-battle.mp3';
+	import tavernTwilight from '$lib/assets/music/tavern-twilight.mp3';
+
 	const backgrounds = [
 		{
-			title: 'Лесной туман',
-			url: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1920&q=80'
+			title: 'Таверна у орков',
+			url: orcsTavern
 		},
 		{
-			title: 'Ночной Токио',
-			url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1920&q=80'
-		},
-		{
-			title: 'Уютная библиотека',
-			url: 'https://images.unsplash.com/photo-1507842229452-7d84814d4580?auto=format&fit=crop&w=1920&q=80'
+			title: 'Таверна у троллей',
+			url: trollsTavern
 		}
 	];
+
+	// Список треков для фона
+	const playlist = [hearthsideLullaby, tavernBeforeBattle, tavernTwilight];
+	let currentTrack = $state(0);
+	/** @type {HTMLAudioElement | undefined} */
+	let audioElement = $state();
+
+	function nextTrack() {
+		currentTrack = (currentTrack + 1) % playlist.length;
+		queueMicrotask(() => {
+			audioElement?.play().catch(() => {});
+		});
+	}
+
+	$effect(() => {
+		// Пробуем запустить воспроизведение сразу
+		audioElement?.play().catch(() => {
+			// Браузеры блокируют звук до первого клика — слушаем первое взаимодействие
+			const startAudio = () => {
+				audioElement?.play().catch(() => {});
+				window.removeEventListener('click', startAudio);
+				window.removeEventListener('keydown', startAudio);
+			};
+
+			window.addEventListener('click', startAudio);
+			window.addEventListener('keydown', startAudio);
+		});
+	});
 
 	let currentBg = $state(0);
 
@@ -25,6 +56,13 @@
 	}
 </script>
 
+<!-- Фоновая музыка без элементов управления -->
+<audio
+	bind:this={audioElement}
+	src={playlist[currentTrack]}
+	onended={nextTrack}
+></audio>
+
 <main class="relative h-screen w-screen overflow-hidden bg-black text-white">
 	<!-- Фоновое изображение -->
 	<img
@@ -32,7 +70,7 @@
 		alt={backgrounds[currentBg].title}
 		class="absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out"
 	/>
-	<div class="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+	<div class="absolute inset-0"></div>
 
 	<!-- Панель управления -->
 	<div
