@@ -1,31 +1,31 @@
-<script lang="ts">
-	let canvasElement = $state<HTMLCanvasElement>();
+import { useEffect, useRef } from 'react';
 
-	interface Props {
-		count?: number;
-	}
+interface EmbersProps {
+	count?: number;
+}
 
-	let { count = 75 }: Props = $props();
+interface Ember {
+	x: number;
+	y: number;
+	radius: number;
+	vy: number;
+	vx: number;
+	swayAmp: number;
+	swayFreq: number;
+	swayPhase: number;
+	life: number;
+	maxLife: number;
+	maxAlpha: number;
+	flickerSpeed: number;
+	flickerPhase: number;
+	colorVariant: number; // 0: yellow-gold, 1: warm orange, 2: reddish orange
+}
 
-	interface Ember {
-		x: number;
-		y: number;
-		radius: number;
-		vy: number;
-		vx: number;
-		swayAmp: number;
-		swayFreq: number;
-		swayPhase: number;
-		life: number;
-		maxLife: number;
-		maxAlpha: number;
-		flickerSpeed: number;
-		flickerPhase: number;
-		colorVariant: number; // 0: yellow-gold, 1: warm orange, 2: reddish orange
-	}
+export function Embers({ count = 75 }: EmbersProps) {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 
-	$effect(() => {
-		const canvas = canvasElement;
+	useEffect(() => {
+		const canvas = canvasRef.current;
 		if (!canvas) return;
 
 		const ctx = canvas.getContext('2d');
@@ -183,11 +183,13 @@
 			window.removeEventListener('resize', resize);
 			document.removeEventListener('visibilitychange', handleVisibilityChange);
 		};
-	});
-</script>
+	}, [count]);
 
-<canvas
-	bind:this={canvasElement}
-	class="pointer-events-none fixed inset-0 z-50 h-full w-full"
-	aria-hidden="true"
-></canvas>
+	return (
+		<canvas
+			ref={canvasRef}
+			className="pointer-events-none fixed inset-0 z-50 h-full w-full"
+			aria-hidden="true"
+		/>
+	);
+}

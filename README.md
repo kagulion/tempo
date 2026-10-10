@@ -1,42 +1,38 @@
-# sv
+# Tempo
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Атмосферная страница-«таверна»: полноэкранные фэнтези-обои, фоновая музыка и эффект летящих искр.
 
-## Creating a project
+## Стек
 
-If you're seeing this, you've probably already done this step. Congrats!
+- [React 19](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
+- [Vite](https://vite.dev)
+- [Tailwind CSS 4](https://tailwindcss.com)
+- [shadcn/ui](https://ui.shadcn.com) (Radix, пресет Nova)
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
+## Разработка
 
 ```sh
-# recreate this project
-nubx sv@0.17.0 create --template minimal --types ts --add prettier tailwindcss="plugins:none" --install nub ./
+pnpm install
+pnpm dev
 ```
 
-## Developing
+## Скрипты
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+| Команда        | Что делает                          |
+| -------------- | ----------------------------------- |
+| `pnpm dev`     | dev-сервер с HMR                    |
+| `pnpm build`   | проверка типов и сборка в `dist/`   |
+| `pnpm preview` | локальный просмотр собранной версии |
+| `pnpm check`   | только проверка типов               |
+| `pnpm lint`    | проверка форматирования Prettier    |
+| `pnpm format`  | форматирование Prettier             |
+
+## shadcn/ui
+
+Компоненты добавляются командой:
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm dlx shadcn@latest add <component>
 ```
 
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Они попадают в `src/components/ui/`.
