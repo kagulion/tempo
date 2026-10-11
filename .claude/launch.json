@@ -7,6 +7,13 @@
 			"runtimeArgs": ["dev", "--host", "127.0.0.1", "--port", "5173", "--strictPort"],
 			"port": 5173,
 			"url": "http://127.0.0.1:5173"
+		},
+		{
+			"name": "preview",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": ["preview", "--host", "127.0.0.1", "--port", "4174", "--strictPort"],
+			"port": 4174,
+			"url": "http://127.0.0.1:4174"
 		}
 	]
 }
