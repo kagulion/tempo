@@ -12,14 +12,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue
-} from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 import {
 	detectCountryCode,
 	fetchCountries,
@@ -48,9 +41,6 @@ const backgrounds = [
 
 // Список треков для фона
 const playlist = [hearthsideLullaby, tavernBeforeBattle, tavernTwilight];
-
-const selectTriggerClass =
-	'border-white/10 bg-white/10 text-white hover:bg-white/20 [&_svg]:text-white/70';
 
 const controlButtonClass =
 	'bg-white/10 px-3 text-sm font-medium text-white transition-colors hover:bg-white/20 hover:text-white';
@@ -224,46 +214,30 @@ export default function App() {
 				<div className="absolute bottom-8 left-1/2 z-10 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-col items-center gap-3 rounded-2xl border border-white/10 bg-black/50 px-6 py-3 shadow-2xl backdrop-blur-md">
 					{mode === 'radio' && (
 						<div className="flex max-w-full items-center gap-3">
-							<Select value={country} onValueChange={loadStations}>
-								<SelectTrigger
-									aria-label="Страна"
-									className={cn('w-40 shrink-0', selectTriggerClass)}
-								>
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent
-									position="popper"
-									side="top"
-									className="dark max-h-80 border border-white/10"
-								>
-									{countries.map((item) => (
-										<SelectItem key={item.code} value={item.code}>
-											{item.name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+							<Combobox
+								aria-label="Страна"
+								items={countries}
+								value={countries.find((item) => item.code === country) ?? null}
+								onValueChange={(item) => loadStations(item.code)}
+								getLabel={(item) => item.name}
+								getKey={(item) => item.code}
+								placeholder={countries.length === 0 ? 'Загрузка…' : 'Страна'}
+								emptyText="Страна не найдена"
+								className="w-40 shrink-0"
+							/>
 
 							{radioStatus === 'idle' && station ? (
-								<Select value={station.stationuuid} onValueChange={selectStation}>
-									<SelectTrigger
-										aria-label="Радиостанция"
-										className={cn('w-64 min-w-0', selectTriggerClass)}
-									>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent
-										position="popper"
-										side="top"
-										className="dark max-h-80 max-w-[calc(100vw-2rem)] border border-white/10"
-									>
-										{stationOptions.map((item) => (
-											<SelectItem key={item.stationuuid} value={item.stationuuid}>
-												{item.name.trim() || 'Без названия'}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+								<Combobox
+									aria-label="Радиостанция"
+									items={stationOptions}
+									value={station}
+									onValueChange={(item) => selectStation(item.stationuuid)}
+									getLabel={(item) => item.name.trim() || 'Без названия'}
+									getKey={(item) => item.stationuuid}
+									placeholder="Радиостанция"
+									emptyText="Станция не найдена"
+									className="w-64 min-w-0"
+								/>
 							) : (
 								<p className="min-w-0 truncate text-sm text-white/80">
 									{radioStatus === 'loading'
