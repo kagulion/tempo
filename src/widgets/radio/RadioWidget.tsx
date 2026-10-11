@@ -107,12 +107,34 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 				<Button
 					variant="ghost"
 					size="icon"
+					onClick={radio.prevStation}
+					disabled={noStations}
+					title="Предыдущая станция"
+					aria-label="Предыдущая станция"
+					className={buttonClass}
+				>
+					<SkipBack />
+				</Button>
+				<Button
+					variant="ghost"
+					size="icon"
 					onClick={radio.togglePlaying}
 					title={radio.playing ? 'Выключить радио' : 'Включить радио'}
 					aria-label={radio.playing ? 'Выключить радио' : 'Включить радио'}
 					className={buttonClass}
 				>
 					{radio.playing ? <Pause /> : <Play />}
+				</Button>
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={radio.nextStation}
+					disabled={noStations}
+					title="Следующая станция"
+					aria-label="Следующая станция"
+					className={buttonClass}
+				>
+					<SkipForward />
 				</Button>
 
 				<Button
@@ -132,31 +154,8 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 					step={0.01}
 					value={radio.muted ? 0 : radio.volume}
 					onValueChange={radio.changeVolume}
-					className="mr-1 w-20 shrink-0"
+					className="mr-1 w-16 shrink-0 sm:w-20"
 				/>
-
-				<Button
-					variant="ghost"
-					size="icon"
-					onClick={radio.prevStation}
-					disabled={noStations}
-					title="Предыдущая станция"
-					aria-label="Предыдущая станция"
-					className={buttonClass}
-				>
-					<SkipBack />
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon"
-					onClick={radio.nextStation}
-					disabled={noStations}
-					title="Следующая станция"
-					aria-label="Следующая станция"
-					className={buttonClass}
-				>
-					<SkipForward />
-				</Button>
 
 				{/* Сплит-кнопка: сердечко добавляет станцию, шеврон открывает список избранного */}
 				<div className="ml-auto flex items-center">
