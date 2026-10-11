@@ -12,6 +12,25 @@ import {
 
 export type RadioStatus = 'idle' | 'loading' | 'empty' | 'error';
 
+const lastStationKey = 'tempo:last-station';
+
+// Последняя станция, которая реально заиграла. При загрузке страницы с неё и начинаем, но без звука
+function loadLastStation(): Station | undefined {
+	try {
+		return JSON.parse(localStorage.getItem(lastStationKey) ?? 'null') ?? undefined;
+	} catch {
+		return undefined;
+	}
+}
+
+function saveLastStation(station: Station) {
+	try {
+		localStorage.setItem(lastStationKey, JSON.stringify(station));
+	} catch {
+		// Хранилище недоступно (приватный режим) — после перезагрузки начнём со случайной станции
+	}
+}
+
 // Перемешиваем станции, чтобы каждый раз звучало что-то новое, а не одни и те же лидеры рейтинга
 function shuffle<T>(items: T[]) {
 	const result = [...items];
@@ -25,7 +44,8 @@ function shuffle<T>(items: T[]) {
 // Вся логика радио: страны, станции, воспроизведение и громкость. Разметка — в RadioWidget
 export function useRadio() {
 	const audioRef = useRef<HTMLAudioElement>(null);
-	const [playing, setPlaying] = useState(true);
+	// Радио всегда стартует выключенным — включает пользователь
+	const [playing, setPlaying] = useState(false);
 	const [volume, setVolume] = useState(0.8);
 	const [muted, setMuted] = useState(false);
 	const [stations, setStations] = useState<Station[]>([]);
@@ -79,7 +99,9 @@ export function useRadio() {
 	}
 
 	useEffect(() => {
-		loadStations(country);
+		const last = loadLastStation();
+		if (last) loadStations(last.countrycode, last);
+		else loadStations(country);
 		loadCountries();
 	}, []);
 
@@ -150,7 +172,12 @@ export function useRadio() {
 			ref: audioRef,
 			src: station?.url_resolved,
 			onEnded: nextStation,
-			onPlaying: () => (failedStations.current = 0),
+			// Пока радио выключено, поток не качаем
+			preload: 'none',
+			onPlaying: () => {
+				failedStations.current = 0;
+				if (station) saveLastStation(station);
+			},
 			onError: handleAudioError
 		},
 		status,
