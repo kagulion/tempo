@@ -4,6 +4,7 @@ import { Dock } from '@/widgets/dock/Dock';
 import { useDock, type WidgetId } from '@/widgets/dock/useDock';
 import { BackgroundMusic } from '@/widgets/music/BackgroundMusic';
 import { RadioWidget } from '@/widgets/radio/RadioWidget';
+import { StatsWidget } from '@/widgets/stats/StatsWidget';
 import { TimerWidget } from '@/widgets/timer/TimerWidget';
 import { useWallpaper } from '@/widgets/wallpaper/useWallpaper';
 import { WallpaperSwitcher } from '@/widgets/wallpaper/WallpaperSwitcher';
@@ -20,6 +21,8 @@ const windowPlacement: Record<WidgetId, string> = {
 	ambience:
 		'sm:top-4 sm:bottom-auto sm:left-4 sm:max-h-[calc(100dvh-15rem)] sm:w-[22rem] lg:top-8 lg:left-8 lg:max-h-[calc(100dvh-17rem)]',
 	timer: 'sm:top-4 sm:right-4 sm:bottom-auto sm:w-[26rem] lg:top-8 lg:right-8',
+	// Между звуками и таймером: свободно по ширине от ~1200px, на более узких экранах может перекрыть соседей
+	stats: 'sm:top-4 sm:bottom-auto sm:left-1/2 sm:w-[18rem] sm:-translate-x-1/2 lg:top-8',
 	wallpaper: 'sm:bottom-24 sm:left-4 lg:bottom-28 lg:left-8',
 	radio: 'sm:right-4 sm:bottom-24 sm:w-[26rem] lg:right-8 lg:bottom-28'
 };
@@ -45,6 +48,7 @@ export default function App() {
 
 			<AmbienceWidget className={placement('ambience')} />
 			<TimerWidget className={placement('timer')} />
+			<StatsWidget className={placement('stats')} />
 			<WallpaperSwitcher
 				faction={wallpaper.faction}
 				index={wallpaper.index}

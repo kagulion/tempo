@@ -1,6 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
-export type WidgetId = 'radio' | 'ambience' | 'timer' | 'wallpaper';
+export type WidgetId = 'radio' | 'ambience' | 'timer' | 'stats' | 'wallpaper';
 
 const storageKey = 'tempo:open-widgets';
 // Первый визит: всё как было до панели, звуки закрыты
