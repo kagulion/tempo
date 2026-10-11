@@ -20,20 +20,26 @@ export default function App() {
 				className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out"
 			/>
 
-			{/* Левый нижний угол. На телефоне радио занимает всю ширину снизу — там панель уходит наверх */}
-			<WallpaperSwitcher
-				faction={wallpaper.faction}
-				index={wallpaper.index}
-				count={wallpaper.count}
-				onFactionChange={wallpaper.setFaction}
-				onPrev={wallpaper.prev}
-				onNext={wallpaper.next}
-				className="absolute top-4 left-4 sm:top-auto sm:bottom-4 lg:bottom-8 lg:left-8"
-			/>
+			{/* На телефоне обои и таймер идут столбиком сверху, а радио занимает низ. С sm обёртка
+			    растворяется (sm:contents), и каждый виджет встаёт в свой угол сам */}
+			<div className="absolute top-4 right-4 left-4 flex flex-col items-start gap-3 sm:contents">
+				{/* Левый нижний угол */}
+				<WallpaperSwitcher
+					faction={wallpaper.faction}
+					index={wallpaper.index}
+					count={wallpaper.count}
+					onFactionChange={wallpaper.setFaction}
+					onPrev={wallpaper.prev}
+					onNext={wallpaper.next}
+					className="sm:absolute sm:bottom-4 sm:left-4 lg:bottom-8 lg:left-8"
+				/>
 
-			{/* Правая нижняя колонка: таймер над радио. На телефоне — снизу во всю ширину */}
-			<div className="absolute right-4 bottom-4 left-4 flex flex-col gap-3 sm:left-auto sm:w-[26rem] lg:right-8 lg:bottom-8">
-				<TimerWidget />
+				{/* Правый верхний угол */}
+				<TimerWidget className="w-full sm:absolute sm:top-4 sm:right-4 sm:w-[26rem] lg:top-8 lg:right-8" />
+			</div>
+
+			{/* Правый нижний угол. На телефоне — снизу во всю ширину */}
+			<div className="absolute right-4 bottom-4 left-4 sm:left-auto sm:w-[26rem] lg:right-8 lg:bottom-8">
 				{musicEnabled ? <BackgroundMusic /> : <RadioWidget />}
 			</div>
 		</main>
