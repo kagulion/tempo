@@ -18,13 +18,14 @@ const windowClass =
 	'absolute inset-x-4 bottom-[4.5rem] max-h-[calc(100dvh-5.5rem)] overflow-y-auto [scrollbar-color:rgb(255_255_255/0.2)_transparent] [scrollbar-width:thin] sm:inset-x-auto sm:max-h-[calc(100dvh-7rem)] lg:max-h-[calc(100dvh-9rem)]';
 
 const windowPlacement: Record<WidgetId, string> = {
+	// Под звуками в том же левом столбце стоит радио (~8.5rem над панелью), поэтому высота звуков ограничена сильнее, а лишнее прокручивается
 	ambience:
-		'sm:top-4 sm:bottom-auto sm:left-4 sm:max-h-[calc(100dvh-15rem)] sm:w-[22rem] lg:top-8 lg:left-8 lg:max-h-[calc(100dvh-17rem)]',
+		'sm:top-4 sm:bottom-auto sm:left-4 sm:max-h-[calc(100dvh-16.5rem)] sm:w-[22rem] lg:top-8 lg:left-8 lg:max-h-[calc(100dvh-18.5rem)]',
 	timer: 'sm:top-4 sm:right-4 sm:bottom-auto sm:w-[26rem] lg:top-8 lg:right-8',
 	// Между звуками и таймером: свободно по ширине от ~1200px, на более узких экранах может перекрыть соседей
 	stats: 'sm:top-4 sm:bottom-auto sm:left-1/2 sm:w-[18rem] sm:-translate-x-1/2 lg:top-8',
-	wallpaper: 'sm:bottom-24 sm:left-4 lg:bottom-28 lg:left-8',
-	radio: 'sm:right-4 sm:bottom-24 sm:w-[26rem] lg:right-8 lg:bottom-28'
+	wallpaper: 'sm:right-4 sm:bottom-24 lg:right-8 lg:bottom-28',
+	radio: 'sm:bottom-24 sm:left-4 sm:w-[26rem] lg:bottom-28 lg:left-8'
 };
 
 // Раскладка страницы: фон, панель и окна виджетов. Логика каждого виджета — в src/widgets/
