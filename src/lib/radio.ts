@@ -81,7 +81,7 @@ export type RadioCountry = {
 // Названия стран по-русски — API отдаёт их только на английском
 const countryNames = new Intl.DisplayNames(['ru'], { type: 'region' });
 
-function countryName(code: string) {
+export function countryName(code: string) {
 	try {
 		return countryNames.of(code) ?? code;
 	} catch {

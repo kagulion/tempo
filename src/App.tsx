@@ -1,25 +1,34 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
-	Globe,
+	Dices,
+	Heart,
 	LoaderCircle,
 	Music,
+	Pause,
+	Play,
 	Radio,
+	SkipBack,
 	SkipForward,
+	Volume1,
 	Volume2,
 	VolumeX
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Combobox } from '@/components/ui/combobox';
+import { Combobox, ComboboxButton } from '@/components/ui/combobox';
+import { Slider } from '@/components/ui/slider';
 import {
+	countryName,
 	detectCountryCode,
 	fetchCountries,
 	fetchStations,
 	type RadioCountry,
 	type Station
 } from '@/lib/radio';
+import { cn } from '@/lib/utils';
 
 import orcsTavern from '@/assets/wallpapers/orcs-tavern.png';
 import trollsTavern from '@/assets/wallpapers/trolls-tavern.png';
@@ -39,11 +48,18 @@ const backgrounds = [
 	}
 ];
 
+// Загруженная музыка временно скрыта: играет только радио. Код оставлен, чтобы вернуть её флагом
+const musicEnabled = false;
+
 // Список треков для фона
 const playlist = [hearthsideLullaby, tavernBeforeBattle, tavernTwilight];
 
 const controlButtonClass =
 	'bg-white/10 px-3 text-sm font-medium text-white transition-colors hover:bg-white/20 hover:text-white';
+
+const radioButtonClass = 'text-white/80 hover:bg-white/15 hover:text-white';
+
+const favoritesKey = 'tempo:favorite-stations';
 
 type Mode = 'music' | 'radio';
 
@@ -57,18 +73,30 @@ function shuffle<T>(items: T[]) {
 	return result;
 }
 
+// Избранные станции храним целиком, чтобы потом показать их без запроса к API
+function loadFavorites(): Record<string, Station> {
+	try {
+		return JSON.parse(localStorage.getItem(favoritesKey) ?? '{}');
+	} catch {
+		return {};
+	}
+}
+
 export default function App() {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const [currentTrack, setCurrentTrack] = useState(0);
 	const [currentBg, setCurrentBg] = useState(0);
 
-	const [mode, setMode] = useState<Mode>('music');
+	const [mode, setMode] = useState<Mode>(musicEnabled ? 'music' : 'radio');
 	const [soundOn, setSoundOn] = useState(true);
+	const [volume, setVolume] = useState(0.8);
+	const [muted, setMuted] = useState(false);
 	const [stations, setStations] = useState<Station[]>([]);
 	const [currentStation, setCurrentStation] = useState(0);
 	const [radioStatus, setRadioStatus] = useState<'idle' | 'loading' | 'empty' | 'error'>('idle');
 	const [countries, setCountries] = useState<RadioCountry[]>([]);
 	const [country, setCountry] = useState(detectCountryCode);
+	const [favorites, setFavorites] = useState(loadFavorites);
 	// Номер последнего запроса станций — ответы на устаревшие запросы игнорируем
 	const stationsRequest = useRef(0);
 	// Сколько станций подряд не запустилось — чтобы не перебирать список бесконечно
@@ -78,25 +106,36 @@ export default function App() {
 	// В селекте станции по алфавиту, а «Следующая» идёт по перемешанному списку
 	const stationOptions = [...stations].sort((a, b) => a.name.localeCompare(b.name));
 	const audioSrc = mode === 'music' ? playlist[currentTrack] : station?.url_resolved;
+	const favoriteOptions = Object.values(favorites).sort((a, b) => a.name.localeCompare(b.name));
+	const isFavorite = station ? station.stationuuid in favorites : false;
+	const silent = muted || volume === 0;
+	const noStations = radioStatus === 'loading' || stations.length === 0;
 
 	function nextTrack() {
 		setCurrentTrack((track) => (track + 1) % playlist.length);
 	}
 
-	async function loadStations(countryCode: string) {
+	// first — станция, с которой начать (например, выбранная из избранного)
+	async function loadStations(countryCode: string, first?: Station) {
 		const request = ++stationsRequest.current;
 		setCountry(countryCode);
 		setRadioStatus('loading');
 		try {
 			const list = await fetchStations(countryCode);
 			if (request !== stationsRequest.current) return;
-			if (list.length === 0) {
+			if (list.length === 0 && !first) {
 				setStations([]);
 				setRadioStatus('empty');
 				return;
 			}
 			failedStations.current = 0;
-			setStations(shuffle(list));
+			const shuffled = shuffle(list);
+			// Станция могла выпасть из топа страны — тогда добавляем её из сохранённых данных
+			setStations(
+				first
+					? [first, ...shuffled.filter((item) => item.stationuuid !== first.stationuuid)]
+					: shuffled
+			);
 			setCurrentStation(0);
 			setRadioStatus('idle');
 		} catch {
@@ -129,6 +168,11 @@ export default function App() {
 		if (countries.length === 0) loadCountries();
 	}
 
+	// Без музыки радио — единственный режим, поэтому станции грузим сразу
+	useEffect(() => {
+		if (!musicEnabled) switchMode('radio');
+	}, []);
+
 	function selectStation(uuid: string) {
 		const index = stations.findIndex((item) => item.stationuuid === uuid);
 		if (index === -1) return;
@@ -136,8 +180,38 @@ export default function App() {
 		setCurrentStation(index);
 	}
 
+	function selectFavorite(favorite: Station) {
+		const index = stations.findIndex((item) => item.stationuuid === favorite.stationuuid);
+		if (index !== -1) {
+			failedStations.current = 0;
+			setCurrentStation(index);
+			return;
+		}
+		// Станция из другой страны — переключаемся на неё и начинаем с выбранной
+		loadStations(favorite.countrycode, favorite);
+	}
+
 	function nextStation() {
 		setCurrentStation((index) => (index + 1) % stations.length);
+	}
+
+	function prevStation() {
+		setCurrentStation((index) => (index - 1 + stations.length) % stations.length);
+	}
+
+	function toggleFavorite() {
+		if (!station) return;
+		setFavorites((current) => {
+			const next = { ...current };
+			if (station.stationuuid in next) delete next[station.stationuuid];
+			else next[station.stationuuid] = station;
+			return next;
+		});
+	}
+
+	function changeVolume(value: number) {
+		setVolume(value);
+		if (value > 0) setMuted(false);
 	}
 
 	function handleAudioError() {
@@ -155,6 +229,21 @@ export default function App() {
 		if (!soundOn && mode === 'radio') audioRef.current?.load();
 		setSoundOn((on) => !on);
 	}
+
+	useEffect(() => {
+		try {
+			localStorage.setItem(favoritesKey, JSON.stringify(favorites));
+		} catch {
+			// Хранилище недоступно (приватный режим) — избранное живёт до перезагрузки
+		}
+	}, [favorites]);
+
+	useEffect(() => {
+		const audio = audioRef.current;
+		if (!audio) return;
+		audio.volume = volume;
+		audio.muted = muted;
+	}, [volume, muted]);
 
 	useEffect(() => {
 		const audio = audioRef.current;
@@ -210,10 +299,51 @@ export default function App() {
 				/>
 				<div className="absolute inset-0" />
 
-				{/* Панель управления */}
-				<div className="absolute bottom-8 left-1/2 z-10 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-col items-center gap-3 rounded-2xl border border-white/10 bg-black/50 px-6 py-3 shadow-2xl backdrop-blur-md">
-					{mode === 'radio' && (
-						<div className="flex max-w-full items-center gap-3">
+				{/* Переключение фона в левом нижнем углу. На телефоне радио занимает всю ширину снизу — там панель уходит наверх */}
+				<div className="absolute top-4 left-4 z-10 flex items-center gap-2 rounded-2xl border border-white/10 bg-black/50 px-3 py-3 shadow-2xl backdrop-blur-md sm:top-auto sm:bottom-4 lg:bottom-8 lg:left-8">
+					<Button
+						variant="ghost"
+						size="icon-lg"
+						onClick={prevBg}
+						title="Предыдущий фон"
+						aria-label="Предыдущий фон"
+						className={controlButtonClass}
+					>
+						<ChevronLeft />
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon-lg"
+						onClick={nextBg}
+						title="Следующий фон"
+						aria-label="Следующий фон"
+						className={controlButtonClass}
+					>
+						<ChevronRight />
+					</Button>
+
+					{musicEnabled && (
+						<Button
+							variant="ghost"
+							size="icon-lg"
+							onClick={() => switchMode(mode === 'music' ? 'radio' : 'music')}
+							title={mode === 'music' ? 'Включить радио' : 'Включить музыку'}
+							aria-label={mode === 'music' ? 'Включить радио' : 'Включить музыку'}
+							className={controlButtonClass}
+						>
+							{mode === 'music' ? <Radio /> : <Music />}
+						</Button>
+					)}
+				</div>
+
+				{/* Виджет радио */}
+				<section
+					aria-label="Радио"
+					className="absolute right-4 bottom-4 left-4 z-10 flex flex-col gap-3 rounded-2xl border border-white/10 bg-black/50 p-4 shadow-2xl backdrop-blur-md sm:left-auto sm:w-[26rem] lg:right-8 lg:bottom-8"
+				>
+					<div className="flex flex-col gap-1.5">
+						<span className="text-xs font-medium text-white/60">Radio</span>
+						<div className="flex items-center gap-2">
 							<Combobox
 								aria-label="Страна"
 								items={countries}
@@ -223,7 +353,7 @@ export default function App() {
 								getKey={(item) => item.code}
 								placeholder={countries.length === 0 ? 'Загрузка…' : 'Страна'}
 								emptyText="Страна не найдена"
-								className="w-40 shrink-0"
+								className="w-36 shrink-0"
 							/>
 
 							{radioStatus === 'idle' && station ? (
@@ -236,10 +366,10 @@ export default function App() {
 									getKey={(item) => item.stationuuid}
 									placeholder="Радиостанция"
 									emptyText="Станция не найдена"
-									className="w-64 min-w-0"
+									className="min-w-0 flex-1"
 								/>
 							) : (
-								<p className="min-w-0 truncate text-sm text-white/80">
+								<p className="flex h-8 min-w-0 flex-1 items-center truncate px-1 text-sm text-white/70">
 									{radioStatus === 'loading'
 										? 'Ищем станции…'
 										: radioStatus === 'empty'
@@ -248,85 +378,113 @@ export default function App() {
 								</p>
 							)}
 						</div>
-					)}
-
-					<div className="flex items-center justify-center gap-2">
-						<Button
-							variant="ghost"
-							size="icon-lg"
-							onClick={prevBg}
-							title="Предыдущий фон"
-							aria-label="Предыдущий фон"
-							className={controlButtonClass}
-						>
-							<ChevronLeft />
-						</Button>
-						<Button
-							variant="ghost"
-							size="icon-lg"
-							onClick={nextBg}
-							title="Следующий фон"
-							aria-label="Следующий фон"
-							className={controlButtonClass}
-						>
-							<ChevronRight />
-						</Button>
-
-						<div className="mx-1 h-6 w-px bg-white/15" />
-
-						<Button
-							variant="ghost"
-							size="icon-lg"
-							onClick={toggleSound}
-							title={soundOn ? 'Выключить звук' : 'Включить звук'}
-							aria-label={soundOn ? 'Выключить звук' : 'Включить звук'}
-							className={controlButtonClass}
-						>
-							{soundOn ? <Volume2 /> : <VolumeX />}
-						</Button>
-						<Button
-							variant="ghost"
-							size="icon-lg"
-							onClick={() => switchMode(mode === 'music' ? 'radio' : 'music')}
-							title={mode === 'music' ? 'Включить радио' : 'Включить музыку'}
-							aria-label={mode === 'music' ? 'Включить радио' : 'Включить музыку'}
-							className={controlButtonClass}
-						>
-							{mode === 'music' ? <Radio /> : <Music />}
-						</Button>
-
-						{mode === 'radio' && (
-							<>
-								<Button
-									variant="ghost"
-									size="icon-lg"
-									onClick={nextStation}
-									disabled={radioStatus === 'loading' || stations.length === 0}
-									title="Следующая станция"
-									aria-label="Следующая станция"
-									className={controlButtonClass}
-								>
-									<SkipForward />
-								</Button>
-								<Button
-									variant="ghost"
-									size="icon-lg"
-									onClick={randomCountry}
-									disabled={radioStatus === 'loading'}
-									title="Случайная страна"
-									aria-label="Случайная страна"
-									className={controlButtonClass}
-								>
-									{radioStatus === 'loading' ? (
-										<LoaderCircle className="animate-spin" />
-									) : (
-										<Globe />
-									)}
-								</Button>
-							</>
-						)}
 					</div>
-				</div>
+
+					<div className="flex items-center gap-1">
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={randomCountry}
+							disabled={radioStatus === 'loading'}
+							title="Случайное радио"
+							aria-label="Случайное радио"
+							className={radioButtonClass}
+						>
+							{radioStatus === 'loading' ? <LoaderCircle className="animate-spin" /> : <Dices />}
+						</Button>
+
+						<div className="mx-1 h-5 w-px shrink-0 bg-white/15" />
+
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={toggleSound}
+							title={soundOn ? 'Выключить радио' : 'Включить радио'}
+							aria-label={soundOn ? 'Выключить радио' : 'Включить радио'}
+							className={radioButtonClass}
+						>
+							{soundOn ? <Pause /> : <Play />}
+						</Button>
+
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={() => setMuted((value) => !value)}
+							title={silent ? 'Включить звук' : 'Выключить звук'}
+							aria-label={silent ? 'Включить звук' : 'Выключить звук'}
+							className={radioButtonClass}
+						>
+							{silent ? <VolumeX /> : volume < 0.5 ? <Volume1 /> : <Volume2 />}
+						</Button>
+						<Slider
+							aria-label="Громкость"
+							min={0}
+							max={1}
+							step={0.01}
+							value={muted ? 0 : volume}
+							onValueChange={changeVolume}
+							className="mr-1 w-20 shrink-0"
+						/>
+
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={prevStation}
+							disabled={noStations}
+							title="Предыдущая станция"
+							aria-label="Предыдущая станция"
+							className={radioButtonClass}
+						>
+							<SkipBack />
+						</Button>
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={nextStation}
+							disabled={noStations}
+							title="Следующая станция"
+							aria-label="Следующая станция"
+							className={radioButtonClass}
+						>
+							<SkipForward />
+						</Button>
+
+						{/* Сплит-кнопка: сердечко добавляет станцию, шеврон открывает список избранного */}
+						<div className="ml-auto flex items-center">
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={toggleFavorite}
+								disabled={!station || radioStatus !== 'idle'}
+								title={isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+								aria-label={isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+								aria-pressed={isFavorite}
+								className={cn(radioButtonClass, 'rounded-r-none')}
+							>
+								<Heart className={cn(isFavorite && 'fill-current')} />
+							</Button>
+							<ComboboxButton
+								aria-label="Избранные станции"
+								title="Избранные станции"
+								items={favoriteOptions}
+								value={isFavorite ? station : null}
+								onValueChange={selectFavorite}
+								getLabel={(item) => item.name.trim() || 'Без названия'}
+								getKey={(item) => item.stationuuid}
+								getHint={(item) => countryName(item.countrycode)}
+								searchPlaceholder="Поиск по избранному"
+								emptyText={
+									favoriteOptions.length === 0
+										? 'Нажмите на сердечко, чтобы добавить станцию'
+										: 'Станция не найдена'
+								}
+								className="flex h-8 w-5 items-center justify-center rounded-r-lg text-white/80 transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20 data-popup-open:bg-white/15 data-popup-open:text-white"
+							>
+								<ChevronDown className="size-4" />
+							</ComboboxButton>
+						</div>
+					</div>
+				</section>
 			</main>
 		</>
 	);
