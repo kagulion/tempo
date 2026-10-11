@@ -120,14 +120,23 @@ export function useAmbience() {
 		setSettings((current) => ({ ...current, volume }));
 	}
 
+	// Выключает все звуки и возвращает их ползунки на ноль. Общую громкость не трогает
+	function resetSounds() {
+		setSettings((current) => ({ ...current, sounds: {} }));
+		setPlaying(false);
+	}
+
 	return {
 		groups,
 		playing: playing && anyOn,
 		anyOn,
+		// Сбрасывать нечего: ни один звук не трогали
+		pristine: Object.keys(settings.sounds).length === 0,
 		volume: settings.volume,
 		toggleSound,
 		changeSoundVolume,
 		togglePlaying,
-		changeVolume
+		changeVolume,
+		resetSounds
 	};
 }

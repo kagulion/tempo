@@ -1,4 +1,4 @@
-import { CircleAlert, LoaderCircle, Pause, Play } from 'lucide-react';
+import { CircleAlert, LoaderCircle, Pause, Play, RotateCcw } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -22,8 +22,19 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 
 	return (
 		<Widget aria-label="Фоновые звуки" className={cn('flex flex-col gap-3 p-4', className)}>
-			<div className="-my-1 flex items-center justify-between">
+			<div className="-my-1 flex items-center gap-1">
 				<span className="text-xs font-medium text-white/60">Звуки</span>
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					onClick={ambience.resetSounds}
+					disabled={ambience.pristine}
+					title="Сбросить звуки"
+					aria-label="Сбросить звуки"
+					className={cn(buttonClass, 'ml-auto')}
+				>
+					<RotateCcw />
+				</Button>
 				<Button
 					variant="ghost"
 					size="icon-sm"
