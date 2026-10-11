@@ -12,7 +12,21 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { fetchRandomCountryCode, fetchStations, type Station } from '@/lib/radio';
+import { cn } from '@/lib/utils';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from '@/components/ui/select';
+import {
+	detectCountryCode,
+	fetchCountries,
+	fetchStations,
+	type RadioCountry,
+	type Station
+} from '@/lib/radio';
 
 import orcsTavern from '@/assets/wallpapers/orcs-tavern.png';
 import trollsTavern from '@/assets/wallpapers/trolls-tavern.png';
@@ -34,6 +48,9 @@ const backgrounds = [
 
 // Список треков для фона
 const playlist = [hearthsideLullaby, tavernBeforeBattle, tavernTwilight];
+
+const selectTriggerClass =
+	'border-white/10 bg-white/10 text-white hover:bg-white/20 [&_svg]:text-white/70';
 
 const controlButtonClass =
 	'bg-white/10 px-3 text-sm font-medium text-white transition-colors hover:bg-white/20 hover:text-white';
@@ -59,43 +76,74 @@ export default function App() {
 	const [soundOn, setSoundOn] = useState(true);
 	const [stations, setStations] = useState<Station[]>([]);
 	const [currentStation, setCurrentStation] = useState(0);
-	const [radioStatus, setRadioStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+	const [radioStatus, setRadioStatus] = useState<'idle' | 'loading' | 'empty' | 'error'>('idle');
+	const [countries, setCountries] = useState<RadioCountry[]>([]);
+	const [country, setCountry] = useState(detectCountryCode);
+	// Номер последнего запроса станций — ответы на устаревшие запросы игнорируем
+	const stationsRequest = useRef(0);
 	// Сколько станций подряд не запустилось — чтобы не перебирать список бесконечно
 	const failedStations = useRef(0);
 
 	const station = stations[currentStation];
+	// В селекте станции по алфавиту, а «Следующая» идёт по перемешанному списку
+	const stationOptions = [...stations].sort((a, b) => a.name.localeCompare(b.name));
 	const audioSrc = mode === 'music' ? playlist[currentTrack] : station?.url_resolved;
 
 	function nextTrack() {
 		setCurrentTrack((track) => (track + 1) % playlist.length);
 	}
 
-	async function loadStations(countryCode?: string) {
+	async function loadStations(countryCode: string) {
+		const request = ++stationsRequest.current;
+		setCountry(countryCode);
 		setRadioStatus('loading');
 		try {
 			const list = await fetchStations(countryCode);
-			if (list.length === 0) throw new Error('Нет доступных станций');
+			if (request !== stationsRequest.current) return;
+			if (list.length === 0) {
+				setStations([]);
+				setRadioStatus('empty');
+				return;
+			}
 			failedStations.current = 0;
 			setStations(shuffle(list));
 			setCurrentStation(0);
 			setRadioStatus('idle');
 		} catch {
-			setRadioStatus('error');
+			if (request === stationsRequest.current) setRadioStatus('error');
+		}
+	}
+
+	async function loadCountries() {
+		try {
+			const list = await fetchCountries();
+			setCountries(list);
+			return list;
+		} catch {
+			return [];
 		}
 	}
 
 	async function randomCountry() {
-		setRadioStatus('loading');
-		try {
-			await loadStations(await fetchRandomCountryCode());
-		} catch {
-			setRadioStatus('error');
-		}
+		const list = countries.length > 0 ? countries : await loadCountries();
+		// Для случайного выбора берём страны с большим количеством станций
+		const candidates = list.filter((item) => item.stationCount >= 30 && item.code !== country);
+		if (candidates.length === 0) return;
+		await loadStations(candidates[Math.floor(Math.random() * candidates.length)].code);
 	}
 
 	function switchMode(next: Mode) {
 		setMode(next);
-		if (next === 'radio' && stations.length === 0) loadStations();
+		if (next !== 'radio') return;
+		if (stations.length === 0) loadStations(country);
+		if (countries.length === 0) loadCountries();
+	}
+
+	function selectStation(uuid: string) {
+		const index = stations.findIndex((item) => item.stationuuid === uuid);
+		if (index === -1) return;
+		failedStations.current = 0;
+		setCurrentStation(index);
 	}
 
 	function nextStation() {
@@ -175,13 +223,57 @@ export default function App() {
 				{/* Панель управления */}
 				<div className="absolute bottom-8 left-1/2 z-10 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-col items-center gap-3 rounded-2xl border border-white/10 bg-black/50 px-6 py-3 shadow-2xl backdrop-blur-md">
 					{mode === 'radio' && (
-						<p className="max-w-full truncate text-sm text-white/80">
-							{radioStatus === 'loading'
-								? 'Ищем станции…'
-								: radioStatus === 'error'
-									? 'Не удалось подключиться к радио'
-									: station && `${station.name.trim()} · ${station.country}`}
-						</p>
+						<div className="flex max-w-full items-center gap-3">
+							<Select value={country} onValueChange={loadStations}>
+								<SelectTrigger
+									aria-label="Страна"
+									className={cn('w-40 shrink-0', selectTriggerClass)}
+								>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent
+									position="popper"
+									side="top"
+									className="dark max-h-80 border border-white/10"
+								>
+									{countries.map((item) => (
+										<SelectItem key={item.code} value={item.code}>
+											{item.name}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+
+							{radioStatus === 'idle' && station ? (
+								<Select value={station.stationuuid} onValueChange={selectStation}>
+									<SelectTrigger
+										aria-label="Радиостанция"
+										className={cn('w-64 min-w-0', selectTriggerClass)}
+									>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent
+										position="popper"
+										side="top"
+										className="dark max-h-80 max-w-[calc(100vw-2rem)] border border-white/10"
+									>
+										{stationOptions.map((item) => (
+											<SelectItem key={item.stationuuid} value={item.stationuuid}>
+												{item.name.trim() || 'Без названия'}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							) : (
+								<p className="min-w-0 truncate text-sm text-white/80">
+									{radioStatus === 'loading'
+										? 'Ищем станции…'
+										: radioStatus === 'empty'
+											? 'В этой стране нет доступных станций'
+											: 'Не удалось подключиться к радио'}
+								</p>
+							)}
+						</div>
 					)}
 
 					<div className="flex items-center justify-center gap-2">

@@ -30,7 +30,8 @@ async function request<T>(path: string): Promise<T> {
 
 	for (const mirror of mirrors) {
 		try {
-			const res = await fetch(`${mirror}/json${path}`);
+			// Зеркала иногда зависают — не ждём дольше 5 секунд и идём к следующему
+			const res = await fetch(`${mirror}/json${path}`, { signal: AbortSignal.timeout(5000) });
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			return await res.json();
 		} catch (error) {
@@ -41,32 +42,75 @@ async function request<T>(path: string): Promise<T> {
 	throw lastError;
 }
 
-export async function fetchStations(countryCode?: string) {
+export async function fetchStations(countryCode: string) {
 	const params = new URLSearchParams({
-		limit: '100',
+		limit: '300',
 		order: 'votes',
 		reverse: 'true',
-		hidebroken: 'true'
+		hidebroken: 'true',
+		countrycode: countryCode
 	});
-	if (countryCode) params.set('countrycode', countryCode);
 
 	const stations = await request<Station[]>(`/stations/search?${params}`);
 
-	// На https-сайте браузер не даст играть http-потоки, а HLS требует отдельного плеера
-	return stations.filter(
-		(station) =>
+	// В базе бывают копии одной станции с разными адресами — оставляем самую популярную
+	const seen = new Set<string>();
+
+	return stations.filter((station) => {
+		// На https-сайте браузер не даст играть http-потоки, а HLS требует отдельного плеера
+		const playable =
 			station.url_resolved.startsWith('https://') &&
 			!station.hls &&
 			!station.url_resolved.includes('.m3u8') &&
-			playableCodecs.includes(station.codec.toUpperCase())
+			playableCodecs.includes(station.codec.toUpperCase());
+		if (!playable) return false;
+
+		const key = `${station.name.trim().toLowerCase()}|${station.countrycode}`;
+		if (seen.has(key)) return false;
+		seen.add(key);
+		return true;
+	});
+}
+
+export type RadioCountry = {
+	code: string;
+	name: string;
+	stationCount: number;
+};
+
+// Названия стран по-русски — API отдаёт их только на английском
+const countryNames = new Intl.DisplayNames(['ru'], { type: 'region' });
+
+function countryName(code: string) {
+	try {
+		return countryNames.of(code) ?? code;
+	} catch {
+		// Нестандартный код страны — показываем как есть
+		return code;
+	}
+}
+
+export async function fetchCountries(): Promise<RadioCountry[]> {
+	const countries = await request<Country[]>('/countries');
+
+	return (
+		countries
+			// В странах с парой станций после фильтрации обычно не остаётся ничего рабочего
+			.filter((country) => country.iso_3166_1 && country.stationcount >= 10)
+			.map((country) => ({
+				code: country.iso_3166_1,
+				name: countryName(country.iso_3166_1),
+				stationCount: country.stationcount
+			}))
+			.sort((a, b) => a.name.localeCompare(b.name, 'ru'))
 	);
 }
 
-export async function fetchRandomCountryCode() {
-	const countries = await request<Country[]>('/countries');
-	// Берём страны, где станций достаточно, чтобы было из чего выбрать
-	const candidates = countries.filter(
-		(country) => country.iso_3166_1 && country.stationcount >= 30
-	);
-	return candidates[Math.floor(Math.random() * candidates.length)].iso_3166_1;
+// Страна по умолчанию — по языку браузера, например ru-RU → RU
+export function detectCountryCode() {
+	try {
+		return new Intl.Locale(navigator.language).maximize().region ?? 'US';
+	} catch {
+		return 'US';
+	}
 }
