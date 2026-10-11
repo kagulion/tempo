@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useAutoplay } from '@/hooks/useAutoplay';
+import { useDuckLevel } from '@/hooks/useDuckLevel';
 
 import {
 	detectCountryCode,
@@ -157,12 +158,15 @@ export function useRadio() {
 		setMuted((value) => !value);
 	}
 
+	// Вокруг сигнала таймера радио затихает. Слайдер при этом показывает громкость пользователя
+	const duck = useDuckLevel();
+
 	useEffect(() => {
 		const audio = audioRef.current;
 		if (!audio) return;
-		audio.volume = volume;
+		audio.volume = volume * duck;
 		audio.muted = muted;
-	}, [volume, muted]);
+	}, [volume, muted, duck]);
 
 	useAutoplay(audioRef, station?.url_resolved, playing);
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { BackgroundMusic } from '@/widgets/music/BackgroundMusic';
 import { RadioWidget } from '@/widgets/radio/RadioWidget';
+import { TimerWidget } from '@/widgets/timer/TimerWidget';
 import { WallpaperSwitcher } from '@/widgets/wallpaper/WallpaperSwitcher';
 import { wallpapers } from '@/widgets/wallpaper/wallpapers';
 
@@ -36,11 +37,11 @@ export default function App() {
 				className="absolute top-4 left-4 sm:top-auto sm:bottom-4 lg:bottom-8 lg:left-8"
 			/>
 
-			{musicEnabled ? (
-				<BackgroundMusic />
-			) : (
-				<RadioWidget className="absolute right-4 bottom-4 left-4 sm:left-auto sm:w-[26rem] lg:right-8 lg:bottom-8" />
-			)}
+			{/* Правая нижняя колонка: таймер над радио. На телефоне — снизу во всю ширину */}
+			<div className="absolute right-4 bottom-4 left-4 flex flex-col gap-3 sm:left-auto sm:w-[26rem] lg:right-8 lg:bottom-8">
+				<TimerWidget />
+				{musicEnabled ? <BackgroundMusic /> : <RadioWidget />}
+			</div>
 		</main>
 	);
 }
