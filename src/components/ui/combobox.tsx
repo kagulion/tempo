@@ -26,7 +26,7 @@ function ComboboxItems<T>({ emptyText, getLabel, getKey, getHint }: ComboboxItem
 					<ComboboxPrimitive.Item
 						key={getKey(item)}
 						value={item}
-						className="relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-8 pl-2.5 outline-none select-none data-highlighted:bg-white/15"
+						className="relative flex cursor-pointer items-center gap-2 rounded-md py-1.5 pr-8 pl-2.5 outline-none select-none data-highlighted:bg-white/15"
 					>
 						<span className="truncate">{getLabel(item)}</span>
 						{getHint && (
