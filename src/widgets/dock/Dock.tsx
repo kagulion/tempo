@@ -17,16 +17,19 @@ export type DockGroup = {
 	extra?: ReactNode;
 };
 
-// Основная панель снизу по центру
-export const mainGroups: DockGroup[] = [
+// Левый нижний угол, под радио
+export const leftGroups: DockGroup[] = [
 	{
 		label: 'Звук',
 		items: [
 			{ id: 'radio', label: 'Радио', icon: Radio },
 			{ id: 'ambience', label: 'Звуки', icon: Headphones }
 		]
-	},
-	{ label: 'Фокус', items: [{ id: 'timer', label: 'Таймер', icon: Timer }] },
+	}
+];
+
+// Снизу по центру
+export const centerGroups: DockGroup[] = [
 	{
 		label: 'Статистика',
 		items: [{ id: 'stats', label: 'Статистика', icon: ChartNoAxesColumn }],
@@ -39,9 +42,10 @@ export const mainGroups: DockGroup[] = [
 	}
 ];
 
-// Отдельная панель в правом нижнем углу, под окном обоев
-export const viewGroups: DockGroup[] = [
-	{ label: 'Вид', items: [{ id: 'wallpaper', label: 'Обои', icon: Image }] }
+// Правый нижний угол, под столбцом таймера и обоев
+export const rightGroups: DockGroup[] = [
+	{ label: 'Вид', items: [{ id: 'wallpaper', label: 'Обои', icon: Image }] },
+	{ label: 'Фокус', items: [{ id: 'timer', label: 'Таймер', icon: Timer }] }
 ];
 
 type DockProps = {
@@ -53,7 +57,7 @@ type DockProps = {
 };
 
 // Панель с кнопками, которые открывают и закрывают окна виджетов. В группе статистики ещё часы и полный экран.
-// Какие группы показать, решает App.tsx: основные — снизу по центру, «Вид» — в правом нижнем углу
+// Какие группы показать, решает App.tsx: «Звук» — в левом нижнем углу, «Статистика» — по центру, «Вид» и «Фокус» — в правом
 export function Dock({ groups, label, isOpen, onToggle, className }: DockProps) {
 	return (
 		<nav aria-label={label} className={cn('z-20 flex items-end gap-2 sm:gap-4', className)}>
