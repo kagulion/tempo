@@ -60,11 +60,16 @@ export default function App() {
 	return (
 		<main className="relative h-screen w-screen overflow-hidden bg-black text-white">
 			<WallpaperBackground wallpaper={wallpaper.current} />
-			{/* Эффекты поверх всего, включая окна (z-50), но клики не перехватывают */}
+			{/* Эффекты не перехватывают клики. Слой (поверх окон или под ними) задаёт сам эффект */}
 			{effects
 				.filter((effect) => activeEffects.isActive(effect.id))
 				.map((effect) => (
-					<EffectCanvas key={effect.id} create={effect.create} />
+					<EffectCanvas
+						key={effect.id}
+						create={effect.create}
+						layer={effect.layer}
+						paused={activeEffects.paused}
+					/>
 				))}
 
 			<AmbienceWidget className={placement('ambience')} />
@@ -79,6 +84,10 @@ export default function App() {
 				<EffectsWidget
 					isActive={activeEffects.isActive}
 					onToggle={activeEffects.toggle}
+					anyActive={activeEffects.anyActive}
+					playing={activeEffects.playing}
+					onTogglePaused={activeEffects.togglePaused}
+					onReset={activeEffects.reset}
 					className={cn(placement('effects'), rightColumnWindowClass)}
 				/>
 			</div>

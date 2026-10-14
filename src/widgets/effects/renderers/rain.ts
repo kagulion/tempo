@@ -9,34 +9,67 @@ type Drop = {
 	width: number;
 };
 
-const count = 320;
-// Лёгкий косой ветер: на каждый пиксель вниз капля сдвигается на столько пикселей вправо
-const slant = 0.12;
+type Range = [min: number, max: number];
 
-// Дождь: тонкие полупрозрачные штрихи падают сверху вниз с небольшим наклоном.
+type RainOptions = {
+	// Капель на экране 1920×1080
+	count: number;
+	// Косой ветер: на каждый пиксель вниз капля сдвигается на столько пикселей вправо
+	slant: number;
+	// Диапазоны от дальних капель к ближним
+	length: Range;
+	speed: Range;
+	alpha: Range;
+	width: Range;
+	// Редкие вспышки молнии
+	lightning?: boolean;
+};
+
+const lerp = ([min, max]: Range, t: number) => min + (max - min) * t;
+
+// Дождь: тонкие полупрозрачные штрихи падают сверху вниз с наклоном.
 // Дальние капли короче, медленнее и бледнее — так появляется глубина
-export function createRain(): EffectRenderer {
+function createRainEffect(options: RainOptions): EffectRenderer {
 	const drops: Drop[] = [];
+	const { slant } = options;
+
+	// Молния: пауза до следующей вспышки и время с начала текущей
+	let nextFlash = 0;
+	let flashTime = Infinity;
+	// При «уменьшить движение» в системе вспышек нет: резкая смена яркости бывает неприятна
+	let flashes = false;
 
 	function createDrop(width: number, height: number, initialSpawn: boolean): Drop {
 		const depth = Math.random(); // 0 — далеко, 1 — близко
-		const length = 14 + depth * 26;
+		const length = lerp(options.length, depth);
 		return {
 			// Из-за наклона капли уходят вправо, поэтому рождаем их и левее экрана
 			x: Math.random() * (width + height * slant) - height * slant,
 			y: initialSpawn ? Math.random() * height : -length - Math.random() * height * 0.3,
 			length,
-			speed: 700 + depth * 700,
-			alpha: 0.2 + depth * 0.35,
-			width: 0.8 + depth * 0.7
+			speed: lerp(options.speed, depth),
+			alpha: lerp(options.alpha, depth),
+			width: lerp(options.width, depth)
 		};
+	}
+
+	// Двойная вспышка: яркая, короткий провал, слабее, затухание. Всего ~0.6 с
+	function flashAlpha(t: number) {
+		if (t < 0.08) return 0.22 * (1 - t / 0.08);
+		if (t < 0.14) return 0;
+		if (t < 0.6) return 0.14 * (1 - (t - 0.14) / 0.46);
+		return 0;
 	}
 
 	return {
 		init(width, height) {
 			drops.length = 0;
-			const total = scaledCount(count, width, height);
+			const total = scaledCount(options.count, width, height);
 			for (let i = 0; i < total; i++) drops.push(createDrop(width, height, true));
+			nextFlash = 6 + Math.random() * 10;
+			flashes =
+				Boolean(options.lightning) &&
+				!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		},
 
 		draw(ctx, dt, _now, width, height) {
@@ -59,6 +92,44 @@ export function createRain(): EffectRenderer {
 				ctx.strokeStyle = `rgba(215, 228, 245, ${d.alpha})`;
 				ctx.stroke();
 			}
+
+			if (!flashes) return;
+
+			nextFlash -= dt;
+			if (nextFlash <= 0) {
+				flashTime = 0;
+				nextFlash = 8 + Math.random() * 14;
+			}
+			flashTime += dt;
+			const alpha = flashAlpha(flashTime);
+			if (alpha > 0) {
+				ctx.fillStyle = `rgba(225, 232, 255, ${alpha})`;
+				ctx.fillRect(0, 0, width, height);
+			}
 		}
 	};
+}
+
+export function createRain() {
+	return createRainEffect({
+		count: 320,
+		slant: 0.12,
+		length: [14, 40],
+		speed: [700, 1400],
+		alpha: [0.2, 0.55],
+		width: [0.8, 1.5]
+	});
+}
+
+// Ливень: капель вдвое больше, они длиннее и быстрее, ветер сильнее, иногда сверкает молния
+export function createHeavyRain() {
+	return createRainEffect({
+		count: 700,
+		slant: 0.22,
+		length: [22, 60],
+		speed: [1100, 2100],
+		alpha: [0.18, 0.5],
+		width: [0.9, 1.7],
+		lightning: true
+	});
 }
