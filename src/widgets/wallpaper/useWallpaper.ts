@@ -1,70 +1,46 @@
 import { useEffect, useState } from 'react';
 
-import { type Faction, wallpapers } from './wallpapers';
+import { wallpapers } from './wallpapers';
 
 const storageKey = 'tempo:wallpaper';
 
-// Выбранная фракция и номер обоев в каждой из них: при возврате к фракции открываются её последние обои
-type WallpaperState = {
-	faction: Faction;
-	indexes: Record<Faction, number>;
+// Обои при первом заходе — как раньше, первые обои Орды
+const defaultId = 'horde/orcs-tavern';
+
+// Раньше сохранялись фракция и номер обоев в ней: { faction, indexes }. Переводим в id, чтобы у старых посетителей фон не сбросился
+const legacyOrder: Record<string, string[]> = {
+	alliance: ['alliance/alliance-tavern', 'alliance/dwarfs-tavern', 'alliance/elfs-tavern'],
+	horde: ['horde/orcs-tavern', 'horde/tauren-tavern', 'horde/bloody-elfs-tavern']
 };
 
-const defaultState: WallpaperState = {
-	faction: 'horde',
-	indexes: { alliance: 0, horde: 0 }
-};
-
-function load(): WallpaperState {
+function load(): string {
 	try {
-		const saved: Partial<WallpaperState> = JSON.parse(localStorage.getItem(storageKey) ?? '{}');
-		const faction =
-			saved.faction && saved.faction in wallpapers ? saved.faction : defaultState.faction;
-		// Список обоев мог поменяться, поэтому номер за пределами списка сбрасываем на первые обои
-		const indexes = { ...defaultState.indexes };
-		for (const key of Object.keys(indexes) as Faction[]) {
-			const index = saved.indexes?.[key];
-			if (typeof index === 'number' && index >= 0 && index < wallpapers[key].length) {
-				indexes[key] = Math.floor(index);
-			}
+		const saved = JSON.parse(localStorage.getItem(storageKey) ?? '{}');
+		let id: unknown = saved.id;
+		if (id === undefined && typeof saved.faction === 'string') {
+			id = legacyOrder[saved.faction]?.[saved.indexes?.[saved.faction] ?? 0];
 		}
-		return { faction, indexes };
+		// Список обоев мог поменяться: неизвестный id сбрасываем на обои по умолчанию
+		return wallpapers.some((item) => item.id === id) ? (id as string) : defaultId;
 	} catch {
-		return defaultState;
+		return defaultId;
 	}
 }
 
-function save(state: WallpaperState) {
-	try {
-		localStorage.setItem(storageKey, JSON.stringify(state));
-	} catch {
-		// Хранилище недоступно (приватный режим) — после перезагрузки откроются обои по умолчанию
-	}
-}
-
+// Выбранные обои, сохраняются в localStorage
 export function useWallpaper() {
-	const [state, setState] = useState(load);
+	const [id, setId] = useState(load);
 
-	useEffect(() => save(state), [state]);
-
-	const list = wallpapers[state.faction];
-	const index = state.indexes[state.faction];
-
-	function shift(step: number) {
-		setState((prev) => {
-			const length = wallpapers[prev.faction].length;
-			const next = (prev.indexes[prev.faction] + step + length) % length;
-			return { ...prev, indexes: { ...prev.indexes, [prev.faction]: next } };
-		});
-	}
+	useEffect(() => {
+		try {
+			localStorage.setItem(storageKey, JSON.stringify({ id }));
+		} catch {
+			// Хранилище недоступно (приватный режим) — после перезагрузки откроются обои по умолчанию
+		}
+	}, [id]);
 
 	return {
-		faction: state.faction,
-		current: list[index],
-		index,
-		count: list.length,
-		setFaction: (faction: Faction) => setState((prev) => ({ ...prev, faction })),
-		next: () => shift(1),
-		prev: () => shift(-1)
+		current: wallpapers.find((item) => item.id === id) ?? wallpapers[0],
+		select: setId
 	};
 }

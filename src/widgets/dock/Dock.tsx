@@ -10,14 +10,15 @@ import type { WidgetId } from './useDock';
 const buttonClass =
 	'flex size-9 items-center justify-center rounded-full text-white/70 transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20';
 
-type DockGroup = {
+export type DockGroup = {
 	label: string;
 	items: { id: WidgetId; label: string; icon: LucideIcon }[];
 	// Не окна, а что-то своё после кнопок окон: часы, полноэкранный режим
 	extra?: ReactNode;
 };
 
-const groups: DockGroup[] = [
+// Основная панель снизу по центру
+export const mainGroups: DockGroup[] = [
 	{
 		label: 'Звук',
 		items: [
@@ -26,7 +27,6 @@ const groups: DockGroup[] = [
 		]
 	},
 	{ label: 'Фокус', items: [{ id: 'timer', label: 'Таймер', icon: Timer }] },
-	{ label: 'Вид', items: [{ id: 'wallpaper', label: 'Обои', icon: Image }] },
 	{
 		label: 'Статистика',
 		items: [{ id: 'stats', label: 'Статистика', icon: ChartNoAxesColumn }],
@@ -39,16 +39,24 @@ const groups: DockGroup[] = [
 	}
 ];
 
+// Отдельная панель в правом нижнем углу, под окном обоев
+export const viewGroups: DockGroup[] = [
+	{ label: 'Вид', items: [{ id: 'wallpaper', label: 'Обои', icon: Image }] }
+];
+
 type DockProps = {
+	groups: DockGroup[];
+	label: string;
 	isOpen: (id: WidgetId) => boolean;
 	onToggle: (id: WidgetId) => void;
 	className?: string;
 };
 
-// Панель внизу экрана: кнопки открывают и закрывают окна виджетов. В группе статистики ещё часы и полный экран
-export function Dock({ isOpen, onToggle, className }: DockProps) {
+// Панель с кнопками, которые открывают и закрывают окна виджетов. В группе статистики ещё часы и полный экран.
+// Какие группы показать, решает App.tsx: основные — снизу по центру, «Вид» — в правом нижнем углу
+export function Dock({ groups, label, isOpen, onToggle, className }: DockProps) {
 	return (
-		<nav aria-label="Виджеты" className={cn('z-20 flex items-end gap-2 sm:gap-4', className)}>
+		<nav aria-label={label} className={cn('z-20 flex items-end gap-2 sm:gap-4', className)}>
 			{groups.map((group) => (
 				<div key={group.label} className="flex flex-col items-start gap-1">
 					{/* На телефоне подписи групп не помещаются */}
