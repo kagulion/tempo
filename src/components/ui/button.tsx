@@ -17,7 +17,12 @@ const buttonVariants = cva(
 					'hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50',
 				destructive:
 					'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',
-				link: 'text-primary underline-offset-4 hover:underline'
+				link: 'text-primary underline-offset-4 hover:underline',
+				// Кнопки в стеклянных окнах виджетов: белая иконка, подсветка при наведении
+				glass:
+					'text-white/80 hover:bg-white/15 hover:text-white aria-expanded:bg-white/15 aria-expanded:text-white',
+				// Главная кнопка окна, например «Старт» у таймера: с фоном и без наведения
+				'glass-solid': 'bg-white/10 text-white hover:bg-white/20 hover:text-white'
 			},
 			size: {
 				default:

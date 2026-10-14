@@ -3,11 +3,9 @@ import { CircleAlert, LoaderCircle, Pause, Play, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { Widget } from '@/widgets/Widget';
+import { Widget, WidgetHeader } from '@/widgets/Widget';
 
 import { useAmbience } from './useAmbience';
-
-const buttonClass = 'text-white/80 hover:bg-white/15 hover:text-white';
 
 function percent(value: number) {
 	return `${Math.round(value * 100)}%`;
@@ -22,31 +20,28 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 
 	return (
 		<Widget aria-label="Фоновые звуки" className={cn('flex flex-col gap-3 p-4', className)}>
-			<div className="-my-1 flex items-center gap-1">
-				<span className="text-xs font-medium text-white/60">Звуки</span>
+			<WidgetHeader title="Звуки">
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon-sm"
 					onClick={ambience.resetSounds}
 					disabled={ambience.pristine}
 					title="Сбросить звуки"
 					aria-label="Сбросить звуки"
-					className={cn(buttonClass, 'ml-auto')}
 				>
 					<RotateCcw />
 				</Button>
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon-sm"
 					onClick={ambience.togglePlaying}
 					disabled={!ambience.anyOn}
 					title={ambience.playing ? 'Остановить звуки' : 'Включить звуки'}
 					aria-label={ambience.playing ? 'Остановить звуки' : 'Включить звуки'}
-					className={buttonClass}
 				>
 					{ambience.playing ? <Pause /> : <Play />}
 				</Button>
-			</div>
+			</WidgetHeader>
 
 			<div className="flex items-center gap-3">
 				<span className="flex-1 text-sm font-medium">Громкость</span>

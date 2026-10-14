@@ -1,6 +1,6 @@
-import { useSyncExternalStore } from 'react';
-
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { usePersistentState } from '@/hooks/usePersistentState';
+import { mediaQueries } from '@/lib/media';
 import { storageKeys } from '@/lib/storage';
 import { isWidgetId, widgets, type WidgetId } from '@/widgets/registry';
 
@@ -19,24 +19,12 @@ function parseOpen(saved: unknown): WidgetId[] | undefined {
 	return Array.isArray(saved) ? saved.filter(isWidgetId) : undefined;
 }
 
-// Телефон — меньше брейкпоинта sm из Tailwind. Там помещается только одно окно
-const mobileQuery = '(max-width: 639px)';
-
-function subscribeMobile(listener: () => void) {
-	const media = window.matchMedia(mobileQuery);
-	media.addEventListener('change', listener);
-	return () => media.removeEventListener('change', listener);
-}
-
-function isMobile() {
-	return window.matchMedia(mobileQuery).matches;
-}
-
 // Какие окна виджетов открыты. Порядок — по времени открытия, последнее открытое в конце
 export function useDock() {
 	// Хранилище недоступно (приватный режим) — после перезагрузки откроем окна по умолчанию
 	const [open, setOpen] = usePersistentState(storageKeys.openWidgets, defaultOpen, parseOpen);
-	const mobile = useSyncExternalStore(subscribeMobile, isMobile);
+	// На телефоне помещается только одно окно
+	const mobile = useMediaQuery(mediaQueries.mobile);
 
 	// На телефоне видно только последнее открытое окно, на компьютере — все открытые
 	function isOpen(id: WidgetId) {

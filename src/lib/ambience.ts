@@ -1,6 +1,9 @@
 // Движок фоновых звуков на Web Audio. Каждый звук — бесконечная петля со своей громкостью,
 // все вместе идут через общий регулятор. Петли AudioBufferSourceNode склеиваются без паузы на стыке,
-// в отличие от <audio loop>. Состояние виджета — в src/widgets/ambience/useAmbience.ts
+// в отличие от <audio loop>. Состояние виджета — в src/widgets/ambience/useAmbience.ts.
+// AudioContext общий для страницы (src/lib/audio.ts), разблокировать его по клику — unlockAudio
+
+import { getAudioContext } from './audio';
 
 export type NoiseColor = 'white' | 'pink' | 'brown';
 
@@ -26,7 +29,6 @@ type Channel = {
 	stopTimer?: ReturnType<typeof setTimeout>;
 };
 
-let context: AudioContext | null = null;
 let master: GainNode | null = null;
 let masterLevel = 1;
 
@@ -55,25 +57,16 @@ export function subscribeStatuses(listener: () => void) {
 	};
 }
 
+// Общий AudioContext и регулятор громкости всех звуков. null — Web Audio недоступен
 function audio() {
-	if (!context) {
-		context = new AudioContext();
+	const context = getAudioContext();
+	if (!context) return null;
+	if (!master) {
 		master = context.createGain();
 		master.gain.value = masterLevel;
 		master.connect(context.destination);
 	}
-	return { context, master: master! };
-}
-
-// Вызывать прямо в обработчике клика: Safari разрешает звук только внутри него
-export function unlockAmbience() {
-	try {
-		audio()
-			.context.resume()
-			.catch(() => {});
-	} catch {
-		// Web Audio недоступен — звуки просто не заиграют
-	}
+	return { context, master };
 }
 
 // Заполняет буфер шумом нужного цвета: белый — ровный, розовый — мягче, коричневый — глухой гул
@@ -160,9 +153,8 @@ function loadBuffer(ctx: AudioContext, id: string, source: AmbienceSource) {
 	return buffer;
 }
 
-async function start(id: string, source: AmbienceSource, channel: Channel) {
+async function start(ctx: AudioContext, id: string, source: AmbienceSource, channel: Channel) {
 	if (channel.source || channel.loading) return;
-	const { context: ctx } = audio();
 
 	channel.loading = true;
 	setStatus(id, 'loading');
@@ -189,24 +181,27 @@ async function start(id: string, source: AmbienceSource, channel: Channel) {
 // Громкость одного звука от 0 до 1. 0 — звук плавно затихает и останавливается
 export function setSoundLevel(id: string, source: AmbienceSource, level: number) {
 	let channel = channels.get(id);
+	// Пока звук ни разу не включали, AudioContext не создаём
+	if (!channel && level === 0) return;
+	const out = audio();
+	// Web Audio недоступен — звуки просто не заиграют
+	if (!out) return;
+	const ctx = out.context;
+
 	if (!channel) {
-		// Пока звук ни разу не включали, AudioContext не создаём
-		if (level === 0) return;
-		const { context: ctx, master: out } = audio();
 		const gain = ctx.createGain();
 		gain.gain.value = 0;
-		gain.connect(out);
+		gain.connect(out.master);
 		channel = { gain, loading: false, level: 0 };
 		channels.set(id, channel);
 	}
 
-	const ctx = audio().context;
 	channel.level = level;
 	channel.gain.gain.setTargetAtTime(level, ctx.currentTime, fade);
 	clearTimeout(channel.stopTimer);
 
 	if (level > 0) {
-		start(id, source, channel);
+		start(ctx, id, source, channel);
 		return;
 	}
 
@@ -222,6 +217,6 @@ export function setSoundLevel(id: string, source: AmbienceSource, level: number)
 // Общая громкость от 0 до 1. Меняется часто (приглушение под таймер), поэтому сглаживаем коротко
 export function setAmbienceLevel(level: number) {
 	masterLevel = level;
-	if (!context || !master) return;
-	master.gain.setTargetAtTime(level, context.currentTime, 0.05);
+	if (!master) return;
+	master.gain.setTargetAtTime(level, master.context.currentTime, 0.05);
 }

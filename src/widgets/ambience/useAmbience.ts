@@ -7,9 +7,9 @@ import {
 	pruneSoundCache,
 	setAmbienceLevel,
 	setSoundLevel,
-	subscribeStatuses,
-	unlockAmbience
+	subscribeStatuses
 } from '@/lib/ambience';
+import { unlockAudio } from '@/lib/audio';
 import { isRecord, storageKeys } from '@/lib/storage';
 
 import { ambientGroups, ambientSounds, type AmbientSound } from './sounds';
@@ -91,7 +91,7 @@ export function useAmbience() {
 	}
 
 	function play() {
-		unlockAmbience();
+		unlockAudio();
 		setPlaying(true);
 	}
 

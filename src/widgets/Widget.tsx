@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -12,5 +12,27 @@ export function Widget({ className, ...props }: ComponentProps<'section'>) {
 			)}
 			{...props}
 		/>
+	);
+}
+
+// Мелкая подпись окна: «Звуки», «Таймер»
+export function WidgetTitle({ className, ...props }: ComponentProps<'span'>) {
+	return <span className={cn('text-xs font-medium text-white/60', className)} {...props} />;
+}
+
+type WidgetHeaderProps = {
+	title: ReactNode;
+	// Маленькие кнопки справа: Button variant="glass" size="icon-sm"
+	children?: ReactNode;
+};
+
+// Шапка окна: подпись слева, кнопки справа. Отрицательный отступ съедает лишнюю высоту кнопок,
+// чтобы шапка не раздвигала окно
+export function WidgetHeader({ title, children }: WidgetHeaderProps) {
+	return (
+		<div className="-my-1 flex items-center gap-1">
+			<WidgetTitle>{title}</WidgetTitle>
+			{children && <div className="ml-auto flex items-center gap-1">{children}</div>}
+		</div>
 	);
 }

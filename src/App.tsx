@@ -9,7 +9,7 @@ import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 // На телефоне окно занимает ширину экрана над панелью, а если не влезает по высоте — прокручивается.
 // С sm каждое окно встаёт на своё место (placement в src/widgets/registry.ts), нижние — над панелью
 const windowClass =
-	'absolute inset-x-4 bottom-[4.5rem] max-h-[calc(100dvh-5.5rem)] overflow-y-auto [scrollbar-color:rgb(255_255_255/0.2)_transparent] [scrollbar-width:thin] sm:inset-x-auto sm:max-h-[calc(100dvh-7rem)] lg:max-h-[calc(100dvh-9rem)]';
+	'absolute inset-x-4 bottom-[4.5rem] max-h-[calc(100dvh-5.5rem)] scrollbar-glass overflow-y-auto sm:inset-x-auto sm:max-h-[calc(100dvh-7rem)] lg:max-h-[calc(100dvh-9rem)]';
 
 // Правый столбец с компьютера: обои прижаты к низу, к кнопкам «Вид» и «Фокус», даже когда таймер закрыт; таймер mb-auto уводит к верху.
 // Если обоим не хватает высоты, галерея сжимается, а не наезжает на таймер.

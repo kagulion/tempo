@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 
 import { usePersistentState } from '@/hooks/usePersistentState';
+import { unlockAudio } from '@/lib/audio';
 import { duckBefore, restoreAfter } from '@/lib/ducking';
 import { isRecord, storageKeys } from '@/lib/storage';
 
-import { chimeLength, notify, playChime, requestNotifications, unlockSound } from './signal';
+import { chimeLength, notify, playChime, requestNotifications } from './signal';
 
 export type TimerMode = 'pomodoro' | 'countdown' | 'stopwatch';
 export type Phase = 'work' | 'shortBreak' | 'longBreak';
@@ -190,7 +191,7 @@ export function useTimer() {
 	}, [run, now, settings]);
 
 	function start() {
-		unlockSound();
+		unlockAudio();
 		requestNotifications();
 		const startedAt = Date.now();
 		setNow(startedAt);
@@ -219,7 +220,7 @@ export function useTimer() {
 	}
 
 	function resume() {
-		unlockSound();
+		unlockAudio();
 		const at = Date.now();
 		setNow(at);
 		setRun((current) =>

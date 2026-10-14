@@ -16,13 +16,11 @@ import { Button } from '@/components/ui/button';
 import { Combobox, ComboboxButton } from '@/components/ui/combobox';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { Widget } from '@/widgets/Widget';
+import { Widget, WidgetTitle } from '@/widgets/Widget';
 
 import { countryName, type Station } from './api';
 import { useFavoriteStations } from './useFavoriteStations';
 import { useRadio, type RadioStatus } from './useRadio';
-
-const buttonClass = 'text-white/80 hover:bg-white/15 hover:text-white';
 
 const statusText: Record<Exclude<RadioStatus, 'idle'>, string> = {
 	loading: 'Ищем станции…',
@@ -55,7 +53,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 			<audio {...radio.audio} />
 
 			<div className="flex flex-col gap-1.5">
-				<span className="text-xs font-medium text-white/60">Radio</span>
+				<WidgetTitle>Radio</WidgetTitle>
 				<div className="flex items-center gap-2">
 					<Combobox
 						aria-label="Страна"
@@ -91,13 +89,12 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 
 			<div className="flex items-center gap-1">
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon"
 					onClick={radio.randomCountry}
 					disabled={status === 'loading'}
 					title="Случайное радио"
 					aria-label="Случайное радио"
-					className={buttonClass}
 				>
 					{status === 'loading' ? <LoaderCircle className="animate-spin" /> : <Dices />}
 				</Button>
@@ -105,45 +102,41 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 				<div className="mx-1 h-5 w-px shrink-0 bg-white/15" />
 
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon"
 					onClick={radio.prevStation}
 					disabled={noStations}
 					title="Предыдущая станция"
 					aria-label="Предыдущая станция"
-					className={buttonClass}
 				>
 					<SkipBack />
 				</Button>
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon"
 					onClick={radio.togglePlaying}
 					title={radio.playing ? 'Выключить радио' : 'Включить радио'}
 					aria-label={radio.playing ? 'Выключить радио' : 'Включить радио'}
-					className={buttonClass}
 				>
 					{radio.playing ? <Pause /> : <Play />}
 				</Button>
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon"
 					onClick={radio.nextStation}
 					disabled={noStations}
 					title="Следующая станция"
 					aria-label="Следующая станция"
-					className={buttonClass}
 				>
 					<SkipForward />
 				</Button>
 
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon"
 					onClick={radio.toggleMuted}
 					title={silent ? 'Включить звук' : 'Выключить звук'}
 					aria-label={silent ? 'Включить звук' : 'Выключить звук'}
-					className={buttonClass}
 				>
 					{silent ? <VolumeX /> : radio.volume < 0.5 ? <Volume1 /> : <Volume2 />}
 				</Button>
@@ -160,14 +153,14 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 				{/* Сплит-кнопка: сердечко добавляет станцию, шеврон открывает список избранного */}
 				<div className="ml-auto flex items-center">
 					<Button
-						variant="ghost"
+						variant="glass"
 						size="icon"
 						onClick={() => station && toggleFavorite(station)}
 						disabled={!station || status !== 'idle'}
 						title={favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
 						aria-label={favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
 						aria-pressed={favorite}
-						className={cn(buttonClass, 'rounded-r-none')}
+						className="rounded-r-none"
 					>
 						<Heart className={cn(favorite && 'fill-current')} />
 					</Button>

@@ -1,27 +1,20 @@
-// Сигнал о конце фазы: звук через Web Audio (без файлов) и системное уведомление
+// Сигнал о конце фазы: звук через Web Audio (без файлов) и системное уведомление.
+// AudioContext общий для страницы, разблокируется по клику «Старт» (unlockAudio из src/lib/audio.ts)
 
-let context: AudioContext | null = null;
-
-// Вызывать по клику: браузер разрешает звук только после взаимодействия со страницей
-export function unlockSound() {
-	try {
-		context ??= new AudioContext();
-		context.resume().catch(() => {});
-	} catch {
-		// Web Audio недоступен — таймер работает без звука
-	}
-}
+import { runningAudioContext } from '@/lib/audio';
 
 // Сколько мс звучит колокольчик: последняя нота начинается через 0,36 с и гаснет за 1,2 с
 export const chimeLength = 1600;
 
 // Короткий колокольчик из трёх нот поверх любого другого звука на странице
 export function playChime() {
+	const context = runningAudioContext();
+	// Web Audio недоступен или страницу ещё не кликали — таймер работает без звука
 	if (!context) return;
 	const start = context.currentTime;
 	[880, 1108.73, 1318.51].forEach((frequency, index) => {
-		const oscillator = context!.createOscillator();
-		const gain = context!.createGain();
+		const oscillator = context.createOscillator();
+		const gain = context.createGain();
 		const at = start + index * 0.18;
 
 		oscillator.type = 'sine';
@@ -30,7 +23,7 @@ export function playChime() {
 		gain.gain.linearRampToValueAtTime(0.3, at + 0.02);
 		gain.gain.exponentialRampToValueAtTime(0.001, at + 1.2);
 
-		oscillator.connect(gain).connect(context!.destination);
+		oscillator.connect(gain).connect(context.destination);
 		oscillator.start(at);
 		oscillator.stop(at + 1.2);
 	});

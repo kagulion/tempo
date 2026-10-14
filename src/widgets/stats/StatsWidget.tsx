@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Widget } from '@/widgets/Widget';
+import { Widget, WidgetTitle } from '@/widgets/Widget';
 
 import { OnlineCard } from './OnlineCard';
 import { StreakCard } from './StreakCard';
@@ -19,7 +19,7 @@ export function StatsWidget({ className }: StatsWidgetProps) {
 	return (
 		<Widget aria-label="Статистика" className={cn('flex flex-col gap-2.5 p-4', className)}>
 			<div className="flex flex-col">
-				<span className="text-xs font-medium text-white/60">Статистика</span>
+				<WidgetTitle>Статистика</WidgetTitle>
 				<span className="text-xs text-white/40">Серия дней и время на сайте</span>
 			</div>
 

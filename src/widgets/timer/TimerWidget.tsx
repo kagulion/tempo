@@ -16,13 +16,10 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { Widget } from '@/widgets/Widget';
+import { Widget, WidgetHeader } from '@/widgets/Widget';
 
 import { SettingSlider } from './SettingSlider';
 import { longBreakEvery, phaseText, pomodoroTotal, useTimer, type TimerMode } from './useTimer';
-
-const buttonClass = 'text-white/80 hover:bg-white/15 hover:text-white';
-const mainButtonClass = 'h-10 bg-white/10 text-white hover:bg-white/20 hover:text-white';
 
 const modes: { value: TimerMode; label: string }[] = [
 	{ value: 'pomodoro', label: 'Помидоро' },
@@ -114,19 +111,18 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 
 			<div className="flex items-center gap-2">
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon-lg"
 					onClick={timer.reset}
 					title="Сбросить таймер"
 					aria-label="Сбросить таймер"
-					className={buttonClass}
 				>
 					<RotateCcw />
 				</Button>
 				<Button
-					variant="ghost"
+					variant="glass-solid"
 					onClick={status === 'running' ? timer.pause : timer.resume}
-					className={cn(mainButtonClass, 'flex-1')}
+					className="h-10 flex-1"
 				>
 					{status === 'running' ? (
 						<Pause data-icon="inline-start" />
@@ -137,12 +133,11 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 				</Button>
 				{mode === 'pomodoro' && (
 					<Button
-						variant="ghost"
+						variant="glass"
 						size="icon-lg"
 						onClick={timer.skip}
 						title="Пропустить фазу"
 						aria-label="Пропустить фазу"
-						className={buttonClass}
 					>
 						<SkipForward />
 					</Button>
@@ -152,7 +147,7 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 	);
 
 	const startButton = (
-		<Button variant="ghost" onClick={timer.start} className={cn(mainButtonClass, 'w-full')}>
+		<Button variant="glass-solid" onClick={timer.start} className="h-10 w-full">
 			<Play data-icon="inline-start" />
 			Старт
 		</Button>
@@ -160,20 +155,18 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 
 	return (
 		<Widget aria-label="Таймер" className={cn('flex flex-col gap-3 p-4', className)}>
-			<div className="-my-1 flex items-center justify-between">
-				<span className="text-xs font-medium text-white/60">Таймер</span>
+			<WidgetHeader title="Таймер">
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon-sm"
 					onClick={() => timer.changeSetting('sound', !settings.sound)}
 					title={settings.sound ? 'Выключить сигнал' : 'Включить сигнал'}
 					aria-label={settings.sound ? 'Выключить сигнал' : 'Включить сигнал'}
 					aria-pressed={settings.sound}
-					className={buttonClass}
 				>
 					{settings.sound ? <Bell /> : <BellOff />}
 				</Button>
-			</div>
+			</WidgetHeader>
 
 			<Tabs value={mode} onValueChange={(value: TimerMode) => timer.changeSetting('mode', value)}>
 				{/* Пока таймер идёт, другие режимы недоступны. На паузе можно уйти и вернуться к нему */}

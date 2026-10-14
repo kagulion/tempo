@@ -2,12 +2,10 @@ import { Pause, Play, RotateCcw } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Widget } from '@/widgets/Widget';
+import { Widget, WidgetHeader } from '@/widgets/Widget';
 
 import { effects } from './effects';
 import { useActiveEffects } from './useActiveEffects';
-
-const buttonClass = 'text-white/80 hover:bg-white/15 hover:text-white';
 
 type EffectsWidgetProps = {
 	className?: string;
@@ -20,31 +18,28 @@ export function EffectsWidget({ className }: EffectsWidgetProps) {
 
 	return (
 		<Widget aria-label="Эффекты" className={cn('flex flex-col gap-3 p-4', className)}>
-			<div className="-my-1 flex items-center gap-1">
-				<span className="text-xs font-medium text-white/60">Эффекты</span>
+			<WidgetHeader title="Эффекты">
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon-sm"
 					onClick={reset}
 					disabled={!anyActive}
 					title="Выключить все эффекты"
 					aria-label="Выключить все эффекты"
-					className={cn(buttonClass, 'ml-auto')}
 				>
 					<RotateCcw />
 				</Button>
 				<Button
-					variant="ghost"
+					variant="glass"
 					size="icon-sm"
 					onClick={togglePaused}
 					disabled={!anyActive}
 					title={playing ? 'Остановить эффекты' : 'Продолжить эффекты'}
 					aria-label={playing ? 'Остановить эффекты' : 'Продолжить эффекты'}
-					className={buttonClass}
 				>
 					{playing ? <Pause /> : <Play />}
 				</Button>
-			</div>
+			</WidgetHeader>
 
 			<div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
 				{effects.map((effect) => {

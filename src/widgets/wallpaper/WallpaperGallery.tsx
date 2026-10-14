@@ -2,7 +2,7 @@ import { Play } from 'lucide-react';
 import { useRef } from 'react';
 
 import { cn } from '@/lib/utils';
-import { Widget } from '@/widgets/Widget';
+import { Widget, WidgetTitle } from '@/widgets/Widget';
 
 import { useWallpaper } from './useWallpaper';
 import { type Category, categories, wallpapers } from './wallpapers';
@@ -25,7 +25,7 @@ export function WallpaperGallery({ className }: WallpaperGalleryProps) {
 
 	return (
 		<Widget aria-label="Обои" className={cn('flex flex-col overflow-hidden', className)}>
-			<span className="px-4 pt-4 text-xs font-medium text-white/60">Обои</span>
+			<WidgetTitle className="px-4 pt-4">Обои</WidgetTitle>
 
 			<div className="flex flex-wrap gap-1.5 px-4 pt-3">
 				{categories.map((category) => (
@@ -42,7 +42,7 @@ export function WallpaperGallery({ className }: WallpaperGalleryProps) {
 
 			<div
 				ref={scrollRef}
-				className="relative min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:rgb(255_255_255/0.2)_transparent] overflow-y-auto px-4 pb-4"
+				className="relative min-h-0 flex-1 scrollbar-glass overflow-y-auto px-4 pb-4"
 			>
 				{categories.map((category) => (
 					<section

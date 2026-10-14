@@ -40,14 +40,17 @@ flowchart TD
 
 ## Общие части
 
-| Что                                                                     | Зачем                                                                                                                             |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| [`src/widgets/Widget.tsx`](../src/widgets/Widget.tsx)                   | «Стеклянная» оболочка: полупрозрачный тёмный фон, размытие, рамка, тень, `z-10`. Рендерит `<section>`, принимает все его свойства |
-| [`src/widgets/registry.ts`](../src/widgets/registry.ts)                 | Реестр окон: id, кнопка на панели, компонент, место на экране, общий `slot`. `WidgetId` выводится отсюда                          |
-| [`src/lib/storage.ts`](../src/lib/storage.ts)                           | Все ключи `localStorage` (`storageKeys`), безопасные `loadStored` и `saveStored`, общее хранилище `createPersistentStore`         |
-| [`src/hooks/usePersistentState.ts`](../src/hooks/usePersistentState.ts) | `useState`, который сохраняется в `localStorage`                                                                                  |
-| [`src/hooks/useAutoplay.ts`](../src/hooks/useAutoplay.ts)               | Запуск звука в `<audio>`. Если браузер заблокировал автозапуск, ждёт первого клика или нажатия клавиши                            |
-| [`src/components/ui/`](../src/components/ui/)                           | Кнопка, комбобокс, слайдер, вкладки, прогресс. Всё, кроме кнопки, — на Base UI в стиле стеклянной панели                          |
+| Что                                                                     | Зачем                                                                                                                                                                                                               |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`src/widgets/Widget.tsx`](../src/widgets/Widget.tsx)                   | «Стеклянная» оболочка: полупрозрачный тёмный фон, размытие, рамка, тень, `z-10`. Рендерит `<section>`, принимает все его свойства. Там же `WidgetHeader` (подпись и кнопки справа) и `WidgetTitle` (мелкая подпись) |
+| [`src/widgets/registry.ts`](../src/widgets/registry.ts)                 | Реестр окон: id, кнопка на панели, компонент, место на экране, общий `slot`. `WidgetId` выводится отсюда                                                                                                            |
+| [`src/lib/storage.ts`](../src/lib/storage.ts)                           | Все ключи `localStorage` (`storageKeys`), безопасные `loadStored` и `saveStored`, общее хранилище `createPersistentStore`                                                                                           |
+| [`src/hooks/usePersistentState.ts`](../src/hooks/usePersistentState.ts) | `useState`, который сохраняется в `localStorage`                                                                                                                                                                    |
+| [`src/hooks/useMediaQuery.ts`](../src/hooks/useMediaQuery.ts)           | Совпадает ли медиазапрос (телефон, «уменьшить движение»). Сами запросы — `mediaQueries` в [`src/lib/media.ts`](../src/lib/media.ts), там же `matchesMedia` для кода вне React                                       |
+| [`src/lib/audio.ts`](../src/lib/audio.ts)                               | Один `AudioContext` на страницу для звуков и сигнала таймера. `unlockAudio()` вызывать прямо в обработчике клика                                                                                                    |
+| `scrollbar-glass` в [`src/index.css`](../src/index.css)                 | Тонкая полупрозрачная полоса прокрутки для стеклянных окон                                                                                                                                                          |
+| [`src/hooks/useAutoplay.ts`](../src/hooks/useAutoplay.ts)               | Запуск звука в `<audio>`. Если браузер заблокировал автозапуск, ждёт первого клика или нажатия клавиши                                                                                                              |
+| [`src/components/ui/`](../src/components/ui/)                           | Кнопка, комбобокс, слайдер, вкладки, прогресс. Всё, кроме кнопки, — на Base UI в стиле стеклянной панели                                                                                                            |
 
 ## Правила для виджетов
 
@@ -59,7 +62,7 @@ flowchart TD
    - состояние одного хука — [`usePersistentState(key, fallback, parse)`](../src/hooks/usePersistentState.ts), как `useState`;
    - состояние, которое нужно нескольким компонентам, — `createPersistentStore` и `useSyncExternalStore(store.subscribe, store.get)`, как в `useWallpaper` (фон и галерея) и `useActiveEffects` (окно и холсты);
    - разовое чтение или запись — `loadStored` и `saveStored`, как последняя станция в `useRadio`.
-6. **Подпись и кнопки — в общем стиле.** Мелкая подпись виджета — `text-xs font-medium text-white/60`, кнопки — `Button variant="ghost"` с белым текстом и подсветкой `hover:bg-white/15`. У каждой кнопки с иконкой есть `title` и `aria-label` на русском.
+6. **Подпись и кнопки — в общем стиле.** Шапка окна — `WidgetHeader` (подпись и кнопки справа), отдельная подпись — `WidgetTitle`. Кнопки — `Button variant="glass"` (белая иконка, подсветка при наведении), главная кнопка окна — `variant="glass-solid"`. Свои классы цвета кнопкам не пиши. У каждой кнопки с иконкой есть `title` и `aria-label` на русском.
 7. **Виджет должен работать, когда его окно закрыто.** Закрытое окно не удаляется со страницы, а скрывается классом `hidden`: радио и звуки продолжают играть, таймер — идти. Не полагайся на то, что виджет видим.
 
 ## Панель
@@ -110,7 +113,7 @@ flowchart TD
 
    ```tsx
    import { cn } from '@/lib/utils';
-   import { Widget } from '@/widgets/Widget';
+   import { Widget, WidgetHeader } from '@/widgets/Widget';
 
    type ClockWidgetProps = {
    	className?: string;
@@ -119,7 +122,7 @@ flowchart TD
    export function ClockWidget({ className }: ClockWidgetProps) {
    	return (
    		<Widget aria-label="Часы" className={cn('flex flex-col gap-1.5 p-4', className)}>
-   			<span className="text-xs font-medium text-white/60">Clock</span>
+   			<WidgetHeader title="Часы" />
    			{/* содержимое виджета */}
    		</Widget>
    	);

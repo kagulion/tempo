@@ -1,21 +1,11 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
 import { useWallpaper } from './useWallpaper';
 import type { Wallpaper } from './wallpapers';
-
-const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
-
-function subscribeReducedMotion(listener: () => void) {
-	const media = window.matchMedia(reducedMotionQuery);
-	media.addEventListener('change', listener);
-	return () => media.removeEventListener('change', listener);
-}
-
-function prefersReducedMotion() {
-	return window.matchMedia(reducedMotionQuery).matches;
-}
 
 const layerClass = 'absolute inset-0 h-full w-full object-cover';
 
@@ -29,7 +19,7 @@ type LayerProps = {
 
 function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 	const videoRef = useRef<HTMLVideoElement>(null);
-	const reducedMotion = useSyncExternalStore(subscribeReducedMotion, prefersReducedMotion);
+	const reducedMotion = useMediaQuery(mediaQueries.reducedMotion);
 
 	// Видео играет, только пока вкладка видна: в фоне оно зря грузит процессор.
 	// При «уменьшить движение» в системе видео стоит на первом кадре

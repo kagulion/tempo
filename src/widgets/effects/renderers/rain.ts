@@ -1,3 +1,5 @@
+import { matchesMedia, mediaQueries } from '@/lib/media';
+
 import { scaledCount, type EffectRenderer } from './types';
 
 type Drop = {
@@ -67,9 +69,7 @@ function createRainEffect(options: RainOptions): EffectRenderer {
 			const total = scaledCount(options.count, width, height);
 			for (let i = 0; i < total; i++) drops.push(createDrop(width, height, true));
 			nextFlash = 6 + Math.random() * 10;
-			flashes =
-				Boolean(options.lightning) &&
-				!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			flashes = Boolean(options.lightning) && !matchesMedia(mediaQueries.reducedMotion);
 		},
 
 		draw(ctx, dt, _now, width, height) {
