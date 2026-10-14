@@ -9,6 +9,7 @@
 - [О звуках](docs/ambience.md)
 - [О таймере](docs/timer.md)
 - [О статистике](docs/stats.md)
+- [Об обоях](docs/wallpaper.md)
 
 ## Стек
 
