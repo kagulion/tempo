@@ -4,6 +4,7 @@
 // Все ключи сайта в одном месте, чтобы два виджета случайно не взяли один и тот же
 export const storageKeys = {
 	ambience: 'tempo:ambience',
+	bigClock: 'tempo:big-clock',
 	effects: 'tempo:effects',
 	favoriteStations: 'tempo:favorite-stations',
 	lastStation: 'tempo:last-station',

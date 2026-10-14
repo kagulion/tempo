@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 
 import { cn } from '@/lib/utils';
+import { BigClock } from '@/widgets/clock/BigClock';
 import { Dock, dockPanels } from '@/widgets/dock/Dock';
 import { useDock } from '@/widgets/dock/useDock';
 import { EffectLayers } from '@/widgets/effects/EffectLayers';
@@ -35,7 +36,7 @@ function columnWidgets(column: WidgetColumn) {
 	];
 }
 
-// Раскладка страницы: фон, эффекты, окна виджетов и панель. Список окон и их места — в src/widgets/registry.ts
+// Раскладка страницы: фон, эффекты, крупные часы, окна виджетов и панель. Список окон и их места — в src/widgets/registry.ts
 export default function App() {
 	const dock = useDock();
 
@@ -59,6 +60,7 @@ export default function App() {
 		<main className="relative h-screen w-screen overflow-hidden bg-black text-white">
 			<WallpaperBackground />
 			<EffectLayers />
+			<BigClock />
 
 			{columns.map((column) => (
 				<div key={column.id} className={cn(columnClass, column.className)}>

@@ -40,7 +40,7 @@ export const dockPanels: DockPanel[] = [
 				label: 'Статистика',
 				extra: (
 					<>
-						<DockClock />
+						<DockClock className={buttonClass} />
 						<FullscreenButton className={buttonClass} />
 					</>
 				)

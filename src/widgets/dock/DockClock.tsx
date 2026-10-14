@@ -1,24 +1,33 @@
-import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { timeFormat } from '@/widgets/clock/time';
+import { useBigClock } from '@/widgets/clock/useBigClock';
+import { useNow } from '@/widgets/clock/useNow';
 
-// Часы и минуты в формате системы: 19:11 или 07:11 PM
-const timeFormat = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
+type DockClockProps = {
+	className?: string;
+};
 
-// Текущее время с компьютера. Обновляется в начале каждой минуты. На телефоне скрыто: панель не влезает, а часы есть в статус-баре
-export function DockClock() {
-	const [now, setNow] = useState(() => new Date());
-
-	useEffect(() => {
-		const delay = 60_000 - (now.getTime() % 60_000);
-		const id = window.setTimeout(() => setNow(new Date()), delay);
-		return () => window.clearTimeout(id);
-	}, [now]);
+// Текущее время с компьютера. По клику показывает или прячет крупные часы посередине экрана (src/widgets/clock/BigClock.tsx).
+// На телефоне скрыто: панель не влезает, а часы есть в статус-баре
+export function DockClock({ className }: DockClockProps) {
+	const now = useNow();
+	const bigClock = useBigClock();
+	const label = bigClock.shown ? 'Скрыть крупные часы' : 'Крупные часы';
 
 	return (
-		<time
-			dateTime={now.toISOString()}
-			className="hidden h-9 items-center px-2 text-sm font-medium text-white/80 tabular-nums sm:flex"
+		<button
+			type="button"
+			onClick={bigClock.toggle}
+			aria-pressed={bigClock.shown}
+			title={label}
+			aria-label={`${timeFormat.format(now)}, ${label.toLowerCase()}`}
+			className={cn(
+				className,
+				'hidden w-auto px-2.5 text-sm font-medium text-white/80 tabular-nums sm:flex',
+				bigClock.shown && 'bg-white/20 text-white'
+			)}
 		>
-			{timeFormat.format(now)}
-		</time>
+			<time dateTime={now.toISOString()}>{timeFormat.format(now)}</time>
+		</button>
 	);
 }
