@@ -22,6 +22,9 @@ export const musicEnabled = false;
 // Группы кнопок на панели. Какая группа в каком углу, задаёт dockPanels в src/widgets/dock/Dock.tsx
 export type DockGroupId = 'sound' | 'stats' | 'view' | 'focus';
 
+// Столбец, в котором стоит окно с брейкпоинта sm. На телефоне столбцов нет: окна стоят одинаково (windowClass в App.tsx)
+export type WidgetColumn = 'left' | 'center' | 'right';
+
 type WidgetDefinition = {
 	id: string;
 	// Подпись кнопки на панели
@@ -30,17 +33,19 @@ type WidgetDefinition = {
 	dockGroup: DockGroupId;
 	// Окно виджета. Положение на экране приходит в className
 	component: ComponentType<{ className?: string }>;
-	// Классы положения окна с брейкпоинта sm. На телефоне все окна стоят одинаково (windowClass в App.tsx)
+	column: WidgetColumn;
+	// top — окно прижато к верху столбца, bottom — к низу, к панели. Окна столбца не перекрывают друг друга:
+	// если им не хватает высоты, окна без shrink-0 сжимаются и прокручиваются внутри
+	anchor: 'top' | 'bottom';
+	// Ширина и прочие классы окна с брейкпоинта sm. Место на экране задают column и anchor
 	placement: string;
-	// right — окно в правом столбце: окна в нём встают друг под другом в порядке этого списка (rightColumnClass в App.tsx)
-	column?: 'right';
 	// Окна с одинаковым slot стоят на одном месте: открытие одного закрывает остальные
 	slot?: string;
 	// false — виджета нет на странице: ни окна, ни кнопки
 	enabled?: boolean;
 };
 
-// Все окна виджетов. Порядок здесь — порядок кнопок внутри группы на панели и окон в столбце
+// Все окна виджетов. Порядок здесь — порядок кнопок внутри группы на панели и окон в столбце (сверху вниз внутри anchor)
 const definitions = [
 	{
 		id: 'radio',
@@ -48,7 +53,10 @@ const definitions = [
 		icon: Radio,
 		dockGroup: 'sound',
 		component: RadioWidget,
-		placement: 'sm:bottom-24 sm:left-4 sm:w-[26rem] lg:bottom-28 lg:left-8',
+		column: 'left',
+		anchor: 'bottom',
+		// Не сжимается: управление радио должно быть видно целиком, прокручиваются звуки над ним
+		placement: 'sm:w-[26rem] sm:shrink-0',
 		enabled: !musicEnabled
 	},
 	{
@@ -57,9 +65,10 @@ const definitions = [
 		icon: Headphones,
 		dockGroup: 'sound',
 		component: AmbienceWidget,
-		// Под звуками в том же левом столбце стоит радио (~8.5rem над панелью), поэтому высота звуков ограничена сильнее, а лишнее прокручивается
-		placement:
-			'sm:top-4 sm:bottom-auto sm:left-4 sm:max-h-[calc(100dvh-16.5rem)] sm:w-[22rem] lg:top-8 lg:left-8 lg:max-h-[calc(100dvh-18.5rem)]'
+		column: 'left',
+		anchor: 'top',
+		// Длинный список звуков сжимается до места над радио и прокручивается
+		placement: 'sm:w-[22rem]'
 	},
 	{
 		id: 'stats',
@@ -67,8 +76,10 @@ const definitions = [
 		icon: ChartNoAxesColumn,
 		dockGroup: 'stats',
 		component: StatsWidget,
+		column: 'center',
+		anchor: 'top',
 		// Между звуками и таймером: свободно по ширине от ~1200px, на более узких экранах может перекрыть соседей
-		placement: 'sm:top-4 sm:bottom-auto sm:left-1/2 sm:w-[18rem] sm:-translate-x-1/2 lg:top-8'
+		placement: 'sm:w-[18rem]'
 	},
 	{
 		id: 'timer',
@@ -76,10 +87,10 @@ const definitions = [
 		icon: Timer,
 		dockGroup: 'focus',
 		component: TimerWidget,
-		// Таймер и обои стоят в правом столбце и не перекрывают друг друга, поэтому здесь только ширина.
-		// mb-auto уводит таймер к верху, остальные окна столбца прижаты к низу
-		placement: 'sm:mb-auto sm:w-[26rem] sm:shrink-0',
-		column: 'right'
+		column: 'right',
+		anchor: 'top',
+		// Не сжимается: при нехватке высоты сжимается галерея под ним
+		placement: 'sm:w-[26rem] sm:shrink-0'
 	},
 	{
 		id: 'wallpaper',
@@ -87,10 +98,10 @@ const definitions = [
 		icon: Image,
 		dockGroup: 'view',
 		component: WallpaperGallery,
-		// Галерея не выше 34rem, сетка превью прокручивается внутри. На компьютере сжимается до места под таймером
-		placement:
-			'max-h-[min(34rem,calc(100dvh-5.5rem))] sm:max-h-[34rem] sm:min-h-0 sm:w-[30rem] lg:max-h-[34rem]',
 		column: 'right',
+		anchor: 'bottom',
+		// Галерея не выше 34rem, сетка превью прокручивается внутри
+		placement: 'max-h-[min(34rem,calc(100dvh-5.5rem))] sm:max-h-[34rem] sm:w-[30rem]',
 		slot: 'view'
 	},
 	{
@@ -99,9 +110,10 @@ const definitions = [
 		icon: Sparkles,
 		dockGroup: 'view',
 		component: EffectsWidget,
+		column: 'right',
+		anchor: 'bottom',
 		// На месте галереи: открывается вместо неё
 		placement: 'sm:w-[30rem]',
-		column: 'right',
 		slot: 'view'
 	}
 ] as const satisfies readonly WidgetDefinition[];
