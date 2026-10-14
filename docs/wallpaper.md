@@ -2,18 +2,18 @@
 
 Фон страницы на весь экран: картинка или зацикленное видео без звука. Обои выбираются в галерее. Галерея разбита по категориям, превью в ней прокручиваются, клик по превью сразу меняет фон. Видео-обои помечены значком ▶.
 
-Галерея открывается кнопкой «Обои» в группе «Вид» в правом нижнем углу ([панель](widgets.md#панель)). На компьютере галерея стоит в правом столбце: прижата к низу, к кнопке, а над ней таймер. Если обоим окнам не хватает высоты, галерея становится ниже и не наезжает на таймер. На телефоне галерея над панелью во всю ширину. Положение задаёт [`src/App.tsx`](../src/App.tsx): `rightColumnClass` и `windowPlacement.wallpaper`.
+Галерея открывается кнопкой «Обои» в группе «Вид» в правом нижнем углу ([панель](widgets.md#панель)). На компьютере галерея стоит в правом столбце: прижата к низу, к кнопке, а над ней таймер. Если обоим окнам не хватает высоты, галерея становится ниже и не наезжает на таймер. На телефоне галерея над панелью во всю ширину. Положение задают `rightColumnClass` в [`src/App.tsx`](../src/App.tsx) и `placement` обоев в [`src/widgets/registry.ts`](../src/widgets/registry.ts).
 
 ## Где код
 
-| Файл                                                                                                | Что внутри                                                                                   |
-| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [`src/widgets/wallpaper/wallpapers.ts`](../src/widgets/wallpaper/wallpapers.ts)                     | Категории и список обоев. Сюда добавлять новые обои                                          |
-| [`src/widgets/wallpaper/useWallpaper.ts`](../src/widgets/wallpaper/useWallpaper.ts)                 | Какие обои выбраны: `current` и `select(id)`, сохранение в `localStorage`, обои по умолчанию |
-| [`src/widgets/wallpaper/WallpaperBackground.tsx`](../src/widgets/wallpaper/WallpaperBackground.tsx) | Фон: `<img>` или `<video>`, плавная смена, пауза видео в скрытой вкладке                     |
-| [`src/widgets/wallpaper/WallpaperGallery.tsx`](../src/widgets/wallpaper/WallpaperGallery.tsx)       | Окно галереи: кнопки категорий и прокручиваемая сетка превью                                 |
-| [`src/assets/wallpapers/<категория>/`](../src/assets/wallpapers/)                                   | Сами обои: картинки (`.jfif`) и видео (`.mp4`)                                               |
-| [`src/assets/wallpapers/thumbs/<категория>/`](../src/assets/wallpapers/thumbs/)                     | Превью для галереи: webp шириной 480px, ~20 КБ. Имя такое же, как у оригинала                |
+| Файл                                                                                                | Что внутри                                                                                                                       |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| [`src/widgets/wallpaper/wallpapers.ts`](../src/widgets/wallpaper/wallpapers.ts)                     | Категории и список обоев. Сюда добавлять новые обои                                                                              |
+| [`src/widgets/wallpaper/useWallpaper.ts`](../src/widgets/wallpaper/useWallpaper.ts)                 | Какие обои выбраны: `current` и `select(id)`, сохранение в `localStorage`, обои по умолчанию. Состояние общее для фона и галереи |
+| [`src/widgets/wallpaper/WallpaperBackground.tsx`](../src/widgets/wallpaper/WallpaperBackground.tsx) | Фон: `<img>` или `<video>`, плавная смена, пауза видео в скрытой вкладке                                                         |
+| [`src/widgets/wallpaper/WallpaperGallery.tsx`](../src/widgets/wallpaper/WallpaperGallery.tsx)       | Окно галереи: кнопки категорий и прокручиваемая сетка превью                                                                     |
+| [`src/assets/wallpapers/<категория>/`](../src/assets/wallpapers/)                                   | Сами обои: картинки (`.jfif`) и видео (`.mp4`)                                                                                   |
+| [`src/assets/wallpapers/thumbs/<категория>/`](../src/assets/wallpapers/thumbs/)                     | Превью для галереи: webp шириной 480px, ~20 КБ. Имя такое же, как у оригинала                                                    |
 
 ## Список обоев
 

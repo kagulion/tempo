@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useAutoplay } from '@/hooks/useAutoplay';
 import { useDuckLevel } from '@/hooks/useDuckLevel';
+import { isRecord, loadStored, saveStored, storageKeys } from '@/lib/storage';
 
 import {
 	detectCountryCode,
@@ -13,23 +14,18 @@ import {
 
 export type RadioStatus = 'idle' | 'loading' | 'empty' | 'error';
 
-const lastStationKey = 'tempo:last-station';
-
-// Последняя станция, которая реально заиграла. При загрузке страницы с неё и начинаем, но без звука
-function loadLastStation(): Station | undefined {
-	try {
-		return JSON.parse(localStorage.getItem(lastStationKey) ?? 'null') ?? undefined;
-	} catch {
-		return undefined;
-	}
+function parseStation(saved: unknown): Station | undefined {
+	return isRecord(saved) &&
+		typeof saved.stationuuid === 'string' &&
+		typeof saved.countrycode === 'string'
+		? (saved as Station)
+		: undefined;
 }
 
-function saveLastStation(station: Station) {
-	try {
-		localStorage.setItem(lastStationKey, JSON.stringify(station));
-	} catch {
-		// Хранилище недоступно (приватный режим) — после перезагрузки начнём со случайной станции
-	}
+// Последняя станция, которая реально заиграла. При загрузке страницы с неё и начинаем, но без звука.
+// Хранилище недоступно (приватный режим) — после перезагрузки начнём со случайной станции
+function loadLastStation() {
+	return loadStored<Station | undefined>(storageKeys.lastStation, undefined, parseStation);
 }
 
 // Перемешиваем станции, чтобы каждый раз звучало что-то новое, а не одни и те же лидеры рейтинга
@@ -180,7 +176,7 @@ export function useRadio() {
 			preload: 'none',
 			onPlaying: () => {
 				failedStations.current = 0;
-				if (station) saveLastStation(station);
+				if (station) saveStored(storageKeys.lastStation, station);
 			},
 			onError: handleAudioError
 		},

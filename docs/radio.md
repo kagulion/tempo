@@ -2,9 +2,9 @@
 
 Виджет, в котором играет интернет-радиостанции со всего мира. Станции и страны берутся из открытой базы [Radio Browser](https://www.radio-browser.info).
 
-Загруженная музыка (`src/assets/music/`) временно скрыта флагом `musicEnabled` в [`src/App.tsx`](../src/App.tsx). Её плеер лежит в [`src/widgets/music/BackgroundMusic.tsx`](../src/widgets/music/BackgroundMusic.tsx).
+Загруженная музыка (`src/assets/music/`) временно скрыта флагом `musicEnabled` в [`src/widgets/registry.ts`](../src/widgets/registry.ts). Её плеер лежит в [`src/widgets/music/BackgroundMusic.tsx`](../src/widgets/music/BackgroundMusic.tsx).
 
-На экране виджет расставляет `App.tsx`: он отвечает только за положение (левый нижний угол, над [панелью](widgets.md#панель)), всё остальное внутри `src/widgets/radio/`. Если закрыть окно радио на панели, радио продолжит играть. Поверх радио можно включить [фоновые звуки](ambience.md).
+Положение виджета задаёт реестр [`src/widgets/registry.ts`](../src/widgets/registry.ts): он отвечает только за место на экране (левый нижний угол, над [панелью](widgets.md#панель)), всё остальное внутри `src/widgets/radio/`. Если закрыть окно радио на панели, радио продолжит играть. Поверх радио можно включить [фоновые звуки](ambience.md).
 
 ## Где код
 

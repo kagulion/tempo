@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
+
+import { createPersistentStore, isRecord, storageKeys } from '@/lib/storage';
 
 import { type EffectId, effects } from './effects';
-
-const storageKey = 'tempo:effects';
 
 type EffectsState = {
 	active: EffectId[];
@@ -20,31 +20,20 @@ function knownIds(list: unknown): EffectId[] {
 		: [];
 }
 
-function load(): EffectsState {
-	try {
-		const saved = localStorage.getItem(storageKey);
-		if (!saved) return defaultState;
-		const parsed = JSON.parse(saved);
-		// Раньше хранился только массив включённых id
-		if (Array.isArray(parsed)) return { active: knownIds(parsed), paused: false };
-		return { active: knownIds(parsed.active), paused: parsed.paused === true };
-	} catch {
-		return defaultState;
-	}
+function parseState(saved: unknown): EffectsState | undefined {
+	// Раньше хранился только массив включённых id
+	if (Array.isArray(saved)) return { active: knownIds(saved), paused: false };
+	if (!isRecord(saved)) return undefined;
+	return { active: knownIds(saved.active), paused: saved.paused === true };
 }
+
+// Общее для окна эффектов и холстов (EffectLayers). Хранилище недоступно (приватный режим) —
+// после перезагрузки включатся эффекты по умолчанию
+const store = createPersistentStore(storageKeys.effects, defaultState, parseState);
 
 // Какие эффекты включены (можно несколько сразу или ни одного) и стоят ли они на паузе
 export function useActiveEffects() {
-	const [state, setState] = useState(load);
-
-	useEffect(() => {
-		try {
-			localStorage.setItem(storageKey, JSON.stringify(state));
-		} catch {
-			// Хранилище недоступно (приватный режим) — после перезагрузки включатся эффекты по умолчанию
-		}
-	}, [state]);
-
+	const state = useSyncExternalStore(store.subscribe, store.get);
 	const anyActive = state.active.length > 0;
 
 	return {
@@ -56,13 +45,13 @@ export function useActiveEffects() {
 		isActive: (id: EffectId) => state.active.includes(id),
 		// Включённый эффект снимает паузу — как включённый звук запускает остальные звуки
 		toggle: (id: EffectId) =>
-			setState((current) =>
+			store.set((current) =>
 				current.active.includes(id)
 					? { ...current, active: current.active.filter((item) => item !== id) }
 					: { active: [...current.active, id], paused: false }
 			),
-		togglePaused: () => setState((current) => ({ ...current, paused: !current.paused })),
+		togglePaused: () => store.set((current) => ({ ...current, paused: !current.paused })),
 		// Выключает все эффекты
-		reset: () => setState({ active: [], paused: false })
+		reset: () => store.set({ active: [], paused: false })
 	};
 }

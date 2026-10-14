@@ -1,28 +1,20 @@
-import { useEffect, useState } from 'react';
+import { usePersistentState } from '@/hooks/usePersistentState';
+import { isRecord, storageKeys } from '@/lib/storage';
 
 import type { Station } from './api';
 
-const storageKey = 'tempo:favorite-stations';
-
-// Избранные станции храним целиком, чтобы потом показать их без запроса к API
-function loadFavorites(): Record<string, Station> {
-	try {
-		return JSON.parse(localStorage.getItem(storageKey) ?? '{}');
-	} catch {
-		return {};
-	}
+function parseFavorites(saved: unknown): Record<string, Station> | undefined {
+	return isRecord(saved) ? (saved as Record<string, Station>) : undefined;
 }
 
 export function useFavoriteStations() {
-	const [favorites, setFavorites] = useState(loadFavorites);
-
-	useEffect(() => {
-		try {
-			localStorage.setItem(storageKey, JSON.stringify(favorites));
-		} catch {
-			// Хранилище недоступно (приватный режим) — избранное живёт до перезагрузки
-		}
-	}, [favorites]);
+	// Избранные станции храним целиком, чтобы потом показать их без запроса к API.
+	// Хранилище недоступно (приватный режим) — избранное живёт до перезагрузки
+	const [favorites, setFavorites] = usePersistentState(
+		storageKeys.favoriteStations,
+		{},
+		parseFavorites
+	);
 
 	function isFavorite(station: Station | undefined) {
 		return station ? station.stationuuid in favorites : false;

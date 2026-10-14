@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
+
+import { createPersistentStore, isRecord, storageKeys } from '@/lib/storage';
 
 import { wallpapers } from './wallpapers';
-
-const storageKey = 'tempo:wallpaper';
 
 // Обои при первом заходе — как раньше, первые обои Орды
 const defaultId = 'horde/orcs-tavern';
@@ -13,34 +13,27 @@ const legacyOrder: Record<string, string[]> = {
 	horde: ['horde/orcs-tavern', 'horde/tauren-tavern', 'horde/bloody-elfs-tavern']
 };
 
-function load(): string {
-	try {
-		const saved = JSON.parse(localStorage.getItem(storageKey) ?? '{}');
-		let id: unknown = saved.id;
-		if (id === undefined && typeof saved.faction === 'string') {
-			id = legacyOrder[saved.faction]?.[saved.indexes?.[saved.faction] ?? 0];
-		}
-		// Список обоев мог поменяться: неизвестный id сбрасываем на обои по умолчанию
-		return wallpapers.some((item) => item.id === id) ? (id as string) : defaultId;
-	} catch {
-		return defaultId;
+function parseSaved(saved: unknown): { id: string } | undefined {
+	if (!isRecord(saved)) return undefined;
+	let id = saved.id;
+	if (id === undefined && typeof saved.faction === 'string') {
+		const indexes = isRecord(saved.indexes) ? saved.indexes : {};
+		const index = typeof indexes[saved.faction] === 'number' ? indexes[saved.faction] : 0;
+		id = legacyOrder[saved.faction]?.[index as number];
 	}
+	// Список обоев мог поменяться: неизвестный id сбрасываем на обои по умолчанию
+	return wallpapers.some((item) => item.id === id) ? { id: id as string } : undefined;
 }
+
+// Общее для фона и галереи. Хранилище недоступно (приватный режим) — после перезагрузки откроются обои по умолчанию
+const store = createPersistentStore(storageKeys.wallpaper, { id: defaultId }, parseSaved);
 
 // Выбранные обои, сохраняются в localStorage
 export function useWallpaper() {
-	const [id, setId] = useState(load);
-
-	useEffect(() => {
-		try {
-			localStorage.setItem(storageKey, JSON.stringify({ id }));
-		} catch {
-			// Хранилище недоступно (приватный режим) — после перезагрузки откроются обои по умолчанию
-		}
-	}, [id]);
+	const { id } = useSyncExternalStore(store.subscribe, store.get);
 
 	return {
 		current: wallpapers.find((item) => item.id === id) ?? wallpapers[0],
-		select: setId
+		select: (next: string) => store.set({ id: next })
 	};
 }

@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react';
 
+import { storageKeys } from '@/lib/storage';
+
 // Supabase Realtime Presence. Ключи задаются в .env (см. .env.example)
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string | undefined;
 const onlineEnabled = Boolean(supabaseUrl && supabaseKey);
 
 const channelName = 'tempo:online';
-const visitorKey = 'tempo:visitor-id';
 
 // Один id на браузер: несколько вкладок одного человека считаются одним пользователем
 function visitorId() {
 	try {
-		let id = localStorage.getItem(visitorKey);
+		let id = localStorage.getItem(storageKeys.visitorId);
 		if (!id) {
 			id = crypto.randomUUID();
-			localStorage.setItem(visitorKey, id);
+			localStorage.setItem(storageKeys.visitorId, id);
 		}
 		return id;
 	} catch {

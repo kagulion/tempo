@@ -1,17 +1,23 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 
-export type WidgetId = 'radio' | 'ambience' | 'timer' | 'stats' | 'wallpaper' | 'effects';
+import { usePersistentState } from '@/hooks/usePersistentState';
+import { storageKeys } from '@/lib/storage';
+import { isWidgetId, widgets, type WidgetId } from '@/widgets/registry';
 
-// Окна, которые стоят на одном месте: открытие одного закрывает остальные из той же группы
-const sharedSlots: WidgetId[][] = [['wallpaper', 'effects']];
-
-function slotmates(id: WidgetId) {
-	return sharedSlots.find((slot) => slot.includes(id)) ?? [];
+// Окна, которые стоят на одном месте (одинаковый slot в реестре): открытие одного закрывает остальные
+function slotmates(id: WidgetId): WidgetId[] {
+	const slot = widgets.find((widget) => widget.id === id)?.slot;
+	return slot ? widgets.filter((widget) => widget.slot === slot).map((widget) => widget.id) : [];
 }
 
-const storageKey = 'tempo:open-widgets';
-// Первый визит: всё как было до панели, звуки закрыты
-const defaultOpen: WidgetId[] = ['wallpaper', 'timer', 'radio'];
+// Первый визит: всё как было до панели, звуки закрыты. На телефоне видно последнее — радио.
+// Выключенные виджеты (enabled: false в реестре) отбрасываем
+const defaultOpen = (['wallpaper', 'timer', 'radio'] satisfies WidgetId[]).filter(isWidgetId);
+
+// Виджет могли убрать из реестра — неизвестные id отбрасываем
+function parseOpen(saved: unknown): WidgetId[] | undefined {
+	return Array.isArray(saved) ? saved.filter(isWidgetId) : undefined;
+}
 
 // Телефон — меньше брейкпоинта sm из Tailwind. Там помещается только одно окно
 const mobileQuery = '(max-width: 639px)';
@@ -26,27 +32,11 @@ function isMobile() {
 	return window.matchMedia(mobileQuery).matches;
 }
 
-function loadOpen(): WidgetId[] {
-	try {
-		const saved = localStorage.getItem(storageKey);
-		return saved ? JSON.parse(saved) : defaultOpen;
-	} catch {
-		return defaultOpen;
-	}
-}
-
 // Какие окна виджетов открыты. Порядок — по времени открытия, последнее открытое в конце
 export function useDock() {
-	const [open, setOpen] = useState(loadOpen);
+	// Хранилище недоступно (приватный режим) — после перезагрузки откроем окна по умолчанию
+	const [open, setOpen] = usePersistentState(storageKeys.openWidgets, defaultOpen, parseOpen);
 	const mobile = useSyncExternalStore(subscribeMobile, isMobile);
-
-	useEffect(() => {
-		try {
-			localStorage.setItem(storageKey, JSON.stringify(open));
-		} catch {
-			// Хранилище недоступно (приватный режим) — после перезагрузки откроем окна по умолчанию
-		}
-	}, [open]);
 
 	// На телефоне видно только последнее открытое окно, на компьютере — все открытые
 	function isOpen(id: WidgetId) {

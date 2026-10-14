@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import { cn } from '@/lib/utils';
 
+import { useWallpaper } from './useWallpaper';
 import type { Wallpaper } from './wallpapers';
 
 const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
@@ -77,13 +78,10 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 	);
 }
 
-type WallpaperBackgroundProps = {
-	wallpaper: Wallpaper;
-};
-
 // Фон на весь экран: картинка или зацикленное видео без звука.
 // Новые обои кладутся поверх старых и проявляются, когда загрузились, — без чёрной вспышки между ними
-export function WallpaperBackground({ wallpaper }: WallpaperBackgroundProps) {
+export function WallpaperBackground() {
+	const wallpaper = useWallpaper().current;
 	// Обои, которые уже полностью видны. Пока новые грузятся, они остаются под ними
 	const [shown, setShown] = useState(wallpaper);
 	const [readyId, setReadyId] = useState<string | null>(null);

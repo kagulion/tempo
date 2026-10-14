@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 
+import { usePersistentState } from '@/hooks/usePersistentState';
 import { duckBefore, restoreAfter } from '@/lib/ducking';
+import { isRecord, storageKeys } from '@/lib/storage';
 
 import { chimeLength, notify, playChime, requestNotifications, unlockSound } from './signal';
 
@@ -42,8 +44,6 @@ type TimerRuns = Partial<Record<TimerMode, TimerRun>>;
 export const longBreakEvery = 4;
 
 const minute = 60_000;
-const settingsKey = 'tempo:timer-settings';
-const runsKey = 'tempo:timer-runs';
 
 const defaultSettings: TimerSettings = {
 	mode: 'pomodoro',
@@ -55,22 +55,13 @@ const defaultSettings: TimerSettings = {
 	sound: true
 };
 
-function load<T>(key: string, fallback: T): T {
-	try {
-		const saved = localStorage.getItem(key);
-		return saved ? JSON.parse(saved) : fallback;
-	} catch {
-		return fallback;
-	}
+// Настройки могли сохраниться до появления новых полей — недостающие берём по умолчанию
+function parseSettings(saved: unknown): TimerSettings | undefined {
+	return isRecord(saved) ? { ...defaultSettings, ...(saved as Partial<TimerSettings>) } : undefined;
 }
 
-function save(key: string, value: unknown) {
-	try {
-		if (value === null) localStorage.removeItem(key);
-		else localStorage.setItem(key, JSON.stringify(value));
-	} catch {
-		// Хранилище недоступно (приватный режим) — таймер живёт до перезагрузки
-	}
+function parseRuns(saved: unknown): TimerRuns | undefined {
+	return isRecord(saved) ? (saved as TimerRuns) : undefined;
 }
 
 function elapsedOf(run: TimerRun, now: number) {
@@ -142,15 +133,14 @@ function announcement(run: TimerRun | null, mode: TimerMode, settings: TimerSett
 }
 
 export function useTimer() {
-	const [settings, setSettings] = useState(() => ({
-		...defaultSettings,
-		...load<Partial<TimerSettings>>(settingsKey, {})
-	}));
-	const [runs, setRuns] = useState(() => load<TimerRuns>(runsKey, {}));
+	// Хранилище недоступно (приватный режим) — таймер живёт до перезагрузки
+	const [settings, setSettings] = usePersistentState(
+		storageKeys.timerSettings,
+		defaultSettings,
+		parseSettings
+	);
+	const [runs, setRuns] = usePersistentState<TimerRuns>(storageKeys.timerRuns, {}, parseRuns);
 	const [now, setNow] = useState(Date.now);
-
-	useEffect(() => save(settingsKey, settings), [settings]);
-	useEffect(() => save(runsKey, runs), [runs]);
 
 	// Идущий таймер главнее выбранной вкладки: уйти с неё, пока он идёт, нельзя
 	const mode = Object.values(runs).find((item) => item.startedAt !== null)?.mode ?? settings.mode;

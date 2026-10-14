@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
 import { useDuckLevel } from '@/hooks/useDuckLevel';
+import { usePersistentState } from '@/hooks/usePersistentState';
 import {
 	getStatuses,
 	pruneSoundCache,
@@ -9,10 +10,10 @@ import {
 	subscribeStatuses,
 	unlockAmbience
 } from '@/lib/ambience';
+import { isRecord, storageKeys } from '@/lib/storage';
 
 import { ambientGroups, ambientSounds, type AmbientSound } from './sounds';
 
-const storageKey = 'tempo:ambience';
 // Пока звук не трогали, его ползунок на нуле
 const defaultSoundVolume = 0;
 // С какой громкостью включается звук, у которого ползунок на нуле, — иначе включилась бы тишина
@@ -24,18 +25,24 @@ type AmbienceSettings = {
 	sounds: Record<string, { on: boolean; volume: number }>;
 };
 
-function loadSettings(): AmbienceSettings {
-	try {
-		const saved: Partial<AmbienceSettings> = JSON.parse(localStorage.getItem(storageKey) ?? '{}');
-		return { volume: saved.volume ?? 0.8, sounds: saved.sounds ?? {} };
-	} catch {
-		return { volume: 0.8, sounds: {} };
-	}
+const defaultSettings: AmbienceSettings = { volume: 0.8, sounds: {} };
+
+function parseSettings(saved: unknown): AmbienceSettings | undefined {
+	if (!isRecord(saved)) return undefined;
+	return {
+		volume: typeof saved.volume === 'number' ? saved.volume : defaultSettings.volume,
+		sounds: isRecord(saved.sounds) ? (saved.sounds as AmbienceSettings['sounds']) : {}
+	};
 }
 
 // Вся логика фоновых звуков. Сам звук играет в src/lib/ambience.ts, разметка — в AmbienceWidget
 export function useAmbience() {
-	const [settings, setSettings] = useState(loadSettings);
+	// Хранилище недоступно (приватный режим) — после перезагрузки начнём с чистого листа
+	const [settings, setSettings] = usePersistentState(
+		storageKeys.ambience,
+		defaultSettings,
+		parseSettings
+	);
 	// Как и радио, после перезагрузки звуки ждут нажатия: набор помним, но не играем
 	const [playing, setPlaying] = useState(false);
 	const statuses = useSyncExternalStore(subscribeStatuses, getStatuses);
@@ -48,14 +55,6 @@ export function useAmbience() {
 		);
 		pruneSoundCache(urls).catch(() => {});
 	}, []);
-
-	useEffect(() => {
-		try {
-			localStorage.setItem(storageKey, JSON.stringify(settings));
-		} catch {
-			// Хранилище недоступно (приватный режим) — после перезагрузки начнём с чистого листа
-		}
-	}, [settings]);
 
 	useEffect(() => {
 		ambientSounds.forEach((sound) => {

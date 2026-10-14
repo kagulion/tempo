@@ -4,31 +4,20 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Widget } from '@/widgets/Widget';
 
-import { type EffectId, effects } from './effects';
+import { effects } from './effects';
+import { useActiveEffects } from './useActiveEffects';
 
 const buttonClass = 'text-white/80 hover:bg-white/15 hover:text-white';
 
 type EffectsWidgetProps = {
-	isActive: (id: EffectId) => boolean;
-	onToggle: (id: EffectId) => void;
-	anyActive: boolean;
-	playing: boolean;
-	onTogglePaused: () => void;
-	onReset: () => void;
 	className?: string;
 };
 
 // Окно эффектов: карточки-переключатели. Эффекты можно включать вместе.
 // Сверху, как у звуков, сброс (выключить все) и пауза (заморозить на месте)
-export function EffectsWidget({
-	isActive,
-	onToggle,
-	anyActive,
-	playing,
-	onTogglePaused,
-	onReset,
-	className
-}: EffectsWidgetProps) {
+export function EffectsWidget({ className }: EffectsWidgetProps) {
+	const { isActive, toggle, anyActive, playing, togglePaused, reset } = useActiveEffects();
+
 	return (
 		<Widget aria-label="Эффекты" className={cn('flex flex-col gap-3 p-4', className)}>
 			<div className="-my-1 flex items-center gap-1">
@@ -36,7 +25,7 @@ export function EffectsWidget({
 				<Button
 					variant="ghost"
 					size="icon-sm"
-					onClick={onReset}
+					onClick={reset}
 					disabled={!anyActive}
 					title="Выключить все эффекты"
 					aria-label="Выключить все эффекты"
@@ -47,7 +36,7 @@ export function EffectsWidget({
 				<Button
 					variant="ghost"
 					size="icon-sm"
-					onClick={onTogglePaused}
+					onClick={togglePaused}
 					disabled={!anyActive}
 					title={playing ? 'Остановить эффекты' : 'Продолжить эффекты'}
 					aria-label={playing ? 'Остановить эффекты' : 'Продолжить эффекты'}
@@ -65,7 +54,7 @@ export function EffectsWidget({
 						<button
 							key={effect.id}
 							type="button"
-							onClick={() => onToggle(effect.id)}
+							onClick={() => toggle(effect.id)}
 							aria-pressed={active}
 							className={cn(
 								'flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-1 py-3 text-xs font-medium text-white/60 transition-colors outline-none',

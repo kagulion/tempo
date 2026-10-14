@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { isRecord, loadStored, saveStored, storageKeys } from '@/lib/storage';
+
 export type VisitStats = {
 	// Последний день с заходом на сайт, по местному времени: 2026-10-11
 	lastDay: string;
@@ -12,7 +14,6 @@ export type VisitStats = {
 	lastTick: number;
 };
 
-const storageKey = 'tempo:stats';
 const tickMs = 1000;
 // Фоновые вкладки браузер будит примерно раз в минуту. Разрыв длиннее — сайт был закрыт или компьютер спал
 const maxGapMs = 65_000;
@@ -32,22 +33,20 @@ function daysBetween(from: string, to: string) {
 	return Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000);
 }
 
-function load(): VisitStats | null {
-	try {
-		const saved = localStorage.getItem(storageKey);
-		return saved ? JSON.parse(saved) : null;
-	} catch {
-		return memory;
-	}
+function parseStats(saved: unknown): VisitStats | undefined {
+	return isRecord(saved) && typeof saved.lastDay === 'string' && typeof saved.lastTick === 'number'
+		? (saved as VisitStats)
+		: undefined;
 }
 
+function load() {
+	return loadStored<VisitStats | null>(storageKeys.stats, memory, parseStats);
+}
+
+// Хранилище недоступно — остаётся копия в памяти
 function save(stats: VisitStats) {
 	memory = stats;
-	try {
-		localStorage.setItem(storageKey, JSON.stringify(stats));
-	} catch {
-		// Хранилище недоступно — остаётся копия в памяти
-	}
+	saveStored(storageKeys.stats, stats);
 }
 
 // Отмечает заход сегодня и, если countTime, добавляет время с прошлой отметки

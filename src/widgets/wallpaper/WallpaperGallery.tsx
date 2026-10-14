@@ -4,16 +4,16 @@ import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Widget } from '@/widgets/Widget';
 
+import { useWallpaper } from './useWallpaper';
 import { type Category, categories, wallpapers } from './wallpapers';
 
 type WallpaperGalleryProps = {
-	currentId: string;
-	onSelect: (id: string) => void;
 	className?: string;
 };
 
 // Окно выбора обоев: превью по категориям в прокручиваемой сетке. Клик по превью сразу меняет фон, окно остаётся открытым
-export function WallpaperGallery({ currentId, onSelect, className }: WallpaperGalleryProps) {
+export function WallpaperGallery({ className }: WallpaperGalleryProps) {
+	const wallpaper = useWallpaper();
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const sectionRefs = useRef<Partial<Record<Category, HTMLElement>>>({});
 
@@ -57,12 +57,12 @@ export function WallpaperGallery({ currentId, onSelect, className }: WallpaperGa
 							{wallpapers
 								.filter((item) => item.category === category.value)
 								.map((item) => {
-									const active = item.id === currentId;
+									const active = item.id === wallpaper.current.id;
 									return (
 										<button
 											key={item.id}
 											type="button"
-											onClick={() => onSelect(item.id)}
+											onClick={() => wallpaper.select(item.id)}
 											aria-pressed={active}
 											title={item.title}
 											className={cn(
