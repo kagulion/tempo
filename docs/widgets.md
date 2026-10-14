@@ -50,7 +50,7 @@ flowchart TD
 | [`src/lib/audio.ts`](../src/lib/audio.ts)                               | Один `AudioContext` на страницу для звуков и сигнала таймера. `unlockAudio()` вызывать прямо в обработчике клика                                                                                                    |
 | `scrollbar-glass` в [`src/index.css`](../src/index.css)                 | Тонкая полупрозрачная полоса прокрутки для стеклянных окон                                                                                                                                                          |
 | [`src/hooks/useAutoplay.ts`](../src/hooks/useAutoplay.ts)               | Запуск звука в `<audio>`. Если браузер заблокировал автозапуск, ждёт первого клика или нажатия клавиши                                                                                                              |
-| [`src/components/ui/`](../src/components/ui/)                           | Кнопка, комбобокс, слайдер, вкладки, прогресс. Всё, кроме кнопки, — на Base UI в стиле стеклянной панели                                                                                                            |
+| [`src/components/ui/`](../src/components/ui/)                           | Кнопка, комбобокс, слайдер, вкладки, прогресс. Всё на Base UI в стиле стеклянной панели                                                                                                                             |
 
 ## Правила для виджетов
 

@@ -17,7 +17,7 @@
 - [React 19](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
 - [Vite](https://vite.dev)
 - [Tailwind CSS 4](https://tailwindcss.com)
-- [shadcn/ui](https://ui.shadcn.com) (Radix, пресет Nova)
+- [shadcn/ui](https://ui.shadcn.com) (Base UI, пресет Nova)
 
 ## Разработка
 
