@@ -22,6 +22,12 @@ const windowClass =
 const columnClass =
 	'contents sm:pointer-events-none sm:absolute sm:top-4 sm:bottom-24 sm:flex sm:flex-col sm:justify-end sm:gap-4 lg:top-8 lg:bottom-28';
 
+// Панели внизу. На телефоне — один ряд во всю ширину с равными промежутками между панелями.
+// С sm ряда нет (contents): каждая панель стоит в своём углу (className в dockPanels).
+// Промежутки между панелями не ловят клики
+const dockRowClass =
+	'pointer-events-none absolute inset-x-4 bottom-4 flex items-end justify-between *:pointer-events-auto sm:contents';
+
 const columns: { id: WidgetColumn; className: string }[] = [
 	{ id: 'left', className: 'sm:left-4 sm:items-start lg:left-8' },
 	{ id: 'center', className: 'sm:left-1/2 sm:-translate-x-1/2 sm:items-center' },
@@ -76,9 +82,11 @@ export default function App() {
 				</Suspense>
 			)}
 
-			{dockPanels.map((panel) => (
-				<Dock key={panel.label} panel={panel} isOpen={dock.isOpen} onToggle={dock.toggle} />
-			))}
+			<div className={dockRowClass}>
+				{dockPanels.map((panel) => (
+					<Dock key={panel.label} panel={panel} isOpen={dock.isOpen} onToggle={dock.toggle} />
+				))}
+			</div>
 		</main>
 	);
 }

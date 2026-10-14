@@ -21,18 +21,18 @@ export type DockPanel = {
 	groups: DockGroup[];
 };
 
-// Три панели внизу экрана. Кнопки окон в группах берутся из реестра виджетов (dockGroup в src/widgets/registry.ts)
+// Три панели внизу экрана. Место с брейкпоинта sm задаёт className, на телефоне панели стоят в общем ряду (dockRowClass в App.tsx). Кнопки окон в группах берутся из реестра виджетов (dockGroup в src/widgets/registry.ts)
 export const dockPanels: DockPanel[] = [
 	// Левый нижний угол, под радио
 	{
 		label: 'Звук',
-		className: 'absolute bottom-4 left-4 lg:bottom-8 lg:left-8',
+		className: 'sm:absolute sm:bottom-4 sm:left-4 lg:bottom-8 lg:left-8',
 		groups: [{ id: 'sound', label: 'Звук' }]
 	},
 	// Снизу по центру
 	{
 		label: 'Главное',
-		className: 'absolute bottom-4 left-1/2 -translate-x-1/2 lg:bottom-8',
+		className: 'sm:absolute sm:bottom-4 sm:left-1/2 sm:-translate-x-1/2 lg:bottom-8',
 		groups: [
 			{
 				id: 'main',
@@ -44,7 +44,7 @@ export const dockPanels: DockPanel[] = [
 	// Правый нижний угол, под столбцом таймера и обоев
 	{
 		label: 'Вид и фокус',
-		className: 'absolute right-4 bottom-4 lg:right-8 lg:bottom-8',
+		className: 'sm:absolute sm:right-4 sm:bottom-4 lg:right-8 lg:bottom-8',
 		groups: [
 			{ id: 'view', label: 'Вид' },
 			{ id: 'focus', label: 'Фокус' }
