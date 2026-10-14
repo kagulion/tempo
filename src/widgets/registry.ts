@@ -4,6 +4,7 @@ import {
 	Image,
 	Radio,
 	Sparkles,
+	SquareKanban,
 	Timer,
 	type LucideIcon
 } from 'lucide-react';
@@ -13,6 +14,7 @@ import { AmbienceWidget } from './ambience/AmbienceWidget';
 import { EffectsWidget } from './effects/EffectsWidget';
 import { RadioWidget } from './radio/RadioWidget';
 import { StatsWidget } from './stats/StatsWidget';
+import { TasksWidget } from './tasks/TasksWidget';
 import { TimerWidget } from './timer/TimerWidget';
 import { WallpaperGallery } from './wallpaper/WallpaperGallery';
 
@@ -28,7 +30,7 @@ export const BackgroundMusic = musicEnabled
 	: null;
 
 // Группы кнопок на панели. Какая группа в каком углу, задаёт dockPanels в src/widgets/dock/Dock.tsx
-export type DockGroupId = 'sound' | 'stats' | 'view' | 'focus';
+export type DockGroupId = 'sound' | 'main' | 'view' | 'focus';
 
 // Столбец, в котором стоит окно с брейкпоинта sm. На телефоне столбцов нет: окна стоят одинаково (windowClass в App.tsx)
 export type WidgetColumn = 'left' | 'center' | 'right';
@@ -82,12 +84,23 @@ const definitions = [
 		id: 'stats',
 		label: 'Статистика',
 		icon: ChartNoAxesColumn,
-		dockGroup: 'stats',
+		dockGroup: 'main',
 		component: StatsWidget,
 		column: 'center',
 		anchor: 'top',
 		// Между звуками и таймером: свободно по ширине от ~1200px, на более узких экранах может перекрыть соседей
 		placement: 'sm:w-[18rem]'
+	},
+	{
+		id: 'tasks',
+		label: 'Задачи',
+		icon: SquareKanban,
+		dockGroup: 'main',
+		component: TasksWidget,
+		column: 'center',
+		anchor: 'bottom',
+		// Под статистикой, у панели. Не shrink-0: при нехватке высоты сжимается и список секций прокручивается внутри
+		placement: 'sm:w-[24rem]'
 	},
 	{
 		id: 'timer',

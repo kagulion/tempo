@@ -11,6 +11,7 @@ export const storageKeys = {
 	openWidgets: 'tempo:open-widgets',
 	radioCompact: 'tempo:radio-compact',
 	stats: 'tempo:stats',
+	tasks: 'tempo:tasks',
 	timerRuns: 'tempo:timer-runs',
 	timerSettings: 'tempo:timer-settings',
 	// Строка без JSON, см. src/widgets/stats/useOnline.ts

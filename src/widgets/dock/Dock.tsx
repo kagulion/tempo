@@ -31,12 +31,12 @@ export const dockPanels: DockPanel[] = [
 	},
 	// Снизу по центру
 	{
-		label: 'Статистика',
+		label: 'Главное',
 		className: 'absolute bottom-4 left-1/2 -translate-x-1/2 lg:bottom-8',
 		groups: [
 			{
-				id: 'stats',
-				label: 'Статистика',
+				id: 'main',
+				label: 'Главное',
 				extra: <DockClock className={buttonClass} />
 			}
 		]
@@ -58,7 +58,7 @@ type DockProps = {
 	onToggle: (id: WidgetId) => void;
 };
 
-// Панель с кнопками, которые открывают и закрывают окна виджетов. В группе статистики ещё часы
+// Панель с кнопками, которые открывают и закрывают окна виджетов. В группе «Главное» ещё часы
 export function Dock({ panel, isOpen, onToggle }: DockProps) {
 	return (
 		<nav
