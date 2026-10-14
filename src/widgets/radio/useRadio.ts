@@ -47,6 +47,9 @@ export function useRadio() {
 	const [muted, setMuted] = useState(false);
 	const [stations, setStations] = useState<Station[]>([]);
 	const [currentStation, setCurrentStation] = useState(0);
+	// Звук реально идёт: playing — лишь намерение пользователя, а поток может буферизоваться,
+	// ждать первого клика (автозапуск заблокирован) или упасть с ошибкой
+	const [sounding, setSounding] = useState(false);
 	const [status, setStatus] = useState<RadioStatus>('loading');
 	const [countries, setCountries] = useState<RadioCountry[]>([]);
 	const [country, setCountry] = useState(detectCountryCode);
@@ -181,10 +184,18 @@ export function useRadio() {
 			preload: 'none',
 			onPlaying: () => {
 				failedStations.current = 0;
+				setSounding(true);
 				if (station) saveStored(storageKeys.lastStation, station);
 			},
-			onError: handleAudioError
+			onWaiting: () => setSounding(false),
+			onPause: () => setSounding(false),
+			onEmptied: () => setSounding(false),
+			onError: () => {
+				setSounding(false);
+				handleAudioError();
+			}
 		},
+		sounding,
 		status,
 		countries,
 		country,

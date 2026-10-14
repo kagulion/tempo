@@ -11,6 +11,17 @@
 	scrollbar-color: rgb(255 255 255 / 0.2) transparent;
 }
 
+/* Полоски «эквалайзера» радио: у каждой своя длительность и задержка, чтобы не двигались в такт */
+@keyframes sound-bar {
+	0%,
+	100% {
+		transform: scaleY(0.25);
+	}
+	50% {
+		transform: scaleY(1);
+	}
+}
+
 @theme inline {
 	--font-heading: var(--font-sans);
 	--font-sans: 'Geist Variable', sans-serif;
