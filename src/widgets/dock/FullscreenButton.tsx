@@ -1,6 +1,8 @@
 import { Maximize, Minimize } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
 
+import { cn } from '@/lib/utils';
+
 function subscribe(listener: () => void) {
 	document.addEventListener('fullscreenchange', listener);
 	return () => document.removeEventListener('fullscreenchange', listener);
@@ -14,7 +16,8 @@ type FullscreenButtonProps = {
 	className?: string;
 };
 
-// Полноэкранный режим страницы, как F11. На iPhone Fullscreen API нет — кнопку не показываем
+// Полноэкранный режим страницы, как F11. Отдельная круглая кнопка; место на экране приходит в className.
+// На iPhone Fullscreen API нет — кнопку не показываем
 export function FullscreenButton({ className }: FullscreenButtonProps) {
 	const fullscreen = useSyncExternalStore(subscribe, isFullscreen);
 
@@ -38,7 +41,10 @@ export function FullscreenButton({ className }: FullscreenButtonProps) {
 			aria-pressed={fullscreen}
 			title={label}
 			aria-label={label}
-			className={className}
+			className={cn(
+				'flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white/70 shadow-2xl backdrop-blur-md transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20',
+				className
+			)}
 		>
 			<Icon className="size-4" />
 		</button>

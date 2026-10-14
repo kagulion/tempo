@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { cn } from '@/lib/utils';
 import { BigClock } from '@/widgets/clock/BigClock';
 import { Dock, dockPanels } from '@/widgets/dock/Dock';
+import { FullscreenButton } from '@/widgets/dock/FullscreenButton';
 import { useDock } from '@/widgets/dock/useDock';
 import { EffectLayers } from '@/widgets/effects/EffectLayers';
 import { BackgroundMusic, widgets, type WidgetColumn, type WidgetEntry } from '@/widgets/registry';
@@ -12,7 +13,7 @@ import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 // С sm окно стоит в своём столбце: не выше столбца, может сжаться (min-h-0) и прокручиваться внутри.
 // Столбец не ловит клики, а окно — ловит
 const windowClass =
-	'absolute inset-x-4 bottom-[4.5rem] max-h-[calc(100dvh-5.5rem)] scrollbar-glass overflow-y-auto sm:pointer-events-auto sm:static sm:max-h-full sm:min-h-0';
+	'absolute inset-x-4 bottom-[4.5rem] max-h-[calc(100dvh-8rem)] scrollbar-glass overflow-y-auto sm:pointer-events-auto sm:static sm:max-h-full sm:min-h-0';
 
 // Столбцы с компьютера: от верхнего края до панели. Окна с anchor: 'top' прижаты к верху (mb-auto),
 // остальные — к низу, к кнопкам панели, даже когда верхнее окно закрыто. Окна в столбце не наезжают друг на друга.
@@ -24,7 +25,8 @@ const columnClass =
 const columns: { id: WidgetColumn; className: string }[] = [
 	{ id: 'left', className: 'sm:left-4 sm:items-start lg:left-8' },
 	{ id: 'center', className: 'sm:left-1/2 sm:-translate-x-1/2 sm:items-center' },
-	{ id: 'right', className: 'sm:right-4 sm:items-end lg:right-8' }
+	// Начинается ниже кнопки полного экрана в правом верхнем углу
+	{ id: 'right', className: 'sm:top-16 sm:right-4 sm:items-end lg:top-20 lg:right-8' }
 ];
 
 // Окна столбца сверху вниз: сначала прижатые к верху, внутри — в порядке реестра
@@ -36,7 +38,7 @@ function columnWidgets(column: WidgetColumn) {
 	];
 }
 
-// Раскладка страницы: фон, эффекты, крупные часы, окна виджетов и панель. Список окон и их места — в src/widgets/registry.ts
+// Раскладка страницы: фон, эффекты, крупные часы, кнопка полного экрана, окна виджетов и панель. Список окон и их места — в src/widgets/registry.ts
 export default function App() {
 	const dock = useDock();
 
@@ -61,6 +63,7 @@ export default function App() {
 			<WallpaperBackground />
 			<EffectLayers />
 			<BigClock />
+			<FullscreenButton className="absolute top-4 right-4 z-20 lg:top-8 lg:right-8" />
 
 			{columns.map((column) => (
 				<div key={column.id} className={cn(columnClass, column.className)}>

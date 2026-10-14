@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import { type DockGroupId, widgets, type WidgetId } from '@/widgets/registry';
 
 import { DockClock } from './DockClock';
-import { FullscreenButton } from './FullscreenButton';
 
 const buttonClass =
 	'flex size-9 items-center justify-center rounded-full text-white/70 transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20';
@@ -12,7 +11,7 @@ const buttonClass =
 type DockGroup = {
 	id: DockGroupId;
 	label: string;
-	// Не окна, а что-то своё после кнопок окон: часы, полноэкранный режим
+	// Не окна, а что-то своё после кнопок окон: часы
 	extra?: ReactNode;
 };
 
@@ -38,12 +37,7 @@ export const dockPanels: DockPanel[] = [
 			{
 				id: 'stats',
 				label: 'Статистика',
-				extra: (
-					<>
-						<DockClock className={buttonClass} />
-						<FullscreenButton className={buttonClass} />
-					</>
-				)
+				extra: <DockClock className={buttonClass} />
 			}
 		]
 	},
@@ -64,7 +58,7 @@ type DockProps = {
 	onToggle: (id: WidgetId) => void;
 };
 
-// Панель с кнопками, которые открывают и закрывают окна виджетов. В группе статистики ещё часы и полный экран
+// Панель с кнопками, которые открывают и закрывают окна виджетов. В группе статистики ещё часы
 export function Dock({ panel, isOpen, onToggle }: DockProps) {
 	return (
 		<nav

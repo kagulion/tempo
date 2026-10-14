@@ -109,7 +109,7 @@ const definitions = [
 		column: 'right',
 		anchor: 'bottom',
 		// Галерея не выше 34rem, сетка превью прокручивается внутри
-		placement: 'max-h-[min(34rem,calc(100dvh-5.5rem))] sm:max-h-[34rem] sm:w-[30rem]',
+		placement: 'max-h-[min(34rem,calc(100dvh-8rem))] sm:max-h-[34rem] sm:w-[30rem]',
 		slot: 'view'
 	},
 	{
