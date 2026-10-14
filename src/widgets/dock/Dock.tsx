@@ -1,4 +1,12 @@
-import { ChartNoAxesColumn, Headphones, Image, Radio, Timer, type LucideIcon } from 'lucide-react';
+import {
+	ChartNoAxesColumn,
+	Headphones,
+	Image,
+	Radio,
+	Sparkles,
+	Timer,
+	type LucideIcon
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -44,7 +52,13 @@ export const centerGroups: DockGroup[] = [
 
 // Правый нижний угол, под столбцом таймера и обоев
 export const rightGroups: DockGroup[] = [
-	{ label: 'Вид', items: [{ id: 'wallpaper', label: 'Обои', icon: Image }] },
+	{
+		label: 'Вид',
+		items: [
+			{ id: 'wallpaper', label: 'Обои', icon: Image },
+			{ id: 'effects', label: 'Эффекты', icon: Sparkles }
+		]
+	},
 	{ label: 'Фокус', items: [{ id: 'timer', label: 'Таймер', icon: Timer }] }
 ];
 

@@ -1,10 +1,6 @@
-import { useEffect, useRef } from 'react';
+import type { EffectRenderer } from './types';
 
-interface EmbersProps {
-	count?: number;
-}
-
-interface Ember {
+type Ember = {
 	x: number;
 	y: number;
 	radius: number;
@@ -19,76 +15,41 @@ interface Ember {
 	flickerSpeed: number;
 	flickerPhase: number;
 	colorVariant: number; // 0: yellow-gold, 1: warm orange, 2: reddish orange
-}
+};
 
-export function Embers({ count = 75 }: EmbersProps) {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
+const count = 75;
 
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
+// Огоньки: искры поднимаются снизу, покачиваются, мерцают и гаснут
+export function createEmbers(): EffectRenderer {
+	const particles: Ember[] = [];
 
-		const ctx = canvas.getContext('2d');
-		if (!ctx) return;
+	function createEmber(width: number, height: number, initialSpawn: boolean): Ember {
+		const maxLife = 4 + Math.random() * 6; // 4 to 10 seconds
+		return {
+			x: Math.random() * width,
+			y: initialSpawn ? Math.random() * height : height + Math.random() * 20,
+			radius: 1 + Math.random() * 2.2, // 1px to 3.2px
+			vy: -(30 + Math.random() * 55), // pixels per second upward
+			vx: (Math.random() - 0.5) * 15,
+			swayAmp: 15 + Math.random() * 30,
+			swayFreq: 0.8 + Math.random() * 1.6,
+			swayPhase: Math.random() * Math.PI * 2,
+			life: initialSpawn ? Math.random() * maxLife : 0,
+			maxLife,
+			maxAlpha: 0.4 + Math.random() * 0.5, // 0.4 to 0.9
+			flickerSpeed: 3 + Math.random() * 6,
+			flickerPhase: Math.random() * Math.PI * 2,
+			colorVariant: Math.random() < 0.35 ? 0 : Math.random() < 0.75 ? 1 : 2
+		};
+	}
 
-		let animationId: number;
-		let lastTime = performance.now();
-		let width = 0;
-		let height = 0;
-		let dpr = 1;
-
-		const particles: Ember[] = [];
-
-		function createEmber(initialSpawn = false): Ember {
-			const maxLife = 4 + Math.random() * 6; // 4 to 10 seconds
-			return {
-				x: Math.random() * width,
-				y: initialSpawn ? Math.random() * height : height + Math.random() * 20,
-				radius: 1 + Math.random() * 2.2, // 1px to 3.2px
-				vy: -(30 + Math.random() * 55), // pixels per second upward
-				vx: (Math.random() - 0.5) * 15,
-				swayAmp: 15 + Math.random() * 30,
-				swayFreq: 0.8 + Math.random() * 1.6,
-				swayPhase: Math.random() * Math.PI * 2,
-				life: initialSpawn ? Math.random() * maxLife : 0,
-				maxLife,
-				maxAlpha: 0.4 + Math.random() * 0.5, // 0.4 to 0.9
-				flickerSpeed: 3 + Math.random() * 6,
-				flickerPhase: Math.random() * Math.PI * 2,
-				colorVariant: Math.random() < 0.35 ? 0 : Math.random() < 0.75 ? 1 : 2
-			};
-		}
-
-		function resize() {
-			if (!canvas) return;
-			dpr = Math.min(window.devicePixelRatio || 1, 2);
-			width = window.innerWidth;
-			height = window.innerHeight;
-
-			canvas.width = Math.floor(width * dpr);
-			canvas.height = Math.floor(height * dpr);
-			canvas.style.width = `${width}px`;
-			canvas.style.height = `${height}px`;
-
-			ctx?.scale(dpr, dpr);
-		}
-
-		function init() {
-			resize();
+	return {
+		init(width, height) {
 			particles.length = 0;
-			for (let i = 0; i < count; i++) {
-				particles.push(createEmber(true));
-			}
-		}
+			for (let i = 0; i < count; i++) particles.push(createEmber(width, height, true));
+		},
 
-		function render(now: number) {
-			const dt = Math.min((now - lastTime) / 1000, 0.1);
-			lastTime = now;
-
-			if (!ctx) return;
-
-			ctx.clearRect(0, 0, width, height);
-
+		draw(ctx, dt, now, width, height) {
 			// Режим наложения для эффекта свечения пламени
 			ctx.globalCompositeOperation = 'lighter';
 
@@ -97,7 +58,7 @@ export function Embers({ count = 75 }: EmbersProps) {
 				p.life += dt;
 
 				if (p.life >= p.maxLife || p.y < -30) {
-					particles[i] = createEmber(false);
+					particles[i] = createEmber(width, height, false);
 					continue;
 				}
 
@@ -159,37 +120,6 @@ export function Embers({ count = 75 }: EmbersProps) {
 				ctx.fillStyle = `rgba(255, 255, 230, ${alpha * 0.9})`;
 				ctx.fill();
 			}
-
-			animationId = requestAnimationFrame(render);
 		}
-
-		function handleVisibilityChange() {
-			if (document.hidden) {
-				cancelAnimationFrame(animationId);
-			} else {
-				lastTime = performance.now();
-				animationId = requestAnimationFrame(render);
-			}
-		}
-
-		init();
-		animationId = requestAnimationFrame(render);
-
-		window.addEventListener('resize', resize);
-		document.addEventListener('visibilitychange', handleVisibilityChange);
-
-		return () => {
-			cancelAnimationFrame(animationId);
-			window.removeEventListener('resize', resize);
-			document.removeEventListener('visibilitychange', handleVisibilityChange);
-		};
-	}, [count]);
-
-	return (
-		<canvas
-			ref={canvasRef}
-			className="pointer-events-none fixed inset-0 z-50 h-full w-full"
-			aria-hidden="true"
-		/>
-	);
+	};
 }

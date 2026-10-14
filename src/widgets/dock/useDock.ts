@@ -1,6 +1,13 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
-export type WidgetId = 'radio' | 'ambience' | 'timer' | 'stats' | 'wallpaper';
+export type WidgetId = 'radio' | 'ambience' | 'timer' | 'stats' | 'wallpaper' | 'effects';
+
+// Окна, которые стоят на одном месте: открытие одного закрывает остальные из той же группы
+const sharedSlots: WidgetId[][] = [['wallpaper', 'effects']];
+
+function slotmates(id: WidgetId) {
+	return sharedSlots.find((slot) => slot.includes(id)) ?? [];
+}
 
 const storageKey = 'tempo:open-widgets';
 // Первый визит: всё как было до панели, звуки закрыты
@@ -48,8 +55,11 @@ export function useDock() {
 
 	function toggle(id: WidgetId) {
 		if (isOpen(id)) setOpen((list) => list.filter((item) => item !== id));
-		// На телефоне новое окно заменяет предыдущее
-		else setOpen((list) => (mobile ? [id] : [...list, id]));
+		// На телефоне новое окно заменяет предыдущее, на компьютере — только соседа по месту
+		else
+			setOpen((list) =>
+				mobile ? [id] : [...list.filter((item) => !slotmates(id).includes(item)), id]
+			);
 	}
 
 	return { isOpen, toggle };

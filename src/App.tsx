@@ -2,6 +2,10 @@ import { cn } from '@/lib/utils';
 import { AmbienceWidget } from '@/widgets/ambience/AmbienceWidget';
 import { centerGroups, Dock, leftGroups, rightGroups } from '@/widgets/dock/Dock';
 import { useDock, type WidgetId } from '@/widgets/dock/useDock';
+import { EffectCanvas } from '@/widgets/effects/EffectCanvas';
+import { effects } from '@/widgets/effects/effects';
+import { EffectsWidget } from '@/widgets/effects/EffectsWidget';
+import { useActiveEffects } from '@/widgets/effects/useActiveEffects';
 import { BackgroundMusic } from '@/widgets/music/BackgroundMusic';
 import { RadioWidget } from '@/widgets/radio/RadioWidget';
 import { StatsWidget } from '@/widgets/stats/StatsWidget';
@@ -37,6 +41,8 @@ const windowPlacement: Record<WidgetId, string> = {
 	// Галерея не выше 34rem, сетка превью прокручивается внутри. На компьютере сжимается до места под таймером
 	wallpaper:
 		'max-h-[min(34rem,calc(100dvh-5.5rem))] sm:max-h-[34rem] sm:min-h-0 sm:w-[30rem] lg:max-h-[34rem]',
+	// На месте галереи: открывается вместо неё (sharedSlots в useDock)
+	effects: 'sm:w-[30rem]',
 	radio: 'sm:bottom-24 sm:left-4 sm:w-[26rem] lg:bottom-28 lg:left-8'
 };
 
@@ -44,6 +50,7 @@ const windowPlacement: Record<WidgetId, string> = {
 export default function App() {
 	const wallpaper = useWallpaper();
 	const dock = useDock();
+	const activeEffects = useActiveEffects();
 
 	// Закрытые окна не размонтируем, а прячем: радио, звуки и таймер продолжают работать
 	function placement(id: WidgetId) {
@@ -53,6 +60,12 @@ export default function App() {
 	return (
 		<main className="relative h-screen w-screen overflow-hidden bg-black text-white">
 			<WallpaperBackground wallpaper={wallpaper.current} />
+			{/* Эффекты поверх всего, включая окна (z-50), но клики не перехватывают */}
+			{effects
+				.filter((effect) => activeEffects.isActive(effect.id))
+				.map((effect) => (
+					<EffectCanvas key={effect.id} create={effect.create} />
+				))}
 
 			<AmbienceWidget className={placement('ambience')} />
 			<StatsWidget className={placement('stats')} />
@@ -62,6 +75,11 @@ export default function App() {
 					currentId={wallpaper.current.id}
 					onSelect={wallpaper.select}
 					className={cn(placement('wallpaper'), rightColumnWindowClass)}
+				/>
+				<EffectsWidget
+					isActive={activeEffects.isActive}
+					onToggle={activeEffects.toggle}
+					className={cn(placement('effects'), rightColumnWindowClass)}
 				/>
 			</div>
 			{musicEnabled ? <BackgroundMusic /> : <RadioWidget className={placement('radio')} />}

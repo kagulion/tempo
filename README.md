@@ -10,6 +10,7 @@
 - [О таймере](docs/timer.md)
 - [О статистике](docs/stats.md)
 - [Об обоях](docs/wallpaper.md)
+- [Об эффектах](docs/effects.md)
 
 ## Стек
 
