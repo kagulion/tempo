@@ -16,7 +16,9 @@ export const storageKeys = {
 	timerSettings: 'tempo:timer-settings',
 	// Строка без JSON, см. src/widgets/stats/useOnline.ts
 	visitorId: 'tempo:visitor-id',
-	wallpaper: 'tempo:wallpaper'
+	wallpaper: 'tempo:wallpaper',
+	youtubeHistory: 'tempo:youtube-history',
+	youtubeSound: 'tempo:youtube-sound'
 } as const;
 
 export type StorageKey = (typeof storageKeys)[keyof typeof storageKeys];

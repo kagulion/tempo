@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 import { parseOpen } from './dock/useDock';
 import { parseState } from './effects/useActiveEffects';
+import { parseSoundOn } from './wallpaper/playback';
 import { parseSaved } from './wallpaper/useWallpaper';
+import { parseHistory } from './wallpaper/youtube';
 
 describe('обои', () => {
 	it('читает текущий формат', () => {
@@ -18,10 +20,47 @@ describe('обои', () => {
 		expect(parseSaved({ faction: 'horde' })).toEqual({ id: 'horde/orcs-tavern' });
 	});
 
+	it('читает видео с YouTube по id вида youtube/<id видео>', () => {
+		expect(parseSaved({ id: 'youtube/dQw4w9WgXcQ' })).toEqual({ id: 'youtube/dQw4w9WgXcQ' });
+	});
+
 	it('неизвестные обои и мусор отбрасывает', () => {
+		expect(parseSaved({ id: 'youtube/short' })).toBeUndefined();
+		expect(parseSaved({ id: 'youtube/dQw4w9WgXcQ/extra' })).toBeUndefined();
 		expect(parseSaved({ id: 'removed/wallpaper' })).toBeUndefined();
 		expect(parseSaved({ faction: 'scourge' })).toBeUndefined();
 		expect(parseSaved('horde')).toBeUndefined();
+	});
+});
+
+describe('история видео YouTube', () => {
+	it('читает сохранённый список', () => {
+		expect(parseHistory([{ videoId: 'dQw4w9WgXcQ', title: 'Клип', start: 30 }])).toEqual([
+			{ videoId: 'dQw4w9WgXcQ', title: 'Клип', start: 30 }
+		]);
+	});
+
+	it('плохие элементы отбрасывает, годные оставляет', () => {
+		expect(parseHistory([{ videoId: 'bad' }, null, { videoId: 'dQw4w9WgXcQ' }])).toEqual([
+			{ videoId: 'dQw4w9WgXcQ' }
+		]);
+	});
+
+	it('не список отбрасывает', () => {
+		expect(parseHistory({ videoId: 'dQw4w9WgXcQ' })).toBeUndefined();
+	});
+});
+
+describe('звук видео-обоев', () => {
+	it('читает сохранённый выбор', () => {
+		expect(parseSoundOn(true)).toBe(true);
+		expect(parseSoundOn(false)).toBe(false);
+	});
+
+	it('мусор отбрасывает', () => {
+		expect(parseSoundOn('true')).toBeUndefined();
+		expect(parseSoundOn({ on: true })).toBeUndefined();
+		expect(parseSoundOn(null)).toBeUndefined();
 	});
 });
 

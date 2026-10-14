@@ -27,9 +27,12 @@ import dragonflight from '@/assets/wallpapers/warcraft/dragonflight.mp4';
 import pandaria from '@/assets/wallpapers/warcraft/mists-of-pandaria.mp4';
 import nightElf from '@/assets/wallpapers/warcraft/night-elf.mp4';
 
+import { type YouTubeHistoryItem, youtubeThumb, youtubeWallpaperId } from './youtube';
+
 export type Category = 'alliance' | 'horde' | 'warcraft' | 'japan';
 
-export type Wallpaper = {
+// Обои из файлов сайта: картинка или зацикленное видео
+export type FileWallpaper = {
 	// Путь к файлу без расширения: по нему выбор хранится в localStorage
 	id: string;
 	title: string;
@@ -40,6 +43,34 @@ export type Wallpaper = {
 	thumb: string;
 };
 
+// Видео с YouTube, которое вставил посетитель. Живёт не в списке обоев, а в истории ссылок
+export type YouTubeWallpaper = {
+	// youtube/<videoId>
+	id: string;
+	title: string;
+	kind: 'youtube';
+	videoId: string;
+	// Секунда, с которой начинать и к которой возвращаться при зацикливании
+	start?: number;
+	thumb: string;
+};
+
+export type Wallpaper = FileWallpaper | YouTubeWallpaper;
+
+const youtubeTitle = 'Видео YouTube';
+
+// Обои из элемента истории. Названия может не быть, пока плеер его не сообщил
+export function youtubeWallpaper(item: YouTubeHistoryItem): YouTubeWallpaper {
+	return {
+		id: youtubeWallpaperId(item.videoId),
+		title: item.title ?? youtubeTitle,
+		kind: 'youtube',
+		videoId: item.videoId,
+		start: item.start,
+		thumb: youtubeThumb(item.videoId)
+	};
+}
+
 export const categories: { value: Category; label: string }[] = [
 	{ value: 'alliance', label: 'Альянс' },
 	{ value: 'horde', label: 'Орда' },
@@ -47,7 +78,7 @@ export const categories: { value: Category; label: string }[] = [
 	{ value: 'japan', label: 'Япония' }
 ];
 
-export const wallpapers: Wallpaper[] = [
+export const wallpapers: FileWallpaper[] = [
 	{
 		id: 'alliance/alliance-tavern',
 		title: 'Таверна Альянса',

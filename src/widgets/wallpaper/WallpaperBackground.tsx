@@ -4,13 +4,15 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
-import { useWallpaper } from './useWallpaper';
-import type { Wallpaper } from './wallpapers';
+import { defaultWallpaperId, useWallpaper } from './useWallpaper';
+import { setYouTubeTitle } from './useYouTubeHistory';
+import type { FileWallpaper, Wallpaper } from './wallpapers';
+import { YouTubeLayer } from './YouTubeLayer';
 
 const layerClass = 'absolute inset-0 h-full w-full object-cover';
 
 type LayerProps = {
-	wallpaper: Wallpaper;
+	wallpaper: FileWallpaper;
 	onReady: () => void;
 	// Слой проявился до конца
 	onShown?: () => void;
@@ -68,10 +70,10 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 	);
 }
 
-// Фон на весь экран: картинка или зацикленное видео без звука.
+// Фон на весь экран: картинка, зацикленное видео без звука или видео с YouTube.
 // Новые обои кладутся поверх старых и проявляются, когда загрузились, — без чёрной вспышки между ними
 export function WallpaperBackground() {
-	const wallpaper = useWallpaper().current;
+	const { current: wallpaper, fail } = useWallpaper();
 	// Обои, которые уже полностью видны. Пока новые грузятся, они остаются под ними
 	const [shown, setShown] = useState(wallpaper);
 	const [readyId, setReadyId] = useState<string | null>(null);
@@ -85,24 +87,42 @@ export function WallpaperBackground() {
 
 	const layers = shown.id === wallpaper.id ? [shown] : [shown, wallpaper];
 
+	// Видео не заиграло. Новое откатываем на то, что сейчас видно, а на уже показанном видео
+	// (его удалили или закрыли доступ) остаётся вернуться к обоям по умолчанию.
+	// Если не загрузился сам плеер (permanent: false), показанные обои не трогаем: превью остаётся на месте
+	function handleError(item: Wallpaper, message: string, permanent: boolean) {
+		if (item.id !== shown.id) fail(message, shown.id);
+		else if (permanent) fail(message, defaultWallpaperId);
+	}
+
 	return (
 		<>
 			{/* key по id: когда новые обои становятся нижним слоем, элемент не пересоздаётся и видео не начинается заново */}
 			{layers.map((item) => {
 				const incoming = item.id !== shown.id;
-				return (
-					<Layer
-						key={item.id}
-						wallpaper={item}
-						onReady={() => setReadyId(item.id)}
-						// Анимация, а не transition: если файл уже в кэше и загрузился до первой отрисовки, transition бы не сработал
-						className={cn(
-							incoming &&
-								(readyId === item.id ? 'animate-in duration-700 ease-in-out fade-in' : 'opacity-0')
-						)}
-						onShown={incoming ? () => setShown(item) : undefined}
-					/>
-				);
+				const common = {
+					onReady: () => setReadyId(item.id),
+					// Анимация, а не transition: если файл уже в кэше и загрузился до первой отрисовки, transition бы не сработал
+					className: cn(
+						incoming &&
+							(readyId === item.id ? 'animate-in duration-700 ease-in-out fade-in' : 'opacity-0')
+					),
+					onShown: incoming ? () => setShown(item) : undefined
+				};
+				if (item.kind === 'youtube') {
+					return (
+						<YouTubeLayer
+							key={item.id}
+							wallpaper={item}
+							// Звучит только главный слой: выбранный и уже проявившийся
+							soundAllowed={item.id === wallpaper.id && readyId === item.id}
+							onError={(message, permanent) => handleError(item, message, permanent)}
+							onTitle={(title) => setYouTubeTitle(item.videoId, title)}
+							{...common}
+						/>
+					);
+				}
+				return <Layer key={item.id} wallpaper={item} {...common} />;
 			})}
 		</>
 	);
