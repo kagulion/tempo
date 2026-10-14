@@ -12,7 +12,7 @@
 | [`src/widgets/wallpaper/useWallpaper.ts`](../src/widgets/wallpaper/useWallpaper.ts)                 | Какие обои выбраны: `current` и `select(id)`, сохранение в `localStorage`, обои по умолчанию. Состояние общее для фона и галереи |
 | [`src/widgets/wallpaper/WallpaperBackground.tsx`](../src/widgets/wallpaper/WallpaperBackground.tsx) | Фон: `<img>` или `<video>`, плавная смена, пауза видео в скрытой вкладке                                                         |
 | [`src/widgets/wallpaper/WallpaperGallery.tsx`](../src/widgets/wallpaper/WallpaperGallery.tsx)       | Окно галереи: кнопки категорий и прокручиваемая сетка превью                                                                     |
-| [`src/assets/wallpapers/<категория>/`](../src/assets/wallpapers/)                                   | Сами обои: картинки (`.jfif`) и видео (`.mp4`)                                                                                   |
+| [`src/assets/wallpapers/<категория>/`](../src/assets/wallpapers/)                                   | Сами обои: картинки (`.webp`) и видео (`.mp4`)                                                                                   |
 | [`src/assets/wallpapers/thumbs/<категория>/`](../src/assets/wallpapers/thumbs/)                     | Превью для галереи: webp шириной 480px, ~20 КБ. Имя такое же, как у оригинала                                                    |
 
 ## Список обоев
@@ -55,7 +55,7 @@
 
 - **Порядок секций** в галерее — порядок массива `categories`. **Порядок превью** внутри секции — порядок записей в `wallpapers`.
 - **Файлы подключаются через `import`.** Vite кладёт их в сборку с хэшем в имени и отдаёт URL. Файл скачивается браузером, только когда его показывают, а не при импорте.
-- **`.jfif`** — это обычный JPEG, но Vite не знает такое расширение. Поэтому оно добавлено в `assetsInclude` в [`vite.config.ts`](../vite.config.ts) и в [`src/assets.d.ts`](../src/assets.d.ts). `.jpg`, `.png`, `.webp`, `.mp4` и `.webm` Vite понимает сам.
+- **Картинки — в webp.** Тот же кадр 2752×1536 в JPEG весил 2.7 МБ, в webp с `-quality 88` — около 400 КБ, на глаз без разницы. `.webp`, `.jpg`, `.png`, `.mp4` и `.webm` Vite понимает сам, настраивать ничего не нужно.
 
 ### Выбор и сохранение
 
@@ -94,7 +94,12 @@
 ## Как добавить обои
 
 1. **Подготовь файл.**
-   - **Картинка:** 1920×1080 или больше, JPEG или webp. Тяжелее 3 МБ делать нет смысла.
+   - **Картинка:** 1920×1080 или больше, в webp. Ориентир — до 500 КБ:
+
+     ```bash
+     ffmpeg -i in.jpg -c:v libwebp -quality 88 -compression_level 6 -preset picture out.webp
+     ```
+
    - **Видео:** пережми в 1080p h264 без звука, с `faststart`, чтобы видео начинало играть до полной загрузки. Ориентир — 2–10 МБ на 20–40 секунд:
 
      ```bash
@@ -111,7 +116,7 @@
    # видео — кадр с первой секунды
    ffmpeg -ss 1 -i booty-bay.mp4 -frames:v 1 -vf scale=480:-2 -c:v libwebp -quality 75 booty-bay.webp
    # картинка
-   ffmpeg -i orcs-tavern.jfif -frames:v 1 -vf scale=480:-2 -c:v libwebp -quality 75 orcs-tavern.webp
+   ffmpeg -i orcs-tavern.webp -frames:v 1 -vf scale=480:-2 -c:v libwebp -quality 75 orcs-tavern.webp
    ```
 
    Если на первой секунде неудачный кадр, поменяй `-ss`.

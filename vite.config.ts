@@ -5,8 +5,6 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [react(), tailwindcss()],
-	// .jfif — это обычный JPEG, но Vite не знает расширение и без этого не отдаёт файл как картинку
-	assetsInclude: ['**/*.jfif'],
 	resolve: {
 		alias: {
 			'@': path.resolve(import.meta.dirname, './src')

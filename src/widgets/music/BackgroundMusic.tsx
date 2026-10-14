@@ -9,7 +9,7 @@ import tavernTwilight from '@/assets/music/tavern-twilight.mp3';
 // Список треков для фона
 const playlist = [hearthsideLullaby, tavernBeforeBattle, tavernTwilight];
 
-// Загруженная музыка по кругу, без элементов управления. Сейчас скрыта — см. musicEnabled в App.tsx
+// Загруженная музыка по кругу, без элементов управления. Сейчас скрыта — см. musicEnabled в src/widgets/registry.ts
 export function BackgroundMusic() {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const [currentTrack, setCurrentTrack] = useState(0);

@@ -1,9 +1,10 @@
+import { Suspense } from 'react';
+
 import { cn } from '@/lib/utils';
 import { Dock, dockPanels } from '@/widgets/dock/Dock';
 import { useDock } from '@/widgets/dock/useDock';
 import { EffectLayers } from '@/widgets/effects/EffectLayers';
-import { BackgroundMusic } from '@/widgets/music/BackgroundMusic';
-import { musicEnabled, widgets, type WidgetColumn, type WidgetEntry } from '@/widgets/registry';
+import { BackgroundMusic, widgets, type WidgetColumn, type WidgetEntry } from '@/widgets/registry';
 import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 
 // На телефоне окно занимает ширину экрана над панелью, а если не влезает по высоте — прокручивается.
@@ -64,7 +65,11 @@ export default function App() {
 					{columnWidgets(column.id).map(renderWindow)}
 				</div>
 			))}
-			{musicEnabled && <BackgroundMusic />}
+			{BackgroundMusic && (
+				<Suspense>
+					<BackgroundMusic />
+				</Suspense>
+			)}
 
 			{dockPanels.map((panel) => (
 				<Dock key={panel.label} panel={panel} isOpen={dock.isOpen} onToggle={dock.toggle} />

@@ -7,7 +7,7 @@ import {
 	Timer,
 	type LucideIcon
 } from 'lucide-react';
-import type { ComponentType } from 'react';
+import { lazy, type ComponentType } from 'react';
 
 import { AmbienceWidget } from './ambience/AmbienceWidget';
 import { EffectsWidget } from './effects/EffectsWidget';
@@ -18,6 +18,14 @@ import { WallpaperGallery } from './wallpaper/WallpaperGallery';
 
 // Загруженная музыка временно скрыта: вместо неё играет радио. Код оставлен, чтобы вернуть её флагом
 export const musicEnabled = false;
+
+// Плеер загруженной музыки, отдельным чанком. Пока музыка выключена, импорта нет вовсе —
+// иначе сборщик положил бы mp3 (~14 МБ) в dist, даже если плеер нигде не показан
+export const BackgroundMusic = musicEnabled
+	? lazy(() =>
+			import('./music/BackgroundMusic').then((module) => ({ default: module.BackgroundMusic }))
+		)
+	: null;
 
 // Группы кнопок на панели. Какая группа в каком углу, задаёт dockPanels в src/widgets/dock/Dock.tsx
 export type DockGroupId = 'sound' | 'stats' | 'view' | 'focus';

@@ -6,10 +6,16 @@
 *.jpg binary
 *.jpeg binary
 *.webp binary
+*.avif binary
+*.jfif binary
 *.gif binary
 *.ico binary
 *.mp3 binary
 *.ogg binary
 *.wav binary
+*.m4a binary
+*.opus binary
+*.mp4 binary
+*.webm binary
 *.woff binary
 *.woff2 binary
