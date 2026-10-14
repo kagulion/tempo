@@ -10,3 +10,8 @@ bun.lockb
 
 # Miscellaneous
 /public/
+
+# Навыки агентов: внешние файлы, обновляются через skills-lock.json
+/.agents/
+/.claude/skills/
+skills-lock.json

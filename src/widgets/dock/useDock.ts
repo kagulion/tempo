@@ -15,7 +15,7 @@ function slotmates(id: WidgetId): WidgetId[] {
 const defaultOpen = (['wallpaper', 'timer', 'radio'] satisfies WidgetId[]).filter(isWidgetId);
 
 // Виджет могли убрать из реестра — неизвестные id отбрасываем
-function parseOpen(saved: unknown): WidgetId[] | undefined {
+export function parseOpen(saved: unknown): WidgetId[] | undefined {
 	return Array.isArray(saved) ? saved.filter(isWidgetId) : undefined;
 }
 

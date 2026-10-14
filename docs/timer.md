@@ -4,16 +4,17 @@
 
 ## Где код
 
-| Файл                                                                            | Что внутри                                                                                                 |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| [`src/widgets/timer/TimerWidget.tsx`](../src/widgets/timer/TimerWidget.tsx)     | Разметка: вкладки, настройки, циферблат и кнопки. Логики нет, только вызов `useTimer`                      |
-| [`src/widgets/timer/useTimer.ts`](../src/widgets/timer/useTimer.ts)             | Вся логика: настройки, запуск, пауза, смена фаз, догон после перезагрузки, `localStorage`                  |
-| [`src/widgets/timer/SettingSlider.tsx`](../src/widgets/timer/SettingSlider.tsx) | Строка настройки во всю ширину на Base UI Slider: заливка фона показывает значение                         |
-| [`src/widgets/timer/signal.ts`](../src/widgets/timer/signal.ts)                 | Сигнал о конце фазы: колокольчик через Web Audio и системное уведомление                                   |
-| [`src/lib/ducking.ts`](../src/lib/ducking.ts)                                   | Приглушение музыки вокруг сигнала: таймер сообщает момент сигнала, радио и звуки берут множитель громкости |
-| [`src/hooks/useDuckLevel.ts`](../src/hooks/useDuckLevel.ts)                     | Хук для звуковых виджетов: текущий множитель громкости, тикает только во время приглушения                 |
-| [`src/components/ui/tabs.tsx`](../src/components/ui/tabs.tsx)                   | Вкладки base-nova на Base UI в стиле стеклянной панели                                                     |
-| [`src/components/ui/progress.tsx`](../src/components/ui/progress.tsx)           | Полоса прогресса base-nova на Base UI в стиле стеклянной панели                                            |
+| Файл                                                                            | Что внутри                                                                                                              |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| [`src/widgets/timer/TimerWidget.tsx`](../src/widgets/timer/TimerWidget.tsx)     | Разметка: вкладки, настройки, циферблат и кнопки. Логики нет, только вызов `useTimer`                                   |
+| [`src/widgets/timer/useTimer.ts`](../src/widgets/timer/useTimer.ts)             | Состояние таймера: настройки, запуск, пауза, сигнал, `localStorage`                                                     |
+| [`src/widgets/timer/phases.ts`](../src/widgets/timer/phases.ts)                 | Логика без React: смена фаз помидоро, догон после перезагрузки (`settle`), тексты уведомлений. Тесты — `phases.test.ts` |
+| [`src/widgets/timer/SettingSlider.tsx`](../src/widgets/timer/SettingSlider.tsx) | Строка настройки во всю ширину на Base UI Slider: заливка фона показывает значение                                      |
+| [`src/widgets/timer/signal.ts`](../src/widgets/timer/signal.ts)                 | Сигнал о конце фазы: колокольчик через Web Audio и системное уведомление                                                |
+| [`src/lib/ducking.ts`](../src/lib/ducking.ts)                                   | Приглушение музыки вокруг сигнала: таймер сообщает момент сигнала, радио и звуки берут множитель громкости              |
+| [`src/hooks/useDuckLevel.ts`](../src/hooks/useDuckLevel.ts)                     | Хук для звуковых виджетов: текущий множитель громкости, тикает только во время приглушения                              |
+| [`src/components/ui/tabs.tsx`](../src/components/ui/tabs.tsx)                   | Вкладки base-nova на Base UI в стиле стеклянной панели                                                                  |
+| [`src/components/ui/progress.tsx`](../src/components/ui/progress.tsx)           | Полоса прогресса base-nova на Base UI в стиле стеклянной панели                                                         |
 
 ## Режимы
 

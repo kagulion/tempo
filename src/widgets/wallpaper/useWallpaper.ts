@@ -13,7 +13,7 @@ const legacyOrder: Record<string, string[]> = {
 	horde: ['horde/orcs-tavern', 'horde/tauren-tavern', 'horde/bloody-elfs-tavern']
 };
 
-function parseSaved(saved: unknown): { id: string } | undefined {
+export function parseSaved(saved: unknown): { id: string } | undefined {
 	if (!isRecord(saved)) return undefined;
 	let id = saved.id;
 	if (id === undefined && typeof saved.faction === 'string') {

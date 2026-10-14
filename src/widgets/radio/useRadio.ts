@@ -95,11 +95,16 @@ export function useRadio() {
 		}
 	}
 
+	// Один раз при открытии страницы: последняя станция или страна посетителя. Дальше станции
+	// грузятся только по действию пользователя, поэтому от country эффект не зависит.
+	// loadStations сразу ставит статус «загрузка» — это и есть начало запроса к API
 	useEffect(() => {
 		const last = loadLastStation();
+		// oxlint-disable-next-line react/set-state-in-effect
 		if (last) loadStations(last.countrycode, last);
 		else loadStations(country);
 		loadCountries();
+		// oxlint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	async function randomCountry() {

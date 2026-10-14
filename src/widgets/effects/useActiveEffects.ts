@@ -20,7 +20,7 @@ function knownIds(list: unknown): EffectId[] {
 		: [];
 }
 
-function parseState(saved: unknown): EffectsState | undefined {
+export function parseState(saved: unknown): EffectsState | undefined {
 	// Раньше хранился только массив включённых id
 	if (Array.isArray(saved)) return { active: knownIds(saved), paused: false };
 	if (!isRecord(saved)) return undefined;

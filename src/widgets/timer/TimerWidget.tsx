@@ -19,7 +19,8 @@ import { cn } from '@/lib/utils';
 import { Widget, WidgetHeader } from '@/widgets/Widget';
 
 import { SettingSlider } from './SettingSlider';
-import { longBreakEvery, phaseText, pomodoroTotal, useTimer, type TimerMode } from './useTimer';
+import { longBreakEvery, phaseText, pomodoroTotal, type TimerMode } from './phases';
+import { useTimer } from './useTimer';
 
 const modes: { value: TimerMode; label: string }[] = [
 	{ value: 'pomodoro', label: 'Помидоро' },

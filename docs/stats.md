@@ -2,11 +2,11 @@
 
 Окно «Статистика» (`StatsWidget`, [`src/widgets/stats/`](../src/widgets/stats/)) собрано из трёх карточек. Данные приходят из двух хуков.
 
-| Карточка          | Компонент        | Данные                              |
-| ----------------- | ---------------- | ----------------------------------- |
-| «Сейчас на сайте» | `OnlineCard.tsx` | `useOnline.ts` — Supabase Realtime  |
-| «Серия дней»      | `StreakCard.tsx` | `useVisitStats.ts` — `localStorage` |
-| «Сегодня / Всего» | `TimeCard.tsx`   | `useVisitStats.ts` — `localStorage` |
+| Карточка          | Компонент        | Данные                                                                                |
+| ----------------- | ---------------- | ------------------------------------------------------------------------------------- |
+| «Сейчас на сайте» | `OnlineCard.tsx` | `useOnline.ts` — Supabase Realtime                                                    |
+| «Серия дней»      | `StreakCard.tsx` | `useVisitStats.ts` — `localStorage`, подсчёт — `visits.ts` (тесты — `visits.test.ts`) |
+| «Сегодня / Всего» | `TimeCard.tsx`   | `useVisitStats.ts` — `localStorage`, подсчёт — `visits.ts`                            |
 
 Общая оболочка карточек и подписи лежат в `StatCard.tsx`, а склонение «день / дня / дней» и формат времени — в `format.ts`.
 
