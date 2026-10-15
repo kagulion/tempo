@@ -32,7 +32,7 @@ export const BackgroundMusic = musicEnabled
 	: null;
 
 // Группы кнопок на панели. Какая группа в каком углу, задаёт dockPanels в src/widgets/dock/Dock.tsx
-export type DockGroupId = 'sound' | 'main' | 'view' | 'focus';
+export type DockGroupId = 'sound' | 'main' | 'view';
 
 // Столбец, в котором стоит окно с брейкпоинта sm. На телефоне столбцов нет: окна стоят одинаково (windowClass в App.tsx)
 export type WidgetColumn = 'left' | 'center' | 'right';
@@ -108,7 +108,7 @@ const definitions = [
 		id: 'timer',
 		label: 'Таймер',
 		icon: Timer,
-		dockGroup: 'focus',
+		dockGroup: 'main',
 		component: TimerWidget,
 		column: 'right',
 		anchor: 'top',
