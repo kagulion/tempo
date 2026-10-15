@@ -6,6 +6,9 @@ import { Dock, dockPanels } from '@/widgets/dock/Dock';
 import { FullscreenButton } from '@/widgets/dock/FullscreenButton';
 import { useDock } from '@/widgets/dock/useDock';
 import { EffectLayers } from '@/widgets/effects/EffectLayers';
+import { focusVisibility } from '@/widgets/focus/focus';
+import { FocusButton } from '@/widgets/focus/FocusButton';
+import { useFocusMode } from '@/widgets/focus/useFocusMode';
 import { BackgroundMusic, widgets, type WidgetColumn, type WidgetEntry } from '@/widgets/registry';
 import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 
@@ -44,9 +47,12 @@ function columnWidgets(column: WidgetColumn) {
 	];
 }
 
-// Раскладка страницы: фон, эффекты, крупные часы, кнопка полного экрана, окна виджетов и панель. Список окон и их места — в src/widgets/registry.ts
+// Раскладка страницы: фон, эффекты, крупные часы, кнопки фокуса и полного экрана, окна виджетов и панель. Список окон и их места — в src/widgets/registry.ts
 export default function App() {
 	const dock = useDock();
+	const focus = useFocusMode();
+	// В фокусе окна и панели только прячутся (hidden), список открытых окон в useDock не трогаем
+	const visibility = focusVisibility(focus.mode);
 
 	// Закрытые окна не размонтируем, а прячем: радио, звуки и таймер продолжают работать
 	function renderWindow(widget: WidgetEntry) {
@@ -58,7 +64,7 @@ export default function App() {
 					windowClass,
 					widget.anchor === 'top' && 'sm:mb-auto',
 					widget.placement,
-					!dock.isOpen(widget.id) && 'hidden'
+					(!dock.isOpen(widget.id) || !visibility.windows) && 'hidden'
 				)}
 			/>
 		);
@@ -68,8 +74,15 @@ export default function App() {
 		<main className="relative h-screen w-screen overflow-hidden bg-black text-white">
 			<WallpaperBackground />
 			<EffectLayers />
-			<BigClock />
-			<FullscreenButton className="absolute top-4 right-4 z-20 lg:top-8 lg:right-8" />
+			<BigClock visibility={visibility.bigClock} />
+			{/* В фокусе клик по свободному экрану (и по крупным часам) возвращает всё обратно. Ниже кнопок (z-20) */}
+			{focus.mode !== 'off' && (
+				<div aria-hidden="true" className="absolute inset-0 z-[15]" onClick={focus.exit} />
+			)}
+			<div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-8 lg:right-8">
+				<FocusButton mode={focus.mode} onToggle={focus.toggle} onClockOnly={focus.enterClockOnly} />
+				<FullscreenButton />
+			</div>
 
 			{columns.map((column) => (
 				<div key={column.id} className={cn(columnClass, column.className)}>
@@ -82,7 +95,7 @@ export default function App() {
 				</Suspense>
 			)}
 
-			<div className={dockRowClass}>
+			<div className={cn(dockRowClass, !visibility.dock && 'hidden sm:hidden')}>
 				{dockPanels.map((panel) => (
 					<Dock key={panel.label} panel={panel} isOpen={dock.isOpen} onToggle={dock.toggle} />
 				))}
