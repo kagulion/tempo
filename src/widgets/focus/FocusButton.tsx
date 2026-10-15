@@ -13,16 +13,16 @@ import type { FocusMode } from './focus';
 type FocusButtonProps = {
 	mode: FocusMode;
 	onToggle: () => void;
-	onClockOnly: () => void;
+	onHideAll: () => void;
 	className?: string;
 };
 
 const partClass =
 	'flex h-full items-center justify-center text-white/70 transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20';
 
-// Разделённая стеклянная кнопка: слева включает и выключает фокус, справа шеврон с меню «Скрыть всё, кроме часов».
+// Разделённая стеклянная кнопка: слева включает и выключает фокус (остаются только часы), справа шеврон с меню «Скрыть всё».
 // Пока фокус включён, шеврона нет: остаётся одна кнопка выхода. Место на экране приходит в className
-export function FocusButton({ mode, onToggle, onClockOnly, className }: FocusButtonProps) {
+export function FocusButton({ mode, onToggle, onHideAll, className }: FocusButtonProps) {
 	const active = mode !== 'off';
 	const label = active ? 'Выйти из фокуса' : 'Фокус';
 
@@ -54,7 +54,7 @@ export function FocusButton({ mode, onToggle, onClockOnly, className }: FocusBut
 						<ChevronDown className="size-4" />
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={onClockOnly}>Скрыть всё, кроме часов</DropdownMenuItem>
+						<DropdownMenuItem onClick={onHideAll}>Скрыть всё</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)}

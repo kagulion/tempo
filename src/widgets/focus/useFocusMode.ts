@@ -6,9 +6,9 @@ import type { FocusMode } from './focus';
 export function useFocusMode() {
 	const [mode, setMode] = useState<FocusMode>('off');
 
-	// Кнопка: обычный ↔ всё скрыто, из «только часы» — обратно в обычный
-	const toggle = useCallback(() => setMode((current) => (current === 'off' ? 'all' : 'off')), []);
-	const enterClockOnly = useCallback(() => setMode('clock'), []);
+	// Кнопка: обычный ↔ только часы, из «всё скрыто» — обратно в обычный
+	const toggle = useCallback(() => setMode((current) => (current === 'off' ? 'clock' : 'off')), []);
+	const enterHideAll = useCallback(() => setMode('all'), []);
 	const exit = useCallback(() => setMode('off'), []);
 
 	// Esc выходит из фокуса; слушатель нужен только пока режим включён
@@ -22,5 +22,5 @@ export function useFocusMode() {
 		return () => document.removeEventListener('keydown', onKeyDown);
 	}, [active, exit]);
 
-	return { mode, toggle, enterClockOnly, exit };
+	return { mode, toggle, enterHideAll, exit };
 }

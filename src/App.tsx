@@ -96,7 +96,7 @@ export default function App() {
 			<div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-8 lg:right-8">
 				{/* С xl: уже, при 1024 с оценкой настроения, пилюля наезжает на окно статистики в центральном столбце. В фокусе её нет */}
 				{focus.mode === 'off' && <StatsHighlights className="hidden xl:flex" />}
-				<FocusButton mode={focus.mode} onToggle={focus.toggle} onClockOnly={focus.enterClockOnly} />
+				<FocusButton mode={focus.mode} onToggle={focus.toggle} onHideAll={focus.enterHideAll} />
 				<FullscreenButton />
 			</div>
 
