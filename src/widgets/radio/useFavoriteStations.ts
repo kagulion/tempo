@@ -1,11 +1,7 @@
 import { usePersistentState } from '@/hooks/usePersistentState';
-import { isRecord, storageKeys } from '@/lib/storage';
+import { storageKeys } from '@/lib/storage';
 
-import type { Station } from './api';
-
-function parseFavorites(saved: unknown): Record<string, Station> | undefined {
-	return isRecord(saved) ? (saved as Record<string, Station>) : undefined;
-}
+import { parseStationMap, type Station } from './stations';
 
 export function useFavoriteStations() {
 	// Избранные станции храним целиком, чтобы потом показать их без запроса к API.
@@ -13,7 +9,7 @@ export function useFavoriteStations() {
 	const [favorites, setFavorites] = usePersistentState(
 		storageKeys.favoriteStations,
 		{},
-		parseFavorites
+		parseStationMap
 	);
 
 	function isFavorite(station: Station | undefined) {

@@ -30,7 +30,9 @@ function ComboboxItems<T>({ emptyText, getLabel, getKey, getHint }: ComboboxItem
 					>
 						<span className="truncate">{getLabel(item)}</span>
 						{getHint && (
-							<span className="ml-auto shrink-0 text-xs text-white/50">{getHint(item)}</span>
+							<span className="ml-auto max-w-[55%] truncate text-xs text-white/50">
+								{getHint(item)}
+							</span>
 						)}
 						<ComboboxPrimitive.ItemIndicator className="absolute right-2 flex size-4 items-center justify-center">
 							<CheckIcon className="size-4" />
@@ -48,8 +50,11 @@ type ComboboxProps<T> = {
 	onValueChange: (item: T) => void;
 	getLabel: (item: T) => string;
 	getKey: (item: T) => string;
+	getHint?: (item: T) => string;
 	placeholder?: string;
 	emptyText?: string;
+	// Поиск на стороне сервера: список не фильтруется по тексту сам, а набранный текст уходит сюда
+	onSearch?: (text: string) => void;
 	disabled?: boolean;
 	className?: string;
 	'aria-label'?: string;
@@ -62,8 +67,10 @@ export function Combobox<T>({
 	onValueChange,
 	getLabel,
 	getKey,
+	getHint,
 	placeholder,
 	emptyText = 'Ничего не найдено',
+	onSearch,
 	disabled,
 	className,
 	'aria-label': ariaLabel
@@ -82,6 +89,11 @@ export function Combobox<T>({
 			itemToStringValue={getKey}
 			isItemEqualToValue={(a, b) => getKey(a) === getKey(b)}
 			openOnInputClick
+			filter={onSearch ? null : undefined}
+			onInputValueChange={(text, details) => {
+				// Только ввод пользователя: подстановка названия выбранной станции запросом не считается
+				if (onSearch && details.reason === 'input-change') onSearch(text);
+			}}
 			onOpenChange={(open, details) => {
 				// При открытии кликом выделяем текст, чтобы запрос сразу печатался поверх названия.
 				// При открытии вводом не выделяем — иначе следующая буква заменит предыдущую
@@ -113,8 +125,15 @@ export function Combobox<T>({
 
 			<ComboboxPrimitive.Portal>
 				<ComboboxPrimitive.Positioner side="top" sideOffset={8} align="start" className="z-50">
-					<ComboboxPrimitive.Popup className={cn(popupClassName, 'w-(--anchor-width) min-w-56')}>
-						<ComboboxItems emptyText={emptyText} getLabel={getLabel} getKey={getKey} />
+					<ComboboxPrimitive.Popup
+						className={cn(popupClassName, 'w-(--anchor-width)', getHint ? 'min-w-80' : 'min-w-56')}
+					>
+						<ComboboxItems
+							emptyText={emptyText}
+							getLabel={getLabel}
+							getKey={getKey}
+							getHint={getHint}
+						/>
 					</ComboboxPrimitive.Popup>
 				</ComboboxPrimitive.Positioner>
 			</ComboboxPrimitive.Portal>

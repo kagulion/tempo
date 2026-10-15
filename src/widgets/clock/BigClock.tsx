@@ -1,4 +1,6 @@
 import { cn } from '@/lib/utils';
+import { SoundBars } from '@/widgets/radio/SoundBars';
+import { nowPlayingLabel, useNowPlaying } from '@/widgets/radio/nowPlaying';
 
 import { dateFormat, timeFormat } from './time';
 import { useBigClock } from './useBigClock';
@@ -24,6 +26,8 @@ export function BigClock({ visibility }: BigClockProps) {
 // Отдельный компонент, чтобы пока часы скрыты, таймер useNow не крутился
 function BigClockFace({ forced }: { forced: boolean }) {
 	const now = useNow();
+	// Станция, которая сейчас звучит (пусто, если радио на паузе или выключено)
+	const playing = useNowPlaying();
 
 	return (
 		<div
@@ -41,6 +45,12 @@ function BigClockFace({ forced }: { forced: boolean }) {
 			<span className="mt-2 text-lg font-light text-white/80 lg:text-xl">
 				{dateFormat.format(now)}
 			</span>
+			{playing && (
+				<div className="mt-3 flex max-w-[80vw] items-center gap-2 text-sm text-white/70 lg:text-base">
+					<SoundBars active />
+					<span className="min-w-0 truncate">{nowPlayingLabel(playing)}</span>
+				</div>
+			)}
 		</div>
 	);
 }

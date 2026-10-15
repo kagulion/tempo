@@ -3,6 +3,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { parseOpen } from './dock/useDock';
+import {
+	normalizeStation,
+	parseLiked,
+	parseSort,
+	parseSource,
+	parseStationMap
+} from './radio/stations';
 import { parseState } from './effects/useActiveEffects';
 import { parseMood } from './stats/mood';
 import { parseSoundOn } from './wallpaper/playback';
@@ -116,5 +123,35 @@ describe('настроение', () => {
 	it('не объект отбрасывает', () => {
 		expect(parseMood('2026-10-15')).toBeUndefined();
 		expect(parseMood(null)).toBeUndefined();
+	});
+});
+
+describe('радио', () => {
+	it('станция из старого сохранения получает votes, clickcount и tags', () => {
+		const saved = {
+			stationuuid: 'u',
+			name: 'Old',
+			country: 'Germany',
+			countrycode: 'DE',
+			url_resolved: 'https://example.com/a.mp3',
+			codec: 'MP3',
+			hls: 0
+		};
+		expect(normalizeStation(saved)).toEqual({ ...saved, votes: 0, clickcount: 0, tags: '' });
+		expect(parseStationMap({ u: saved })?.u.votes).toBe(0);
+	});
+
+	it('источник станций: читает страну, жанр и поиск, мусор отбрасывает', () => {
+		expect(parseSource({ kind: 'country', code: 'DE' })).toEqual({ kind: 'country', code: 'DE' });
+		expect(parseSource({ kind: 'genre', genre: 'lofi' })).toEqual({ kind: 'genre', genre: 'lofi' });
+		expect(parseSource({ kind: 'genre', genre: 'removed' })).toBeUndefined();
+		expect(parseSource('DE')).toBeUndefined();
+	});
+
+	it('порядок станций и лайки', () => {
+		expect(parseSort('popular')).toBe('popular');
+		expect(parseSort(1)).toBeUndefined();
+		expect(parseLiked({ u: 1 })).toEqual({ u: 1 });
+		expect(parseLiked(['u'])).toBeUndefined();
 	});
 });
