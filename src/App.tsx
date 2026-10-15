@@ -57,9 +57,9 @@ export default function App() {
 	const focus = useFocusMode();
 	// В фокусе окна и панели только прячутся (hidden), список открытых окон в useDock не трогаем
 	const visibility = focusVisibility(focus.mode);
-	// Угловые часы стоят первым элементом левого столбца. Если сверху нет видимого окна, которое
+	// Свёрнутые часы стоят первым элементом центрального столбца, над статистикой. Если сверху нет видимого окна, которое
 	// само прижато к верху (mb-auto), часы прижимаем сами, иначе столбец (justify-end) спустит их вниз
-	const cornerClockClass = columnWidgets('left').some(
+	const cornerClockClass = columnWidgets('center').some(
 		(widget) => widget.anchor === 'top' && dock.isOpen(widget.id) && visibility.windows
 	)
 		? undefined
@@ -87,7 +87,7 @@ export default function App() {
 			{/* Затемнение только обоев: эффекты, часы и окна выше */}
 			<DimmerLayer />
 			<EffectLayers />
-			{/* Центральные часы: слой на весь экран. Угловые стоят в левом столбце ниже */}
+			{/* Центральные часы: слой на весь экран. свёрнутые стоят наверху центрального столбца ниже */}
 			<BigClock visibility={visibility.bigClock} variant="center" />
 			{/* В фокусе клик по свободному экрану (и по крупным часам) возвращает всё обратно. Ниже кнопок (z-20) */}
 			{focus.mode !== 'off' && (
@@ -103,11 +103,11 @@ export default function App() {
 			{columns.map((column) => (
 				<div
 					key={column.id}
-					// В фокусе окна скрыты, а столбец остаётся ради угловых часов: поднимаем его над
+					// В фокусе окна скрыты, а столбец остаётся ради свёрнутых часов: поднимаем его над
 					// слоем кликов (z-15), чтобы кнопка в строке станции нажималась
 					className={cn(columnClass, focus.mode !== 'off' && 'sm:z-[16]', column.className)}
 				>
-					{column.id === 'left' && (
+					{column.id === 'center' && (
 						<BigClock
 							visibility={visibility.bigClock}
 							variant="corner"

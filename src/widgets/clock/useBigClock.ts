@@ -6,7 +6,8 @@ function parseShown(saved: unknown): boolean | undefined {
 	return typeof saved === 'boolean' ? saved : undefined;
 }
 
-// Где стоят крупные часы: посередине экрана или уменьшенными в левом верхнем углу
+// Где стоят крупные часы: посередине экрана или свёрнутыми наверху по центру.
+// Значение 'corner' осталось с тех пор, когда свёрнутые часы стояли в левом углу: так сохранённая настройка не теряется
 export type BigClockPosition = 'center' | 'corner';
 
 export function parsePosition(saved: unknown): BigClockPosition | undefined {
@@ -28,7 +29,7 @@ export function useBigClock() {
 	return { shown, toggle: () => store.set((current) => !current) };
 }
 
-// Позиция крупных часов (в центре или в углу), тоже сохраняется. На телефоне не действует
+// Позиция крупных часов (в центре или свёрнуты наверх), тоже сохраняется. На телефоне не действует
 export function useBigClockPosition() {
 	const position = useSyncExternalStore(positionStore.subscribe, positionStore.get);
 

@@ -16,7 +16,8 @@ import { useNow } from './useNow';
 
 // Крупное время, включается кликом по часам на панели. Два варианта (где его ставит App):
 // 'center' — посередине экрана, слой над обоями и задними эффектами, под окнами (z-10), клики не перехватывает;
-// 'corner' — уменьшенное, первым элементом левого столбца окон (см. App.tsx), чтобы «Звуки» вставали ниже и сжимались.
+// 'corner' — свёрнутое: уменьшенное, наверху по центру, первым элементом центрального столбца окон (см. App.tsx),
+// чтобы «Статистика» вставала ниже и окна под часами сжимались.
 // На телефоне позиция не действует: часы показываются только в фокусе и по центру.
 // visibility задаёт режим фокуса: 'user' — по настройке, 'force' — показать всегда (и на телефоне), 'hide' — скрыть.
 // Сохранённую настройку это не меняет. В 'force' часы стоят там, где их поставил пользователь
@@ -25,7 +26,7 @@ export type BigClockVariant = 'center' | 'corner';
 type BigClockProps = {
 	visibility: 'user' | 'force' | 'hide';
 	variant: BigClockVariant;
-	// Сколько места занимает угловой вариант в столбце: прижать к верху столбца, если сверху нет окон
+	// Сколько места занимает свёрнутый вариант в столбце: прижать к верху столбца, если сверху нет окон
 	className?: string;
 };
 
@@ -36,8 +37,8 @@ export function BigClock({ visibility, variant, className }: BigClockProps) {
 	if (visibility === 'hide') return null;
 	const forced = visibility === 'force';
 	if (!forced && !shown) return null;
-	// Угловой вариант — только если выбран угол. Центральный — если выбран центр, а при угле
-	// остаётся лишь на телефоне в фокусе (на sm и выше его заменяет угловой)
+	// Свёрнутый вариант — только если часы свёрнуты. Центральный — если выбран центр, а при свёрнутых
+	// остаётся лишь на телефоне в фокусе (на sm и выше его заменяет свёрнутый)
 	if (variant === 'corner' && position !== 'corner') return null;
 	if (variant === 'center' && position === 'corner' && !forced) return null;
 	return (
@@ -87,7 +88,7 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 			<div
 				className={cn(
 					// Не сжимается: при нехватке высоты сжимаются окна под часами
-					'group relative hidden shrink-0 text-white drop-shadow-[0_2px_24px_rgb(0_0_0/0.6)] select-none sm:flex sm:w-max sm:flex-col',
+					'group relative hidden shrink-0 text-white drop-shadow-[0_2px_24px_rgb(0_0_0/0.6)] select-none sm:flex sm:w-max sm:flex-col sm:items-center',
 					// В фокусе клик по часам выходит из фокуса, поэтому ловят клики только кнопки
 					forced ? 'pointer-events-none' : 'sm:pointer-events-auto',
 					className
@@ -100,9 +101,9 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 					{time}
 					{!forced && <PositionButton />}
 				</div>
-				{/* Высота строки постоянная, чтобы окна ниже не прыгали. Ширина — как у окна «Звуки» под часами:
+				{/* Высота строки постоянная, чтобы окна ниже не прыгали. Ширина больше цифр:
 				    по ширине цифр от названия станции почти ничего не оставалось */}
-				<div className="mt-1 flex h-8 w-[22rem] max-w-[calc(100vw-2rem)] items-center">
+				<div className="mt-1 flex h-8 w-[22rem] max-w-[calc(100vw-2rem)] items-center justify-center">
 					<StationRow corner />
 				</div>
 			</div>
@@ -134,7 +135,7 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 }
 
 // Строка станции: полоски, название (с многоточием) и справа кнопка play/пауза.
-// В углу шрифт всегда 14px (text-sm), в центре с lg крупнее
+// У свёрнутых часов шрифт всегда 14px (text-sm), в центре с lg крупнее
 function StationRow({ corner = false }: { corner?: boolean }) {
 	const playing = useNowPlaying();
 	const canToggle = useCanToggleNowPlaying();
@@ -177,7 +178,7 @@ function StationRow({ corner = false }: { corner?: boolean }) {
 // чтобы наведение не терялось между цифрами и кнопкой
 function PositionButton() {
 	const { position, toggle } = useBigClockPosition();
-	const label = position === 'center' ? 'Часы в угол' : 'Часы в центр';
+	const label = position === 'center' ? 'Свернуть часы наверх' : 'Часы в центр';
 
 	return (
 		<div className="absolute top-0 left-full pl-2">
