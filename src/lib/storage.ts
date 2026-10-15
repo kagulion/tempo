@@ -8,6 +8,7 @@ export const storageKeys = {
 	effects: 'tempo:effects',
 	favoriteStations: 'tempo:favorite-stations',
 	lastStation: 'tempo:last-station',
+	mood: 'tempo:mood',
 	openWidgets: 'tempo:open-widgets',
 	radioCompact: 'tempo:radio-compact',
 	stats: 'tempo:stats',

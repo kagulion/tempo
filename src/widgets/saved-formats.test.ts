@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { parseOpen } from './dock/useDock';
 import { parseState } from './effects/useActiveEffects';
+import { parseMood } from './stats/mood';
 import { parseSoundOn } from './wallpaper/playback';
 import { parseSaved } from './wallpaper/useWallpaper';
 import { parseHistory } from './wallpaper/youtube';
@@ -96,5 +97,24 @@ describe('открытые окна', () => {
 
 	it('мусор отбрасывает', () => {
 		expect(parseOpen({ timer: true })).toBeUndefined();
+	});
+});
+
+describe('настроение', () => {
+	it('читает текущий формат', () => {
+		expect(parseMood({ '2026-10-15': { level: 4, note: 'Хороший день' } })).toEqual({
+			'2026-10-15': { level: 4, note: 'Хороший день' }
+		});
+	});
+
+	it('плохие записи отбрасывает, годные оставляет', () => {
+		expect(
+			parseMood({ '2026-10-15': { level: 3 }, today: { level: 3 }, '2026-10-14': { level: 9 } })
+		).toEqual({ '2026-10-15': { level: 3 } });
+	});
+
+	it('не объект отбрасывает', () => {
+		expect(parseMood('2026-10-15')).toBeUndefined();
+		expect(parseMood(null)).toBeUndefined();
 	});
 });

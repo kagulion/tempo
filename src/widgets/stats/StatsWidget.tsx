@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Widget, WidgetTitle } from '@/widgets/Widget';
 
+import { MoodCard } from './MoodCard';
 import { OnlineCard } from './OnlineCard';
 import { StreakCard } from './StreakCard';
 import { TimeCard } from './TimeCard';
@@ -20,12 +21,13 @@ export function StatsWidget({ className }: StatsWidgetProps) {
 		<Widget aria-label="Статистика" className={cn('flex flex-col gap-2.5 p-4', className)}>
 			<div className="flex flex-col">
 				<WidgetTitle>Статистика</WidgetTitle>
-				<span className="text-xs text-white/40">Серия дней и время на сайте</span>
+				<span className="text-xs text-white/40">Серия дней, время на сайте и настроение</span>
 			</div>
 
 			<OnlineCard count={online} />
 			<StreakCard streak={stats.streak} best={stats.best} />
 			<TimeCard todayMs={stats.todayMs} totalMs={stats.totalMs} />
+			<MoodCard today={stats.lastDay} />
 		</Widget>
 	);
 }
