@@ -56,6 +56,13 @@ export default function App() {
 	const focus = useFocusMode();
 	// В фокусе окна и панели только прячутся (hidden), список открытых окон в useDock не трогаем
 	const visibility = focusVisibility(focus.mode);
+	// Угловые часы стоят первым элементом левого столбца. Если сверху нет видимого окна, которое
+	// само прижато к верху (mb-auto), часы прижимаем сами, иначе столбец (justify-end) спустит их вниз
+	const cornerClockClass = columnWidgets('left').some(
+		(widget) => widget.anchor === 'top' && dock.isOpen(widget.id) && visibility.windows
+	)
+		? undefined
+		: 'sm:mb-auto';
 
 	// Закрытые окна не размонтируем, а прячем: радио, звуки и таймер продолжают работать
 	function renderWindow(widget: WidgetEntry) {
@@ -77,7 +84,8 @@ export default function App() {
 		<main className="relative h-screen w-screen overflow-hidden bg-black text-white">
 			<WallpaperBackground />
 			<EffectLayers />
-			<BigClock visibility={visibility.bigClock} />
+			{/* Центральные часы: слой на весь экран. Угловые стоят в левом столбце ниже */}
+			<BigClock visibility={visibility.bigClock} variant="center" />
 			{/* В фокусе клик по свободному экрану (и по крупным часам) возвращает всё обратно. Ниже кнопок (z-20) */}
 			{focus.mode !== 'off' && (
 				<div aria-hidden="true" className="absolute inset-0 z-[15]" onClick={focus.exit} />
@@ -90,7 +98,19 @@ export default function App() {
 			</div>
 
 			{columns.map((column) => (
-				<div key={column.id} className={cn(columnClass, column.className)}>
+				<div
+					key={column.id}
+					// В фокусе окна скрыты, а столбец остаётся ради угловых часов: поднимаем его над
+					// слоем кликов (z-15), чтобы кнопка в строке станции нажималась
+					className={cn(columnClass, focus.mode !== 'off' && 'sm:z-[16]', column.className)}
+				>
+					{column.id === 'left' && (
+						<BigClock
+							visibility={visibility.bigClock}
+							variant="corner"
+							className={cornerClockClass}
+						/>
+					)}
 					{columnWidgets(column.id).map(renderWindow)}
 				</div>
 			))}

@@ -2,6 +2,7 @@
 // у старых посетителей молча сбросятся обои, эффекты или открытые окна
 import { describe, expect, it } from 'vitest';
 
+import { parsePosition } from './clock/useBigClock';
 import { parseOpen } from './dock/useDock';
 import {
 	normalizeStation,
@@ -94,6 +95,19 @@ describe('эффекты', () => {
 	it('мусор отбрасывает', () => {
 		expect(parseState('rain')).toBeUndefined();
 		expect(parseState(null)).toBeUndefined();
+	});
+});
+
+describe('позиция крупных часов', () => {
+	it('читает центр и угол', () => {
+		expect(parsePosition('center')).toBe('center');
+		expect(parsePosition('corner')).toBe('corner');
+	});
+
+	it('мусор отбрасывает', () => {
+		expect(parsePosition('left')).toBeUndefined();
+		expect(parsePosition(true)).toBeUndefined();
+		expect(parsePosition(null)).toBeUndefined();
 	});
 });
 

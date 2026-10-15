@@ -13,7 +13,7 @@ import {
 	voteStation,
 	type RadioCountry
 } from './api';
-import { setNowPlaying } from './nowPlaying';
+import { registerNowPlayingToggle, setNowPlaying } from './nowPlaying';
 import {
 	curatedIds,
 	minSearchLength,
@@ -316,19 +316,28 @@ export function useRadio() {
 
 	useAutoplay(audioRef, station?.url_resolved, playing);
 
-	// Текущая станция для общего стора (строка под крупными часами). Звучит — значит показываем
+	// Текущая станция для общего стора (строка под крупными часами). Станция держится и на паузе,
+	// а звучит ли она, говорит флаг audible
 	const stationName = station?.name;
 	const stationCountry = station?.countrycode;
 	useEffect(() => {
 		const audible = sounding && playing && !muted && volume > 0;
 		setNowPlaying(
-			audible && stationName !== undefined && stationCountry !== undefined
-				? { name: stationName, countrycode: stationCountry }
+			stationName !== undefined && stationCountry !== undefined
+				? { name: stationName, countrycode: stationCountry, playing, audible }
 				: null
 		);
 	}, [sounding, playing, muted, volume, stationName, stationCountry]);
 	// При размонтировании радио строка с часов пропадает
 	useEffect(() => () => setNowPlaying(null), []);
+
+	// Переключатель для кнопки в строке станции на крупных часах. Свежая версия — через ref,
+	// чтобы регистрировать один раз
+	const toggleRef = useRef(togglePlaying);
+	useEffect(() => {
+		toggleRef.current = togglePlaying;
+	});
+	useEffect(() => registerNowPlayingToggle(() => toggleRef.current()), []);
 
 	return {
 		// Свойства для элемента <audio>, который рендерит виджет
