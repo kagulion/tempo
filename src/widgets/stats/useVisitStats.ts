@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
+import { createLiveStore } from '@/lib/liveStore';
 import { isRecord, loadStored, saveStored, storageKeys } from '@/lib/storage';
 
 import { advance, type VisitStats } from './visits';
@@ -32,15 +33,17 @@ function update(now: number, countTime: boolean) {
 	return stats;
 }
 
+// Один таймер на всю страницу, пока есть хоть один читатель (окно статистики, хайлайты).
+// Первая отметка ничего не добавляет: время до неё сайт был закрыт
+const visitStore = createLiveStore<VisitStats>(
+	() => update(Date.now(), false),
+	(set) => {
+		const id = window.setInterval(() => set(update(Date.now(), true)), tickMs);
+		return () => window.clearInterval(id);
+	}
+);
+
 // Серия дней и время на сайте. Время идёт, пока открыта хотя бы одна вкладка, даже фоновая
 export function useVisitStats() {
-	// Первая отметка ничего не добавляет: время до неё сайт был закрыт
-	const [stats, setStats] = useState(() => update(Date.now(), false));
-
-	useEffect(() => {
-		const id = window.setInterval(() => setStats(update(Date.now(), true)), tickMs);
-		return () => window.clearInterval(id);
-	}, []);
-
-	return stats;
+	return useSyncExternalStore(visitStore.subscribe, visitStore.get);
 }

@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
+import { createLiveStore } from '@/lib/liveStore';
 import { storageKeys } from '@/lib/storage';
 
 // Supabase Realtime Presence. Ключи задаются в .env (см. .env.example)
@@ -23,13 +24,13 @@ function visitorId() {
 	}
 }
 
-// Сколько пользователей сейчас на сайте. null — ещё подключаемся.
+// Один канал на всю страницу: открывается при первом подписчике (окно статистики, хайлайты),
+// закрывается, когда отписался последний. null — ещё подключаемся.
 // Заглушка: пока Supabase не настроен, на сайте всегда 1 пользователь — сам посетитель
-export function useOnline() {
-	const [count, setCount] = useState<number | null>(onlineEnabled ? null : 1);
-
-	useEffect(() => {
-		if (!supabaseUrl || !supabaseKey) return;
+const onlineStore = createLiveStore<number | null>(
+	() => (onlineEnabled ? null : 1),
+	(set) => {
+		if (!supabaseUrl || !supabaseKey) return () => {};
 		let cancelled = false;
 		let cleanup = () => {};
 
@@ -44,7 +45,7 @@ export function useOnline() {
 			channel
 				.on('presence', { event: 'sync' }, () => {
 					// Ключи состояния — id посетителей, вкладки одного браузера сгруппированы под одним ключом
-					setCount(Object.keys(channel.presenceState()).length);
+					set(Object.keys(channel.presenceState()).length);
 				})
 				.subscribe((status) => {
 					if (status === 'SUBSCRIBED') channel.track({ since: Date.now() });
@@ -59,7 +60,10 @@ export function useOnline() {
 			cancelled = true;
 			cleanup();
 		};
-	}, []);
+	}
+);
 
-	return count;
+// Сколько пользователей сейчас на сайте. null — ещё подключаемся
+export function useOnline() {
+	return useSyncExternalStore(onlineStore.subscribe, onlineStore.get);
 }

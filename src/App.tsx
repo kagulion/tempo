@@ -10,6 +10,7 @@ import { focusVisibility } from '@/widgets/focus/focus';
 import { FocusButton } from '@/widgets/focus/FocusButton';
 import { useFocusMode } from '@/widgets/focus/useFocusMode';
 import { BackgroundMusic, widgets, type WidgetColumn, type WidgetEntry } from '@/widgets/registry';
+import { StatsHighlights } from '@/widgets/stats/StatsHighlights';
 import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 
 // На телефоне окно занимает ширину экрана над панелью, а если не влезает по высоте — прокручивается.
@@ -82,6 +83,8 @@ export default function App() {
 				<div aria-hidden="true" className="absolute inset-0 z-[15]" onClick={focus.exit} />
 			)}
 			<div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-8 lg:right-8">
+				{/* С xl: уже, при 1024 с оценкой настроения, пилюля наезжает на окно статистики в центральном столбце. В фокусе её нет */}
+				{focus.mode === 'off' && <StatsHighlights className="hidden xl:flex" />}
 				<FocusButton mode={focus.mode} onToggle={focus.toggle} onClockOnly={focus.enterClockOnly} />
 				<FullscreenButton />
 			</div>

@@ -1,15 +1,38 @@
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 
-import { usePersistentState } from '@/hooks/usePersistentState';
-import { storageKeys } from '@/lib/storage';
+import { createPersistentStore, storageKeys } from '@/lib/storage';
 
-import { parseMood, setMood, setNote, type MoodLevel } from './mood';
+import {
+	monthAverage,
+	parseMood,
+	setMood,
+	setNote,
+	type MoodEntries,
+	type MoodLevel
+} from './mood';
+
+// Оценки настроения общие для карточки в окне статистики и хайлайтов в углу экрана:
+// оценка, поставленная в карточке, сразу видна в хайлайте
+const moodStore = createPersistentStore<MoodEntries>(storageKeys.mood, {}, parseMood);
+
+function useMoodEntries() {
+	return useSyncExternalStore(moodStore.subscribe, moodStore.get);
+}
+
+// Среднее настроение за текущий месяц; null, если оценок нет.
+// today — сегодняшний день в формате dayKey (useVisitStats отдаёт его в lastDay)
+export function useMonthMoodAverage(today: string) {
+	const entries = useMoodEntries();
+	const [year, month] = today.split('-').map(Number);
+	return monthAverage(entries, year, month - 1);
+}
 
 // Оценки настроения по дням, выбранный день и показываемый месяц.
 // Новых таймеров нет: окно статистики и так перерисовывается каждую секунду, а useVisitStats каждый раз
 // отдаёт актуальный день в lastDay, его и передаём как «сегодня»
 export function useMood(today: string) {
-	const [entries, setEntries] = usePersistentState(storageKeys.mood, {}, parseMood);
+	const entries = useMoodEntries();
+	const setEntries = moodStore.set;
 	// null — «сегодня», чтобы выбор не залипал на вчера, если сайт открыт через полночь
 	const [picked, setPicked] = useState<string | null>(null);
 	const [view, setView] = useState(() => {
