@@ -1,6 +1,8 @@
 import { Maximize2, Pause, PictureInPicture2, Play } from 'lucide-react';
+import { useLayoutEffect, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { easeInOutStrong, easeOutStrong, flipTransform, prefersReducedMotion } from '@/lib/flip';
 import { cn } from '@/lib/utils';
 import { SoundBars } from '@/widgets/radio/SoundBars';
 import {
@@ -29,6 +31,20 @@ type BigClockProps = {
 	// Сколько места занимает свёрнутый вариант в столбце: прижать к верху столбца, если сверху нет окон
 	className?: string;
 };
+
+// Где стояло время до переключения позиции. Варианты — разные элементы, поэтому положение
+// передаётся через модуль. Устаревшее (переключение не привело к монтированию) не используем
+let pendingClock: { rect: DOMRect; at: number } | null = null;
+
+function rememberClockRect(rect: DOMRect) {
+	pendingClock = { rect, at: performance.now() };
+}
+
+function takePendingClockRect() {
+	const pending = pendingClock;
+	pendingClock = null;
+	return pending && performance.now() - pending.at < 500 ? pending.rect : null;
+}
 
 export function BigClock({ visibility, variant, className }: BigClockProps) {
 	const { shown } = useBigClock();
@@ -63,9 +79,37 @@ type BigClockFaceProps = {
 function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFaceProps) {
 	const now = useNow();
 	const corner = variant === 'corner';
+	const rootRef = useRef<HTMLDivElement>(null);
+	const timeRef = useRef<HTMLTimeElement>(null);
+	const dateRef = useRef<HTMLDivElement>(null);
+	const stationRef = useRef<HTMLDivElement>(null);
+
+	// Анимация только при монтировании после переключения позиции: время «переезжает» со старого места
+	useLayoutEffect(() => {
+		const from = takePendingClockRect();
+		const timeEl = timeRef.current;
+		if (!from || !timeEl) return;
+		const fade = [{ opacity: 0 }, { opacity: 1 }];
+		if (prefersReducedMotion()) {
+			rootRef.current?.animate(fade, { duration: 200, easing: easeOutStrong });
+			return;
+		}
+		const origin = 'top left';
+		timeEl.animate(
+			[
+				{ transform: flipTransform(from, timeEl.getBoundingClientRect()), transformOrigin: origin },
+				{ transform: 'none', transformOrigin: origin }
+			],
+			{ duration: 300, easing: easeInOutStrong }
+		);
+		for (const el of [dateRef.current, stationRef.current]) {
+			el?.animate(fade, { duration: 200, delay: 100, easing: easeOutStrong, fill: 'backwards' });
+		}
+	}, []);
 
 	const time = (
 		<time
+			ref={timeRef}
 			dateTime={now.toISOString()}
 			className={cn(
 				'block font-light tracking-tight tabular-nums',
@@ -86,6 +130,8 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 	if (corner) {
 		return (
 			<div
+				ref={rootRef}
+				data-big-clock
 				className={cn(
 					// Не сжимается: при нехватке высоты сжимаются окна под часами
 					'group relative hidden shrink-0 text-white drop-shadow-[0_2px_24px_rgb(0_0_0/0.6)] select-none sm:flex sm:w-max sm:flex-col sm:items-center',
@@ -95,7 +141,9 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 				)}
 			>
 				{/* День недели над цифрами, как и в центральном варианте */}
-				<div className="mb-1">{date}</div>
+				<div ref={dateRef} className="mb-1">
+					{date}
+				</div>
 				{/* Кнопка позиции в правом верхнем углу цифр, а не строки станции, которая шире */}
 				<div className="relative w-max">
 					{time}
@@ -103,7 +151,10 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 				</div>
 				{/* Высота строки постоянная, чтобы окна ниже не прыгали. Ширина больше цифр:
 				    по ширине цифр от названия станции почти ничего не оставалось */}
-				<div className="mt-1 flex h-8 w-[22rem] max-w-[calc(100vw-2rem)] items-center justify-center">
+				<div
+					ref={stationRef}
+					className="mt-1 flex h-8 w-[22rem] max-w-[calc(100vw-2rem)] items-center justify-center"
+				>
 					<StationRow corner />
 				</div>
 			</div>
@@ -112,6 +163,7 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 
 	return (
 		<div
+			ref={rootRef}
 			className={cn(
 				'pointer-events-none absolute inset-0 flex-col items-center justify-center text-white drop-shadow-[0_2px_24px_rgb(0_0_0/0.6)] select-none',
 				// В фокусе слой над затемняющим слоем кликов (z-15), иначе кнопка станции не нажмётся
@@ -120,13 +172,19 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 			)}
 		>
 			{/* Центрируется только время: дата висит над ним, станция под ним, и они ничего не сдвигают */}
-			<div className={cn('group relative', !forced && 'pointer-events-auto')}>
-				<div className="pointer-events-none absolute bottom-full left-1/2 flex w-[min(80vw,28rem)] -translate-x-1/2 justify-center">
+			<div data-big-clock className={cn('group relative', !forced && 'pointer-events-auto')}>
+				<div
+					ref={dateRef}
+					className="pointer-events-none absolute bottom-full left-1/2 flex w-[min(80vw,28rem)] -translate-x-1/2 justify-center"
+				>
 					{date}
 				</div>
 				{time}
 				{!forced && <PositionButton />}
-				<div className="pointer-events-none absolute top-full left-1/2 mt-3 flex h-8 w-[min(80vw,28rem)] -translate-x-1/2 items-center justify-center">
+				<div
+					ref={stationRef}
+					className="pointer-events-none absolute top-full left-1/2 mt-3 flex h-8 w-[min(80vw,28rem)] -translate-x-1/2 items-center justify-center"
+				>
 					<StationRow />
 				</div>
 			</div>
@@ -187,7 +245,12 @@ function PositionButton() {
 				size="icon-sm"
 				// На сенсорных экранах наведения нет (group-hover там не срабатывает) — кнопка видна всегда
 				className="opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
-				onClick={toggle}
+				onClick={(event) => {
+					// Запоминаем, где время стоит сейчас: новый вариант после монтирования «переедет» отсюда
+					const timeEl = event.currentTarget.closest('[data-big-clock]')?.querySelector('time');
+					if (timeEl) rememberClockRect(timeEl.getBoundingClientRect());
+					toggle();
+				}}
 				title={label}
 				aria-label={label}
 			>
