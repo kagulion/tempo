@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import {
 	ChevronDown,
 	Dices,
@@ -22,7 +20,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Combobox, ComboboxButton } from '@/components/ui/combobox';
 import { Slider } from '@/components/ui/slider';
-import { useDragScroll } from '@/hooks/useDragScroll';
 import { cn } from '@/lib/utils';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { storageKeys } from '@/lib/storage';
@@ -58,8 +55,6 @@ type RadioWidgetProps = {
 
 export function RadioWidget({ className }: RadioWidgetProps) {
 	const radio = useRadio();
-	const genresRef = useRef<HTMLDivElement>(null);
-	useDragScroll(genresRef);
 	// Свёрнутое окно: только звук, название станции и Play/Pause
 	const [compact, setCompact] = usePersistentState(storageKeys.radioCompact, false, parseCompact);
 	const { favorites, isFavorite, toggleFavorite } = useFavoriteStations();
@@ -156,8 +151,9 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 						className="w-full"
 					/>
 
-					{/* Порядок станций, голос за текущую станцию и жанры: одна строка, жанры прокручиваются мышью */}
-					<div className="flex items-center gap-1.5">
+					{/* Порядок станций, голос за текущую станцию и все жанры одним потоком с переносом строк:
+					    так помещаются в две строки, без скрытой прокрутки */}
+					<div className="flex flex-wrap items-center gap-1">
 						<Button
 							variant="glass"
 							size="icon-sm"
@@ -196,12 +192,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 							</span>
 						</div>
 						<div className="mx-0.5 h-4 w-px shrink-0 bg-white/15" />
-						<div
-							ref={genresRef}
-							role="group"
-							aria-label="Жанры"
-							className="flex min-w-0 flex-1 cursor-grab [scrollbar-width:none] gap-1 overflow-x-auto"
-						>
+						<div role="group" aria-label="Жанры" className="contents">
 							{genres.map((genre) => (
 								<button
 									key={genre.id}
