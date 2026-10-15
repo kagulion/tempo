@@ -90,8 +90,21 @@ const definitions = [
 		component: StatsWidget,
 		column: 'center',
 		anchor: 'top',
-		// Между звуками и таймером: свободно по ширине от ~1200px, на более узких экранах может перекрыть соседей
-		placement: 'sm:w-[18rem]'
+		// Между звуками и окнами справа: свободно по ширине от ~1200px, на более узких экранах может перекрыть соседей
+		placement: 'sm:w-[18rem]',
+		slot: 'center-top'
+	},
+	{
+		id: 'timer',
+		label: 'Таймер',
+		icon: Timer,
+		dockGroup: 'main',
+		component: TimerWidget,
+		column: 'center',
+		anchor: 'top',
+		// На месте статистики: открывается вместо неё. Не сжимается: при нехватке высоты сжимаются задачи под ним
+		placement: 'sm:w-[26rem] sm:shrink-0',
+		slot: 'center-top'
 	},
 	{
 		id: 'tasks',
@@ -103,17 +116,6 @@ const definitions = [
 		anchor: 'bottom',
 		// Под статистикой, у панели. Не shrink-0: при нехватке высоты сжимается и список секций прокручивается внутри
 		placement: 'sm:w-[24rem]'
-	},
-	{
-		id: 'timer',
-		label: 'Таймер',
-		icon: Timer,
-		dockGroup: 'main',
-		component: TimerWidget,
-		column: 'right',
-		anchor: 'top',
-		// Не сжимается: при нехватке высоты сжимается галерея под ним
-		placement: 'sm:w-[26rem] sm:shrink-0'
 	},
 	{
 		id: 'wallpaper',

@@ -120,6 +120,10 @@ describe('открытые окна', () => {
 	it('мусор отбрасывает', () => {
 		expect(parseOpen({ timer: true })).toBeUndefined();
 	});
+
+	it('из окон на одном месте оставляет последнее открытое', () => {
+		expect(parseOpen(['timer', 'radio', 'stats'])).toEqual(['radio', 'stats']);
+	});
 });
 
 describe('настроение', () => {

@@ -41,7 +41,7 @@ export const dockPanels: DockPanel[] = [
 			}
 		]
 	},
-	// Правый нижний угол, под столбцом таймера и обоев
+	// Правый нижний угол, под столбцом обоев, эффектов и затемнения
 	{
 		label: 'Вид',
 		className: 'sm:absolute sm:right-4 sm:bottom-4 lg:right-8 lg:bottom-8',

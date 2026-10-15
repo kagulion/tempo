@@ -14,9 +14,14 @@ function slotmates(id: WidgetId): WidgetId[] {
 // Выключенные виджеты (enabled: false в реестре) отбрасываем
 const defaultOpen = (['wallpaper', 'timer', 'radio'] satisfies WidgetId[]).filter(isWidgetId);
 
-// Виджет могли убрать из реестра — неизвестные id отбрасываем
+// Виджет могли убрать из реестра — неизвестные id отбрасываем. Окна могли попасть на одно место
+// после правки slot в реестре (раньше таймер и статистика открывались вместе) — из соседей по месту оставляем последнее открытое
 export function parseOpen(saved: unknown): WidgetId[] | undefined {
-	return Array.isArray(saved) ? saved.filter(isWidgetId) : undefined;
+	if (!Array.isArray(saved)) return undefined;
+	const known = saved.filter(isWidgetId);
+	return known.filter((id, index) =>
+		known.slice(index + 1).every((later) => !slotmates(id).includes(later))
+	);
 }
 
 // Какие окна виджетов открыты. Порядок — по времени открытия, последнее открытое в конце
