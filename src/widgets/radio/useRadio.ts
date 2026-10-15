@@ -20,6 +20,7 @@ import {
 	normalizeStation,
 	parseSort,
 	parseSource,
+	placeStation,
 	sortStations,
 	type RadioSort,
 	type Station,
@@ -73,11 +74,14 @@ export function useRadio() {
 	// Результаты поиска по всем странам лежат отдельно от очереди, чтобы поиск не прерывал звук
 	const [searchResults, setSearchResults] = useState<Station[]>([]);
 	const [searchStatus, setSearchStatus] = useState<RadioStatus>('idle');
+	// Набранный запрос живёт отдельно от источника: набор текста не прерывает звук
+	const [searchQuery, setSearchQuery] = useState(source.kind === 'search' ? source.query : '');
 	const [voting, setVoting] = useState(false);
 	const [voteError, setVoteError] = useState<{ uuid: string; message: string }>();
 	const { isLiked, markLiked } = useLikedStations();
 	// Номер последнего запроса станций — ответы на устаревшие запросы игнорируем
 	const stationsRequest = useRef(0);
+	const searchRequest = useRef(0);
 	const searchTimer = useRef<number>(undefined);
 	// Сколько станций подряд не запустилось — чтобы не перебирать список бесконечно
 	const failedStations = useRef(0);
@@ -102,11 +106,10 @@ export function useRadio() {
 			}
 			failedStations.current = 0;
 			const sorted = sortStations(list, sort, curatedIds(next));
-			// Станция могла выпасть из выдачи — тогда добавляем её из сохранённых данных
-			setStations(
-				first ? [first, ...sorted.filter((item) => item.stationuuid !== first.stationuuid)] : sorted
-			);
-			setCurrentStation(0);
+			// Станция могла выпасть из выдачи — тогда ставим её на законное место
+			const placed = first ? placeStation(sorted, first, sort) : { list: sorted, index: 0 };
+			setStations(placed.list);
+			setCurrentStation(placed.index);
 			setStatus('idle');
 		} catch {
 			if (request === stationsRequest.current) setStatus('error');
@@ -114,28 +117,46 @@ export function useRadio() {
 	}
 
 	async function runSearch(query: string) {
-		const request = ++stationsRequest.current;
+		const request = ++searchRequest.current;
 		try {
 			const list = await fetchStations({ kind: 'search', query });
-			if (request !== stationsRequest.current) return;
+			if (request !== searchRequest.current) return;
 			setSearchResults(list);
 			setSearchStatus(list.length === 0 ? 'empty' : 'idle');
 		} catch {
-			if (request === stationsRequest.current) setSearchStatus('error');
+			if (request === searchRequest.current) setSearchStatus('error');
 		}
 	}
 
-	// Режим «Все страны»: станция продолжает играть, пока посетитель ищет другую
-	function startSearch() {
-		search('');
+	// После перезагрузки с сохранённым поиском: выдача становится очередью, прошлая станция встаёт
+	// на своё место. Пока выдача не пришла, очередь — одна прошлая станция
+	async function restoreSearch(query: string, last: Station) {
+		const request = ++stationsRequest.current;
+		const searchId = ++searchRequest.current;
+		setSearchStatus('loading');
+		try {
+			const list = await fetchStations({ kind: 'search', query });
+			if (searchId === searchRequest.current) {
+				setSearchResults(list);
+				setSearchStatus(list.length === 0 ? 'empty' : 'idle');
+			}
+			// Посетитель уже выбрал другое — очередь не трогаем
+			if (request !== stationsRequest.current) return;
+			const placed = placeStation(sortStations(list, sort), last, sort);
+			setStations(placed.list);
+			setCurrentStation(placed.index);
+		} catch {
+			if (searchId === searchRequest.current) setSearchStatus('error');
+		}
 	}
 
-	// Запрос уходит после паузы в наборе и только от двух символов
+	// Запрос уходит после паузы в наборе и только от двух символов. Источник и очередь не меняются:
+	// станция продолжает играть, пока посетитель ищет другую
 	function search(query: string) {
 		// Устаревшие ответы больше не нужны
-		stationsRequest.current += 1;
+		searchRequest.current += 1;
 		window.clearTimeout(searchTimer.current);
-		setSource({ kind: 'search', query });
+		setSearchQuery(query);
 		if (query.trim().length < minSearchLength) {
 			setSearchResults([]);
 			setSearchStatus('idle');
@@ -164,10 +185,11 @@ export function useRadio() {
 			// oxlint-disable-next-line react/set-state-in-effect
 			loadStations(source, last);
 		} else if (source.kind === 'search' && last) {
-			// Поиск не повторяем без запроса: просто возвращаем последнюю станцию и прошлую выдачу
+			// Пока выдача не пришла, очередь — прошлая станция
 			setStations([last]);
+			setCurrentStation(0);
 			setStatus('idle');
-			if (source.query.trim().length >= minSearchLength) runSearch(source.query);
+			if (source.query.trim().length >= minSearchLength) restoreSearch(source.query, last);
 		} else if (last) {
 			// Последняя станция загружает свою страну
 			loadStations({ kind: 'country', code: last.countrycode }, last);
@@ -193,20 +215,28 @@ export function useRadio() {
 		});
 	}
 
-	// Включает станцию: из результатов поиска, из текущей очереди сразу, из другой страны — после
+	// Станция из результатов поиска: очередь становится выдачей, источник — поиском
+	function playSearchResult(target: Station) {
+		failedStations.current = 0;
+		// Загрузка станций, начатая раньше, больше не нужна
+		stationsRequest.current += 1;
+		window.clearTimeout(searchTimer.current);
+		const queue = sortStations(searchResults, sort);
+		setSource({ kind: 'search', query: searchQuery });
+		setStations(queue);
+		setCurrentStation(
+			Math.max(
+				0,
+				queue.findIndex((item) => item.stationuuid === target.stationuuid)
+			)
+		);
+		setStatus('idle');
+	}
+
+	// Включает станцию: из текущей очереди или избранного сразу, из другой страны — после
 	// загрузки её станций
 	function playStation(target: Station) {
 		failedStations.current = 0;
-		if (
-			source.kind === 'search' &&
-			searchResults.some((item) => item.stationuuid === target.stationuuid)
-		) {
-			// Очередь «Следующей станции» становится выдачей поиска, выбранная станция — первой
-			setStations(sortStations(searchResults, sort, [target.stationuuid]));
-			setCurrentStation(0);
-			setStatus('idle');
-			return;
-		}
 		const index = stations.findIndex((item) => item.stationuuid === target.stationuuid);
 		if (index === -1) {
 			loadStations({ kind: 'country', code: target.countrycode }, target);
@@ -336,6 +366,7 @@ export function useRadio() {
 		stations,
 		searchResults,
 		searchStatus,
+		searchQuery,
 		voting,
 		liked: isLiked(station?.stationuuid),
 		voteError: voteError?.uuid === station?.stationuuid ? voteError?.message : undefined,
@@ -344,8 +375,8 @@ export function useRadio() {
 		volume,
 		muted,
 		loadStations,
-		startSearch,
 		search,
+		playSearchResult,
 		changeSort,
 		likeStation,
 		randomCountry,

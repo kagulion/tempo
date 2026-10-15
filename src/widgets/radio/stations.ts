@@ -178,21 +178,41 @@ function byPopularity(a: Station, b: Station) {
 }
 
 // shuffle — чтобы каждый раз звучало что-то новое, а не одни и те же лидеры рейтинга.
-// pinned — uuid станций, которые идут в начале (каждая группа сортируется отдельно)
+// pinned — uuid станций, которые идут в начале; учитывается только в режиме shuffle: порядок
+// «Популярные» строго по голосам, иначе список и «Далее» выглядят перемешанными
 export function sortStations(
 	stations: Station[],
 	sort: RadioSort,
 	pinned: string[] = [],
 	random: () => number = Math.random
 ) {
-	const order = (list: Station[]) =>
-		sort === 'popular' ? [...list].sort(byPopularity) : shuffled(list, random);
+	if (sort === 'popular') return [...stations].sort(byPopularity);
 
 	const pinnedSet = new Set(pinned);
 	return [
-		...order(stations.filter((item) => pinnedSet.has(item.stationuuid))),
-		...order(stations.filter((item) => !pinnedSet.has(item.stationuuid)))
+		...shuffled(
+			stations.filter((item) => pinnedSet.has(item.stationuuid)),
+			random
+		),
+		...shuffled(
+			stations.filter((item) => !pinnedSet.has(item.stationuuid)),
+			random
+		)
 	];
+}
+
+// Ставит станцию first на её место в уже отсортированном списке и возвращает номер станции.
+// Если она в списке есть — остаётся где была. Если нет: «Популярные» — встаёт по голосам,
+// «Перемешать» — в начало
+export function placeStation(sorted: Station[], first: Station, sort: RadioSort) {
+	const existing = sorted.findIndex((item) => item.stationuuid === first.stationuuid);
+	if (existing !== -1) return { list: sorted, index: existing };
+
+	if (sort === 'shuffle') return { list: [first, ...sorted], index: 0 };
+
+	const found = sorted.findIndex((item) => byPopularity(first, item) < 0);
+	const index = found === -1 ? sorted.length : found;
+	return { list: [...sorted.slice(0, index), first, ...sorted.slice(index)], index };
 }
 
 // Число голосов коротко: 950, 1.2k, 12k

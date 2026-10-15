@@ -13,6 +13,7 @@ import {
 	parseSort,
 	parseSource,
 	parseStationMap,
+	placeStation,
 	sortStations,
 	type Station
 } from './stations';
@@ -144,8 +145,41 @@ describe('sortStations', () => {
 		expect(ids(list)).toEqual(before);
 	});
 
-	it('закреплённые станции идут первыми, в каждой группе своя сортировка', () => {
-		expect(ids(sortStations(list, 'popular', ['d', 'a']))).toEqual(['a', 'd', 'c', 'b']);
+	it('popular: закреплённые не влияют, порядок строго по голосам', () => {
+		expect(ids(sortStations(list, 'popular', ['d', 'a']))).toEqual(['c', 'b', 'a', 'd']);
+	});
+
+	it('shuffle: закреплённые станции идут первыми', () => {
+		const result = sortStations(list, 'shuffle', ['d', 'a'], () => 0);
+		expect(ids(result).slice(0, 2).sort()).toEqual(['a', 'd']);
+	});
+});
+
+describe('placeStation', () => {
+	const sorted = [
+		station('c', { votes: 10 }),
+		station('a', { votes: 5 }),
+		station('d', { votes: 1 })
+	];
+
+	it('станция из списка остаётся на своём месте', () => {
+		expect(placeStation(sorted, station('a', { votes: 5 }), 'popular')).toEqual({
+			list: sorted,
+			index: 1
+		});
+	});
+
+	it('popular: станция вне списка встаёт по голосам', () => {
+		const result = placeStation(sorted, station('x', { votes: 7 }), 'popular');
+		expect(ids(result.list)).toEqual(['c', 'x', 'a', 'd']);
+		expect(result.index).toBe(1);
+		expect(placeStation(sorted, station('y', { votes: 0 }), 'popular').index).toBe(3);
+	});
+
+	it('shuffle: станция вне списка идёт в начало', () => {
+		const result = placeStation(sorted, station('x', { votes: 7 }), 'shuffle');
+		expect(ids(result.list)).toEqual(['x', 'c', 'a', 'd']);
+		expect(result.index).toBe(0);
 	});
 });
 

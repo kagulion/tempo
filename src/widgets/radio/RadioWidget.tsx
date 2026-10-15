@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import {
 	ChevronDown,
 	Dices,
@@ -20,12 +22,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Combobox, ComboboxButton } from '@/components/ui/combobox';
 import { Slider } from '@/components/ui/slider';
+import { useDragScroll } from '@/hooks/useDragScroll';
 import { cn } from '@/lib/utils';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { storageKeys } from '@/lib/storage';
 import { Widget, WidgetHeader } from '@/widgets/Widget';
 
-import { countryName, type RadioCountry } from './api';
+import { countryName } from './api';
 import { genres } from './genres';
 import { formatCount, minSearchLength, type Station } from './stations';
 import { useFavoriteStations } from './useFavoriteStations';
@@ -37,9 +40,6 @@ const statusText: Record<Exclude<RadioStatus, 'idle'>, string> = {
 	empty: 'Нет доступных станций',
 	error: 'Не удалось подключиться к радио'
 };
-
-// Первый пункт списка стран: включает поиск по названию среди всех стран
-const allCountries: RadioCountry = { code: '*', name: 'Все страны', stationCount: 0 };
 
 const chipClassName =
 	'h-7 shrink-0 rounded-lg border border-white/10 bg-white/10 px-2.5 text-xs text-white/80 transition-colors outline-none hover:bg-white/20 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20 aria-pressed:bg-white/30 aria-pressed:text-white disabled:opacity-50';
@@ -58,13 +58,14 @@ type RadioWidgetProps = {
 
 export function RadioWidget({ className }: RadioWidgetProps) {
 	const radio = useRadio();
+	const genresRef = useRef<HTMLDivElement>(null);
+	useDragScroll(genresRef);
 	// Свёрнутое окно: только звук, название станции и Play/Pause
 	const [compact, setCompact] = usePersistentState(storageKeys.radioCompact, false, parseCompact);
 	const { favorites, isFavorite, toggleFavorite } = useFavoriteStations();
 
 	const { station, status, sounding, source } = radio;
 	const popular = radio.sort === 'popular';
-	const searching = source.kind === 'search';
 	const canVote = Boolean(station) && status === 'idle' && !radio.liked && !radio.voting;
 	const likeTitle = radio.liked
 		? 'Вы проголосовали за эту станцию'
@@ -72,7 +73,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 			? `Не удалось проголосовать: ${radio.voteError}`
 			: 'Проголосовать за станцию в Radio Browser (голос нельзя отозвать)';
 	const noSearchResults =
-		source.kind !== 'search' || source.query.trim().length < minSearchLength
+		radio.searchQuery.trim().length < minSearchLength
 			? 'Введите название станции'
 			: radio.searchStatus === 'loading'
 				? 'Ищем…'
@@ -86,8 +87,6 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 	const noStations = status === 'loading' || radio.stations.length === 0;
 	const emptyText =
 		source.kind === 'genre' ? 'В этом жанре нет доступных станций' : statusText.empty;
-	// В селекте станции по алфавиту, а «Следующая» идёт по очереди (перемешанной или по голосам)
-	const stationOptions = [...radio.stations].sort((a, b) => a.name.localeCompare(b.name));
 	// В подсказке: страна (в поиске и жанрах) и голоса (в режиме «Популярные»)
 	function stationHint(item: Station) {
 		const parts = [
@@ -143,68 +142,21 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 				</div>
 			) : (
 				<>
-					<div className="flex flex-col gap-1.5">
-						<div className="flex items-center gap-2">
-							<Combobox
-								aria-label="Страна"
-								items={[allCountries, ...radio.countries]}
-								value={
-									source.kind === 'country'
-										? (radio.countries.find((item) => item.code === source.code) ?? null)
-										: searching
-											? allCountries
-											: null
-								}
-								onValueChange={(item) =>
-									item.code === allCountries.code
-										? radio.startSearch()
-										: radio.loadStations({ kind: 'country', code: item.code })
-								}
-								getLabel={(item) => item.name}
-								getKey={(item) => item.code}
-								placeholder={radio.countries.length === 0 ? 'Загрузка…' : 'Страна'}
-								emptyText="Страна не найдена"
-								className="w-36 shrink-0"
-							/>
+					<Combobox
+						aria-label="Поиск станции по всем странам"
+						items={radio.searchResults}
+						value={null}
+						onValueChange={radio.playSearchResult}
+						onSearch={radio.search}
+						getLabel={stationName}
+						getKey={(item) => item.stationuuid}
+						getHint={stationHint}
+						placeholder="Поиск станции по всем странам"
+						emptyText={noSearchResults}
+						className="w-full"
+					/>
 
-							{searching ? (
-								<Combobox
-									aria-label="Поиск радиостанции по названию"
-									items={radio.searchResults}
-									value={station ?? null}
-									onValueChange={radio.playStation}
-									onSearch={radio.search}
-									getLabel={stationName}
-									getKey={(item) => item.stationuuid}
-									getHint={stationHint}
-									placeholder="Название станции"
-									emptyText={noSearchResults}
-									className="min-w-0 flex-1"
-								/>
-							) : status === 'idle' && station ? (
-								<Combobox
-									aria-label="Радиостанция"
-									items={stationOptions}
-									value={station}
-									onValueChange={radio.playStation}
-									getLabel={stationName}
-									getKey={(item) => item.stationuuid}
-									getHint={stationHint}
-									placeholder="Радиостанция"
-									emptyText="Станция не найдена"
-									className="min-w-0 flex-1"
-								/>
-							) : (
-								<p className="flex h-8 min-w-0 flex-1 items-center truncate px-1 text-sm text-white/70">
-									{status === 'empty'
-										? emptyText
-										: statusText[status === 'idle' ? 'loading' : status]}
-								</p>
-							)}
-						</div>
-					</div>
-
-					{/* Порядок станций, голос за текущую станцию и жанры: одна строка, жанры прокручиваются */}
+					{/* Порядок станций, голос за текущую станцию и жанры: одна строка, жанры прокручиваются мышью */}
 					<div className="flex items-center gap-1.5">
 						<Button
 							variant="glass"
@@ -245,9 +197,10 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 						</div>
 						<div className="mx-0.5 h-4 w-px shrink-0 bg-white/15" />
 						<div
+							ref={genresRef}
 							role="group"
 							aria-label="Жанры"
-							className="flex min-w-0 flex-1 [scrollbar-width:none] gap-1 overflow-x-auto"
+							className="flex min-w-0 flex-1 cursor-grab [scrollbar-width:none] gap-1 overflow-x-auto"
 						>
 							{genres.map((genre) => (
 								<button
@@ -261,6 +214,45 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 								</button>
 							))}
 						</div>
+					</div>
+
+					<div className="flex items-center gap-2">
+						<Combobox
+							aria-label="Страна"
+							items={radio.countries}
+							value={
+								source.kind === 'country'
+									? (radio.countries.find((item) => item.code === source.code) ?? null)
+									: null
+							}
+							onValueChange={(item) => radio.loadStations({ kind: 'country', code: item.code })}
+							getLabel={(item) => item.name}
+							getKey={(item) => item.code}
+							placeholder={radio.countries.length === 0 ? 'Загрузка…' : 'Страна'}
+							emptyText="Страна не найдена"
+							className="w-36 shrink-0"
+						/>
+
+						{status === 'idle' && station ? (
+							<Combobox
+								aria-label="Радиостанция"
+								items={radio.stations}
+								value={station}
+								onValueChange={radio.playStation}
+								getLabel={stationName}
+								getKey={(item) => item.stationuuid}
+								getHint={stationHint}
+								placeholder="Радиостанция"
+								emptyText="Станция не найдена"
+								className="min-w-0 flex-1"
+							/>
+						) : (
+							<p className="flex h-8 min-w-0 flex-1 items-center truncate px-1 text-sm text-white/70">
+								{status === 'empty'
+									? emptyText
+									: statusText[status === 'idle' ? 'loading' : status]}
+							</p>
+						)}
 					</div>
 
 					<div className="flex items-center gap-1">
