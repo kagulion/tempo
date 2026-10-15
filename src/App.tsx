@@ -21,9 +21,11 @@ const windowClass =
 // Столбцы с компьютера: от верхнего края до панели. Окна с anchor: 'top' прижаты к верху (mb-auto),
 // остальные — к низу, к кнопкам панели, даже когда верхнее окно закрыто. Окна в столбце не наезжают друг на друга.
 // На телефоне столбцов нет (contents): окна встают по общему windowClass.
-// Сам столбец не ловит клики, иначе перекрыл бы фон между окнами
+// Сам столбец не ловит клики, иначе перекрыл бы фон между окнами.
+// У столбца свой z-10 (над крупными часами): transform у центрального столбца создаёт слой,
+// и без z-index окна внутри него оказывались бы под часами
 const columnClass =
-	'contents sm:pointer-events-none sm:absolute sm:top-4 sm:bottom-24 sm:flex sm:flex-col sm:justify-end sm:gap-4 lg:top-8 lg:bottom-28';
+	'contents sm:pointer-events-none sm:absolute sm:z-10 sm:top-4 sm:bottom-24 sm:flex sm:flex-col sm:justify-end sm:gap-4 lg:top-8 lg:bottom-28';
 
 // Панели внизу. На телефоне — один ряд во всю ширину с равными промежутками между панелями.
 // С sm ряда нет (contents): каждая панель стоит в своём углу (className в dockPanels).
