@@ -1,5 +1,6 @@
 import {
 	ChartNoAxesColumn,
+	Contrast,
 	Headphones,
 	Image,
 	Radio,
@@ -11,6 +12,7 @@ import {
 import { lazy, type ComponentType } from 'react';
 
 import { AmbienceWidget } from './ambience/AmbienceWidget';
+import { DimmerWidget } from './dimmer/DimmerWidget';
 import { EffectsWidget } from './effects/EffectsWidget';
 import { RadioWidget } from './radio/RadioWidget';
 import { StatsWidget } from './stats/StatsWidget';
@@ -135,6 +137,18 @@ const definitions = [
 		anchor: 'bottom',
 		// На месте галереи: открывается вместо неё
 		placement: 'sm:w-[30rem]',
+		slot: 'view'
+	},
+	{
+		id: 'dimmer',
+		label: 'Затемнение',
+		icon: Contrast,
+		dockGroup: 'view',
+		component: DimmerWidget,
+		column: 'right',
+		anchor: 'bottom',
+		// На месте галереи и эффектов: открывается вместо них
+		placement: 'sm:w-[22rem]',
 		slot: 'view'
 	}
 ] as const satisfies readonly WidgetDefinition[];

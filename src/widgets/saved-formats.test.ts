@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parsePosition } from './clock/useBigClock';
+import { parseDimmer } from './dimmer/dimmer';
 import { parseOpen } from './dock/useDock';
 import {
 	normalizeStation,
@@ -167,5 +168,18 @@ describe('радио', () => {
 		expect(parseSort(1)).toBeUndefined();
 		expect(parseLiked({ u: 1 })).toEqual({ u: 1 });
 		expect(parseLiked(['u'])).toBeUndefined();
+	});
+});
+
+describe('затемнение', () => {
+	it('читает сохранённое значение и округляет до шага', () => {
+		expect(parseDimmer(40)).toBe(40);
+		expect(parseDimmer(42)).toBe(40);
+	});
+
+	it('мусор и значения вне диапазона отбрасывает', () => {
+		expect(parseDimmer('40')).toBeUndefined();
+		expect(parseDimmer(95)).toBeUndefined();
+		expect(parseDimmer(null)).toBeUndefined();
 	});
 });

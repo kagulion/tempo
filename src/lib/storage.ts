@@ -6,6 +6,7 @@ export const storageKeys = {
 	ambience: 'tempo:ambience',
 	bigClock: 'tempo:big-clock',
 	bigClockPosition: 'tempo:big-clock-position',
+	dimmer: 'tempo:dimmer',
 	effects: 'tempo:effects',
 	favoriteStations: 'tempo:favorite-stations',
 	lastStation: 'tempo:last-station',

@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import { cn } from '@/lib/utils';
 import { BigClock } from '@/widgets/clock/BigClock';
+import { DimmerLayer } from '@/widgets/dimmer/DimmerLayer';
 import { Dock, dockPanels } from '@/widgets/dock/Dock';
 import { FullscreenButton } from '@/widgets/dock/FullscreenButton';
 import { useDock } from '@/widgets/dock/useDock';
@@ -83,6 +84,8 @@ export default function App() {
 	return (
 		<main className="relative h-screen w-screen overflow-hidden bg-black text-white">
 			<WallpaperBackground />
+			{/* Затемнение только обоев: эффекты, часы и окна выше */}
+			<DimmerLayer />
 			<EffectLayers />
 			{/* Центральные часы: слой на весь экран. Угловые стоят в левом столбце ниже */}
 			<BigClock visibility={visibility.bigClock} variant="center" />
