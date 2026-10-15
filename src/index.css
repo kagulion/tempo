@@ -22,6 +22,37 @@
 	}
 }
 
+/* Появление окна виджета: окно выходит из display: none (класс hidden), и браузер берёт начальные значения
+   из @starting-style. Окно чуть поднимается от панели снизу и проявляется. Закрывается мгновенно: окна стоят
+   в потоке столбца, и уходящее окно ещё держало бы место — соседи дёргались бы, а окна на одном месте
+   (общий slot) на миг стояли бы друг над другом */
+@layer components {
+	.widget-window {
+		transition-property: opacity, translate, scale;
+		transition-duration: 220ms;
+		/* Сильный ease-out: быстро стартует, мягко доезжает */
+		transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+
+		@starting-style {
+			opacity: 0;
+			translate: 0 0.5rem;
+			scale: 0.98;
+		}
+	}
+
+	/* С уменьшенным движением окно только проявляется, без сдвига */
+	@media (prefers-reduced-motion: reduce) {
+		.widget-window {
+			transition-property: opacity;
+
+			@starting-style {
+				translate: none;
+				scale: none;
+			}
+		}
+	}
+}
+
 @theme inline {
 	--font-heading: var(--font-sans);
 	--font-sans: 'Geist Variable', sans-serif;

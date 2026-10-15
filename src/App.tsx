@@ -73,6 +73,8 @@ export default function App() {
 				key={widget.id}
 				className={cn(
 					windowClass,
+					// Анимация появления — в src/index.css
+					'widget-window',
 					widget.anchor === 'top' && 'sm:mb-auto',
 					widget.placement,
 					(!dock.isOpen(widget.id) || !visibility.windows) && 'hidden'
