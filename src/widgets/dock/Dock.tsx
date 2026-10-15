@@ -41,13 +41,13 @@ export const dockPanels: DockPanel[] = [
 			}
 		]
 	},
-	// Правый нижний угол, под столбцом таймера и обоев
+	// Правый нижний угол, под столбцом таймера и обоев. Группа focus подписана «Таймеры», чтобы не путать с кнопкой фокус-режима
 	{
-		label: 'Вид и фокус',
+		label: 'Вид и таймеры',
 		className: 'sm:absolute sm:right-4 sm:bottom-4 lg:right-8 lg:bottom-8',
 		groups: [
 			{ id: 'view', label: 'Вид' },
-			{ id: 'focus', label: 'Фокус' }
+			{ id: 'focus', label: 'Таймеры' }
 		]
 	}
 ];
