@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 
+import { Logo } from '@/components/Logo';
 import { cn } from '@/lib/utils';
 import { BigClock } from '@/widgets/clock/BigClock';
 import { DimmerLayer } from '@/widgets/dimmer/DimmerLayer';
@@ -18,7 +19,7 @@ import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 // С sm окно стоит в своём столбце: не выше столбца, может сжаться (min-h-0) и прокручиваться внутри.
 // Столбец не ловит клики, а окно — ловит
 const windowClass =
-	'absolute inset-x-4 bottom-[4.5rem] max-h-[calc(100dvh-8rem)] scrollbar-glass overflow-y-auto sm:pointer-events-auto sm:static sm:max-h-full sm:min-h-0';
+	'absolute inset-x-4 bottom-[4.5rem] max-h-[calc(100dvh-9.5rem)] scrollbar-glass overflow-y-auto sm:pointer-events-auto sm:static sm:max-h-full sm:min-h-0';
 
 // Столбцы с компьютера: от верхнего края до панели. Окна с anchor: 'top' прижаты к верху (mb-auto),
 // остальные — к низу, к кнопкам панели, даже когда верхнее окно закрыто. Окна в столбце не наезжают друг на друга.
@@ -36,7 +37,8 @@ const dockRowClass =
 	'pointer-events-none absolute inset-x-4 bottom-4 flex items-end justify-between *:pointer-events-auto sm:contents';
 
 const columns: { id: WidgetColumn; className: string }[] = [
-	{ id: 'left', className: 'sm:left-4 sm:items-start lg:left-8' },
+	// Начинается ниже логотипа в левом верхнем углу
+	{ id: 'left', className: 'sm:top-16 sm:left-4 sm:items-start lg:top-24 lg:left-8' },
 	{ id: 'center', className: 'sm:left-1/2 sm:-translate-x-1/2 sm:items-center' },
 	// Начинается ниже кнопки полного экрана в правом верхнем углу
 	{ id: 'right', className: 'sm:top-16 sm:right-4 sm:items-end lg:top-20 lg:right-8' }
@@ -95,6 +97,8 @@ export default function App() {
 			{focus.mode !== 'off' && (
 				<div aria-hidden="true" className="absolute inset-0 z-[15]" onClick={focus.exit} />
 			)}
+			{/* В фокусе логотипа нет: страница остаётся чистой */}
+			{focus.mode === 'off' && <Logo className="absolute top-4 left-4 z-20 lg:top-8 lg:left-8" />}
 			<div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-8 lg:right-8">
 				{/* С xl: уже, при 1024 с оценкой настроения, пилюля наезжает на окно статистики в центральном столбце. В фокусе её нет */}
 				{focus.mode === 'off' && <StatsHighlights className="hidden xl:flex" />}
