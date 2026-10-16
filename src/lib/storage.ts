@@ -20,6 +20,7 @@ export const storageKeys = {
 	tasks: 'tempo:tasks',
 	timerRuns: 'tempo:timer-runs',
 	timerSettings: 'tempo:timer-settings',
+	tvSound: 'tempo:tv-sound',
 	// Строка без JSON, см. src/widgets/stats/useOnline.ts
 	visitorId: 'tempo:visitor-id',
 	wallpaper: 'tempo:wallpaper',

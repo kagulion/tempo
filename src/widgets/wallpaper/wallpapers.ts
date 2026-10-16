@@ -27,7 +27,13 @@ import dragonflight from '@/assets/wallpapers/warcraft/dragonflight.mp4';
 import pandaria from '@/assets/wallpapers/warcraft/mists-of-pandaria.mp4';
 import nightElf from '@/assets/wallpapers/warcraft/night-elf.mp4';
 
-import { type YouTubeHistoryItem, youtubeThumb, youtubeWallpaperId } from './youtube';
+import { tvWallpaperId } from '@/widgets/tv/tv';
+import type { TvChannel } from '@/widgets/tv/channels';
+import {
+	type YouTubeHistoryItem,
+	youtubeThumb,
+	youtubeWallpaperId
+} from '@/widgets/youtube/youtube';
 
 export type Category = 'alliance' | 'horde' | 'warcraft' | 'japan';
 
@@ -55,7 +61,17 @@ export type YouTubeWallpaper = {
 	thumb: string;
 };
 
-export type Wallpaper = FileWallpaper | YouTubeWallpaper;
+// Телеканал из списка ТВ: поток HLS. Как и YouTube, живёт не в списке обоев
+export type TvWallpaper = {
+	// tv/<id канала>
+	id: string;
+	title: string;
+	kind: 'tv';
+	// Ссылка на плейлист HLS
+	url: string;
+};
+
+export type Wallpaper = FileWallpaper | YouTubeWallpaper | TvWallpaper;
 
 const youtubeTitle = 'Видео YouTube';
 
@@ -68,6 +84,15 @@ export function youtubeWallpaper(item: YouTubeHistoryItem): YouTubeWallpaper {
 		videoId: item.videoId,
 		start: item.start,
 		thumb: youtubeThumb(item.videoId)
+	};
+}
+
+export function tvWallpaper(channel: TvChannel): TvWallpaper {
+	return {
+		id: tvWallpaperId(channel.id),
+		title: channel.title,
+		kind: 'tv',
+		url: channel.url
 	};
 }
 

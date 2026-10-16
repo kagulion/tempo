@@ -4,7 +4,7 @@ import { createPersistentStore, storageKeys } from '@/lib/storage';
 
 import { parseSoundOn } from './playback';
 
-// Управление видео-фоном с YouTube, общее для фона и окна обоев
+// Управление видео-фоном с YouTube, общее для фона и окна YouTube. Пауза общая и для ТВ-фона: фон один
 
 // Пауза от кнопки. undefined — посетитель не выбирал. Не сохраняется: после перезагрузки видео снова играет
 let paused: boolean | undefined;
@@ -23,11 +23,15 @@ function subscribePaused(listener: () => void) {
 	};
 }
 
+export function usePaused() {
+	return useSyncExternalStore(subscribePaused, () => paused);
+}
+
 // Звук сохраняется. Громкость отдельно не настраивается: 100 с учётом приглушения таймером
 const soundStore = createPersistentStore(storageKeys.youtubeSound, false, parseSoundOn);
 
 export function useYouTubePlayback() {
-	const pausedNow = useSyncExternalStore(subscribePaused, () => paused);
+	const pausedNow = usePaused();
 	const soundOn = useSyncExternalStore(soundStore.subscribe, soundStore.get);
 
 	return {

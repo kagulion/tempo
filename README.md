@@ -10,6 +10,8 @@
 - [О таймере](docs/timer.md)
 - [О статистике](docs/stats.md)
 - [Об обоях](docs/wallpaper.md)
+- [О YouTube-фоне](docs/youtube.md)
+- [О ТВ-фоне](docs/tv.md)
 - [Об эффектах](docs/effects.md)
 
 ## Стек

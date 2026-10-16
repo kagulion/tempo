@@ -7,7 +7,7 @@ import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
 import { audioTarget, shouldPause } from './playback';
-import type { YouTubeWallpaper } from './wallpapers';
+import type { YouTubeWallpaper } from '@/widgets/wallpaper/wallpapers';
 import { youtubeErrorMessage } from './youtube';
 import { loadYouTubeApi, type YouTubePlayer } from './youtubeApi';
 import { useYouTubePlayback } from './youtubePlayback';

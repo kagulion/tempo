@@ -4,10 +4,12 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
+import { TvLayer } from '@/widgets/tv/TvLayer';
+import { setYouTubeTitle } from '@/widgets/youtube/useYouTubeHistory';
+import { YouTubeLayer } from '@/widgets/youtube/YouTubeLayer';
+
 import { defaultWallpaperId, useWallpaper } from './useWallpaper';
-import { setYouTubeTitle } from './useYouTubeHistory';
 import type { FileWallpaper, Wallpaper } from './wallpapers';
-import { YouTubeLayer } from './YouTubeLayer';
 
 const layerClass = 'absolute inset-0 h-full w-full object-cover';
 
@@ -70,7 +72,7 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 	);
 }
 
-// Фон на весь экран: картинка, зацикленное видео без звука или видео с YouTube.
+// Фон на весь экран: картинка, зацикленное видео без звука, видео с YouTube или телеканал.
 // Новые обои кладутся поверх старых и проявляются, когда загрузились, — без чёрной вспышки между ними
 export function WallpaperBackground() {
 	const { current: wallpaper, fail } = useWallpaper();
@@ -87,7 +89,7 @@ export function WallpaperBackground() {
 
 	const layers = shown.id === wallpaper.id ? [shown] : [shown, wallpaper];
 
-	// Видео не заиграло. Новое откатываем на то, что сейчас видно, а на уже показанном видео
+	// Видео или канал не заиграли. Новое откатываем на то, что сейчас видно, а на уже показанном видео
 	// (его удалили или закрыли доступ) остаётся вернуться к обоям по умолчанию.
 	// Если не загрузился сам плеер (permanent: false), показанные обои не трогаем: превью остаётся на месте
 	function handleError(item: Wallpaper, message: string, permanent: boolean) {
@@ -118,6 +120,18 @@ export function WallpaperBackground() {
 							soundAllowed={item.id === wallpaper.id && readyId === item.id}
 							onError={(message, permanent) => handleError(item, message, permanent)}
 							onTitle={(title) => setYouTubeTitle(item.videoId, title)}
+							{...common}
+						/>
+					);
+				}
+				if (item.kind === 'tv') {
+					return (
+						<TvLayer
+							key={item.id}
+							wallpaper={item}
+							// Звучит только главный слой: выбранный и уже проявившийся
+							soundAllowed={item.id === wallpaper.id && readyId === item.id}
+							onError={(message) => handleError(item, message, true)}
 							{...common}
 						/>
 					);

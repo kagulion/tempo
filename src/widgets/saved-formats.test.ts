@@ -14,9 +14,10 @@ import {
 } from './radio/stations';
 import { parseState } from './effects/useActiveEffects';
 import { parseMood } from './stats/mood';
-import { parseSoundOn } from './wallpaper/playback';
+import { tvChannels } from './tv/channels';
 import { parseSaved } from './wallpaper/useWallpaper';
-import { parseHistory } from './wallpaper/youtube';
+import { parseSoundOn } from './youtube/playback';
+import { parseHistory } from './youtube/youtube';
 
 describe('обои', () => {
 	it('читает текущий формат', () => {
@@ -32,6 +33,16 @@ describe('обои', () => {
 
 	it('читает видео с YouTube по id вида youtube/<id видео>', () => {
 		expect(parseSaved({ id: 'youtube/dQw4w9WgXcQ' })).toEqual({ id: 'youtube/dQw4w9WgXcQ' });
+	});
+
+	it('читает телеканал из списка по id вида tv/<id канала>', () => {
+		const id = `tv/${tvChannels[0].id}`;
+		expect(parseSaved({ id })).toEqual({ id });
+	});
+
+	it('канал, которого нет в списке, отбрасывает', () => {
+		expect(parseSaved({ id: 'tv/Removed.channel' })).toBeUndefined();
+		expect(parseSaved({ id: 'tv/' })).toBeUndefined();
 	});
 
 	it('неизвестные обои и мусор отбрасывает', () => {
@@ -61,7 +72,7 @@ describe('история видео YouTube', () => {
 	});
 });
 
-describe('звук видео-обоев', () => {
+describe('звук видео-обоев (YouTube и ТВ)', () => {
 	it('читает сохранённый выбор', () => {
 		expect(parseSoundOn(true)).toBe(true);
 		expect(parseSoundOn(false)).toBe(false);

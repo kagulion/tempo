@@ -3,10 +3,12 @@ import {
 	Contrast,
 	Headphones,
 	Image,
+	MonitorPlay,
 	Radio,
 	Sparkles,
 	SquareKanban,
 	Timer,
+	Tv,
 	type LucideIcon
 } from 'lucide-react';
 import { lazy, type ComponentType } from 'react';
@@ -18,7 +20,9 @@ import { RadioWidget } from './radio/RadioWidget';
 import { StatsWidget } from './stats/StatsWidget';
 import { TasksWidget } from './tasks/TasksWidget';
 import { TimerWidget } from './timer/TimerWidget';
+import { TvWidget } from './tv/TvWidget';
 import { WallpaperGallery } from './wallpaper/WallpaperGallery';
+import { YouTubeWidget } from './youtube/YouTubeWidget';
 
 // Загруженная музыка временно скрыта: вместо неё играет радио. Код оставлен, чтобы вернуть её флагом
 export const musicEnabled = false;
@@ -126,7 +130,31 @@ const definitions = [
 		column: 'right',
 		anchor: 'bottom',
 		// Галерея не выше 34rem, сетка превью прокручивается внутри
-		placement: 'max-h-[min(34rem,calc(100dvh-8rem))] sm:max-h-[34rem] sm:w-[30rem]',
+		placement: 'max-h-[min(34rem,calc(100dvh-11rem))] sm:max-h-[34rem] sm:w-[30rem]',
+		slot: 'view'
+	},
+	{
+		id: 'youtube',
+		label: 'YouTube',
+		icon: MonitorPlay,
+		dockGroup: 'view',
+		component: YouTubeWidget,
+		column: 'right',
+		anchor: 'bottom',
+		// На месте галереи: открывается вместо неё. Подборки прокручиваются внутри
+		placement: 'max-h-[min(34rem,calc(100dvh-11rem))] sm:max-h-[34rem] sm:w-[30rem]',
+		slot: 'view'
+	},
+	{
+		id: 'tv',
+		label: 'ТВ',
+		icon: Tv,
+		dockGroup: 'view',
+		component: TvWidget,
+		column: 'right',
+		anchor: 'bottom',
+		// На месте галереи: открывается вместо неё. Каналы прокручиваются внутри
+		placement: 'max-h-[min(34rem,calc(100dvh-11rem))] sm:max-h-[34rem] sm:w-[30rem]',
 		slot: 'view'
 	},
 	{
