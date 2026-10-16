@@ -1,7 +1,6 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 
 import { useDuckLevel } from '@/hooks/useDuckLevel';
-import { usePersistentState } from '@/hooks/usePersistentState';
 import {
 	getStatuses,
 	pruneSoundCache,
@@ -10,7 +9,7 @@ import {
 	subscribeStatuses
 } from '@/lib/ambience';
 import { unlockAudio } from '@/lib/audio';
-import { isRecord, storageKeys } from '@/lib/storage';
+import { createPersistentStore, isRecord, storageKeys } from '@/lib/storage';
 
 import { ambientGroups, ambientSounds, type AmbientSound } from './sounds';
 
@@ -27,6 +26,10 @@ type AmbienceSettings = {
 
 const defaultSettings: AmbienceSettings = { volume: 0.8, sounds: {} };
 
+function isPlaying() {
+	return playing;
+}
+
 function parseSettings(saved: unknown): AmbienceSettings | undefined {
 	if (!isRecord(saved)) return undefined;
 	return {
@@ -35,16 +38,48 @@ function parseSettings(saved: unknown): AmbienceSettings | undefined {
 	};
 }
 
+// Общее для окна звуков и первого экрана со сценами. Хранилище недоступно (приватный режим) —
+// после перезагрузки начнём с чистого листа
+const settingsStore = createPersistentStore(storageKeys.ambience, defaultSettings, parseSettings);
+
+// Как и радио, после перезагрузки звуки ждут нажатия: набор помним, но не играем
+let playing = false;
+const playingListeners = new Set<() => void>();
+
+function setPlaying(next: boolean) {
+	if (playing === next) return;
+	playing = next;
+	playingListeners.forEach((listener) => listener());
+}
+
+function subscribePlaying(listener: () => void) {
+	playingListeners.add(listener);
+	return () => {
+		playingListeners.delete(listener);
+	};
+}
+
+function play() {
+	unlockAudio();
+	setPlaying(true);
+}
+
+// Включает сцену: ровно эти звуки с этими громкостями, остальные выключены. Вызывать из обработчика клика (разблокировка звука)
+export function applyAmbienceScene(sounds: { id: string; volume: number }[]) {
+	settingsStore.set((current) => ({
+		...current,
+		sounds: Object.fromEntries(
+			sounds.map((sound) => [sound.id, { on: true, volume: sound.volume }])
+		)
+	}));
+	play();
+}
+
 // Вся логика фоновых звуков. Сам звук играет в src/lib/ambience.ts, разметка — в AmbienceWidget
 export function useAmbience() {
-	// Хранилище недоступно (приватный режим) — после перезагрузки начнём с чистого листа
-	const [settings, setSettings] = usePersistentState(
-		storageKeys.ambience,
-		defaultSettings,
-		parseSettings
-	);
-	// Как и радио, после перезагрузки звуки ждут нажатия: набор помним, но не играем
-	const [playing, setPlaying] = useState(false);
+	const settings = useSyncExternalStore(settingsStore.subscribe, settingsStore.get);
+	const setSettings = settingsStore.set;
+	const playing = useSyncExternalStore(subscribePlaying, () => isPlaying());
 	const statuses = useSyncExternalStore(subscribeStatuses, getStatuses);
 	const duck = useDuckLevel();
 
@@ -88,11 +123,6 @@ export function useAmbience() {
 				[id]: { ...(current.sounds[id] ?? { on: false, volume: defaultSoundVolume }), ...change }
 			}
 		}));
-	}
-
-	function play() {
-		unlockAudio();
-		setPlaying(true);
 	}
 
 	// Включённый звук при остановленном воспроизведении сразу запускает всё остальное

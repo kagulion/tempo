@@ -24,8 +24,7 @@ export function DimmerWidget({ className }: DimmerWidgetProps) {
 					size="icon-sm"
 					onClick={() => setValue(dimmerDefault)}
 					disabled={value === dimmerDefault}
-					title="Убрать затемнение"
-					aria-label="Убрать затемнение"
+					hint="Убрать затемнение"
 				>
 					<RotateCcw />
 				</Button>

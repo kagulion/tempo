@@ -1,7 +1,9 @@
 import { Maximize, Minimize } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
 
+import { Hint } from '@/components/Hint';
 import { cn } from '@/lib/utils';
+import { hotkeyLabel } from '@/widgets/hotkeys/bindings';
 
 function subscribe(listener: () => void) {
 	document.addEventListener('fullscreenchange', listener);
@@ -10,6 +12,14 @@ function subscribe(listener: () => void) {
 
 function isFullscreen() {
 	return document.fullscreenElement !== null;
+}
+
+// Включает и выключает полный экран. Браузер может отказать, например если запрос пришёл не от нажатия. Тогда просто ничего не меняем
+export function toggleFullscreen() {
+	const request = isFullscreen()
+		? document.exitFullscreen()
+		: document.documentElement.requestFullscreen();
+	request.catch(() => {});
 }
 
 type FullscreenButtonProps = {
@@ -23,30 +33,23 @@ export function FullscreenButton({ className }: FullscreenButtonProps) {
 
 	if (!document.fullscreenEnabled) return null;
 
-	function toggle() {
-		// Браузер может отказать, например если запрос пришёл не от клика. Тогда просто ничего не меняем
-		const request = fullscreen
-			? document.exitFullscreen()
-			: document.documentElement.requestFullscreen();
-		request.catch(() => {});
-	}
-
 	const label = fullscreen ? 'Выйти из полноэкранного режима' : 'На весь экран';
 	const Icon = fullscreen ? Minimize : Maximize;
 
 	return (
-		<button
-			type="button"
-			onClick={toggle}
-			aria-pressed={fullscreen}
-			title={label}
-			aria-label={label}
-			className={cn(
-				'flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white/70 shadow-2xl backdrop-blur-md transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20',
-				className
-			)}
-		>
-			<Icon className="size-4" />
-		</button>
+		<Hint label={label} hotkey={hotkeyLabel('fullscreen')} side="bottom">
+			<button
+				type="button"
+				onClick={toggleFullscreen}
+				aria-pressed={fullscreen}
+				aria-label={label}
+				className={cn(
+					'flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white/70 shadow-2xl backdrop-blur-md transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20',
+					className
+				)}
+			>
+				<Icon className="size-4" />
+			</button>
+		</Hint>
 	);
 }

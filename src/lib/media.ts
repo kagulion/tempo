@@ -2,6 +2,8 @@
 export const mediaQueries = {
 	// Телефон — меньше брейкпоинта sm из Tailwind
 	mobile: '(max-width: 639px)',
+	// Основной указатель — палец (нет мыши и клавиатуры): горячие клавиши не нужны
+	coarsePointer: '(pointer: coarse)',
 	// В системе включено «уменьшить движение»
 	reducedMotion: '(prefers-reduced-motion: reduce)'
 } as const;

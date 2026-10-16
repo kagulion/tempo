@@ -2,6 +2,7 @@ import { useRef, type ReactNode } from 'react';
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox';
 import { CheckIcon, ChevronDownIcon, SearchIcon } from 'lucide-react';
 
+import { Hint } from '@/components/Hint';
 import { cn } from '@/lib/utils';
 
 const popupClassName =
@@ -153,7 +154,8 @@ type ComboboxButtonProps<T> = {
 	emptyText?: string;
 	disabled?: boolean;
 	className?: string;
-	title?: string;
+	// Подсказка при наведении, она же aria-label
+	hint?: string;
 	'aria-label'?: string;
 };
 
@@ -170,7 +172,7 @@ export function ComboboxButton<T>({
 	emptyText = 'Ничего не найдено',
 	disabled,
 	className,
-	title,
+	hint,
 	'aria-label': ariaLabel
 }: ComboboxButtonProps<T>) {
 	return (
@@ -185,9 +187,17 @@ export function ComboboxButton<T>({
 			isItemEqualToValue={(a, b) => getKey(a) === getKey(b)}
 			disabled={disabled}
 		>
-			<ComboboxPrimitive.Trigger aria-label={ariaLabel} title={title} className={className}>
-				{children}
-			</ComboboxPrimitive.Trigger>
+			{hint ? (
+				<Hint label={hint}>
+					<ComboboxPrimitive.Trigger aria-label={ariaLabel ?? hint} className={className}>
+						{children}
+					</ComboboxPrimitive.Trigger>
+				</Hint>
+			) : (
+				<ComboboxPrimitive.Trigger aria-label={ariaLabel} className={className}>
+					{children}
+				</ComboboxPrimitive.Trigger>
+			)}
 
 			<ComboboxPrimitive.Portal>
 				<ComboboxPrimitive.Positioner side="top" sideOffset={8} align="end" className="z-50">

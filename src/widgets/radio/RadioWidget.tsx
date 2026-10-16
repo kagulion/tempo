@@ -166,8 +166,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 					variant="glass"
 					size="icon-sm"
 					onClick={toggleCompact}
-					title={compact ? 'Развернуть' : 'Свернуть'}
-					aria-label={compact ? 'Развернуть' : 'Свернуть'}
+					hint={compact ? 'Развернуть' : 'Свернуть'}
 					aria-pressed={compact}
 				>
 					{compact ? <Maximize2 /> : <Minimize2 />}
@@ -191,8 +190,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 							variant="glass"
 							size="icon"
 							onClick={radio.togglePlaying}
-							title={radio.playing ? 'Выключить радио' : 'Включить радио'}
-							aria-label={radio.playing ? 'Выключить радио' : 'Включить радио'}
+							hint={radio.playing ? 'Выключить радио' : 'Включить радио'}
 						>
 							{radio.playing ? <Pause /> : <Play />}
 						</Button>
@@ -235,8 +233,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 									size="icon-sm"
 									onClick={radio.likeStation}
 									disabled={!canVote}
-									title={likeTitle}
-									aria-label={likeTitle}
+									hint={likeTitle}
 									aria-pressed={radio.liked}
 									className={cn('rounded-r-none', radio.voteError && 'text-red-300')}
 								>
@@ -314,8 +311,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 								size="icon"
 								onClick={radio.randomCountry}
 								disabled={status === 'loading'}
-								title="Случайное радио"
-								aria-label="Случайное радио"
+								hint="Случайное радио"
 							>
 								{status === 'loading' ? <LoaderCircle className="animate-spin" /> : <Dices />}
 							</Button>
@@ -327,8 +323,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 								size="icon"
 								onClick={radio.prevStation}
 								disabled={noStations}
-								title="Предыдущая станция"
-								aria-label="Предыдущая станция"
+								hint="Предыдущая станция"
 							>
 								<SkipBack />
 							</Button>
@@ -336,8 +331,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 								variant="glass"
 								size="icon"
 								onClick={radio.togglePlaying}
-								title={radio.playing ? 'Выключить радио' : 'Включить радио'}
-								aria-label={radio.playing ? 'Выключить радио' : 'Включить радио'}
+								hint={radio.playing ? 'Выключить радио' : 'Включить радио'}
 							>
 								{radio.playing ? <Pause /> : <Play />}
 							</Button>
@@ -346,8 +340,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 								size="icon"
 								onClick={radio.nextStation}
 								disabled={noStations}
-								title="Следующая станция"
-								aria-label="Следующая станция"
+								hint="Следующая станция"
 							>
 								<SkipForward />
 							</Button>
@@ -356,8 +349,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 								variant="glass"
 								size="icon"
 								onClick={radio.toggleMuted}
-								title={silent ? 'Включить звук' : 'Выключить звук'}
-								aria-label={silent ? 'Включить звук' : 'Выключить звук'}
+								hint={silent ? 'Включить звук' : 'Выключить звук'}
 							>
 								{silent ? <VolumeX /> : radio.volume < 0.5 ? <Volume1 /> : <Volume2 />}
 							</Button>
@@ -378,16 +370,14 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 									size="icon"
 									onClick={() => station && toggleFavorite(station)}
 									disabled={!station || status !== 'idle'}
-									title={favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
-									aria-label={favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+									hint={favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
 									aria-pressed={favorite}
 									className="rounded-r-none"
 								>
 									<Heart className={cn(favorite && 'fill-current')} />
 								</Button>
 								<ComboboxButton
-									aria-label="Избранные станции"
-									title="Избранные станции"
+									hint="Избранные станции"
 									items={favorites}
 									value={favorite ? station : null}
 									onValueChange={radio.playStation}

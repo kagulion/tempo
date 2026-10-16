@@ -111,13 +111,7 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 			)}
 
 			<div className="flex items-center gap-2">
-				<Button
-					variant="glass"
-					size="icon-lg"
-					onClick={timer.reset}
-					title="Сбросить таймер"
-					aria-label="Сбросить таймер"
-				>
+				<Button variant="glass" size="icon-lg" onClick={timer.reset} hint="Сбросить таймер">
 					<RotateCcw />
 				</Button>
 				<Button
@@ -133,13 +127,7 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 					{status === 'running' ? 'Пауза' : 'Продолжить'}
 				</Button>
 				{mode === 'pomodoro' && (
-					<Button
-						variant="glass"
-						size="icon-lg"
-						onClick={timer.skip}
-						title="Пропустить фазу"
-						aria-label="Пропустить фазу"
-					>
+					<Button variant="glass" size="icon-lg" onClick={timer.skip} hint="Пропустить фазу">
 						<SkipForward />
 					</Button>
 				)}
@@ -161,8 +149,7 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 					variant="glass"
 					size="icon-sm"
 					onClick={() => timer.changeSetting('sound', !settings.sound)}
-					title={settings.sound ? 'Выключить сигнал' : 'Включить сигнал'}
-					aria-label={settings.sound ? 'Выключить сигнал' : 'Включить сигнал'}
+					hint={settings.sound ? 'Выключить сигнал' : 'Включить сигнал'}
 					aria-pressed={settings.sound}
 				>
 					{settings.sound ? <Bell /> : <BellOff />}

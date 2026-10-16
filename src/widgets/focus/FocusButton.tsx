@@ -6,7 +6,9 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { Hint } from '@/components/Hint';
 import { cn } from '@/lib/utils';
+import { hotkeyLabel } from '@/widgets/hotkeys/bindings';
 
 import type { FocusMode } from './focus';
 
@@ -33,26 +35,28 @@ export function FocusButton({ mode, onToggle, onHideAll, className }: FocusButto
 				className
 			)}
 		>
-			<button
-				type="button"
-				onClick={onToggle}
-				aria-pressed={active}
-				title={label}
-				aria-label={label}
-				className={cn(partClass, 'gap-1.5 pl-3 text-sm', active ? 'pr-3.5' : 'pr-2')}
-			>
-				<Focus className="size-4" />
-				Фокус
-			</button>
+			<Hint label={label} hotkey={active ? 'Esc' : hotkeyLabel('focus')} side="bottom">
+				<button
+					type="button"
+					onClick={onToggle}
+					aria-pressed={active}
+					aria-label={label}
+					className={cn(partClass, 'gap-1.5 pl-3 text-sm', active ? 'pr-3.5' : 'pr-2')}
+				>
+					<Focus className="size-4" />
+					Фокус
+				</button>
+			</Hint>
 			{!active && (
 				<DropdownMenu>
-					<DropdownMenuTrigger
-						aria-label="Другие режимы фокуса"
-						title="Другие режимы фокуса"
-						className={cn(partClass, 'w-8 pr-1')}
-					>
-						<ChevronDown className="size-4" />
-					</DropdownMenuTrigger>
+					<Hint label="Другие режимы фокуса" side="bottom">
+						<DropdownMenuTrigger
+							aria-label="Другие режимы фокуса"
+							className={cn(partClass, 'w-8 pr-1')}
+						>
+							<ChevronDown className="size-4" />
+						</DropdownMenuTrigger>
+					</Hint>
 					<DropdownMenuContent align="end">
 						<DropdownMenuItem onClick={onHideAll}>Скрыть всё</DropdownMenuItem>
 					</DropdownMenuContent>

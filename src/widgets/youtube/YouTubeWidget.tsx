@@ -151,7 +151,7 @@ export function YouTubeWidget({ className }: YouTubeWidgetProps) {
 											size="icon-xs"
 											onClick={() => remove(entry.videoId)}
 											aria-label={`Удалить «${item.title}»`}
-											title="Удалить"
+											hint="Удалить"
 											className="absolute top-1 right-1 rounded-full bg-black/60 hover:bg-black/80"
 										>
 											<X />

@@ -45,6 +45,8 @@ type WidgetDefinition = {
 	id: string;
 	// Подпись кнопки на панели
 	label: string;
+	// Клавиша открытия и закрытия окна: event.code, например 'Digit1'. Не должна повторяться (проверяет hotkeys.test.ts)
+	hotkey?: string;
 	icon: LucideIcon;
 	dockGroup: DockGroupId;
 	// Окно виджета. Положение на экране приходит в className
@@ -65,6 +67,7 @@ type WidgetDefinition = {
 const definitions = [
 	{
 		id: 'radio',
+		hotkey: 'Digit1',
 		label: 'Радио',
 		icon: Radio,
 		dockGroup: 'sound',
@@ -77,6 +80,7 @@ const definitions = [
 	},
 	{
 		id: 'ambience',
+		hotkey: 'Digit2',
 		label: 'Звуки',
 		icon: Headphones,
 		dockGroup: 'sound',
@@ -88,6 +92,7 @@ const definitions = [
 	},
 	{
 		id: 'stats',
+		hotkey: 'Digit3',
 		label: 'Статистика',
 		icon: ChartNoAxesColumn,
 		dockGroup: 'main',
@@ -100,6 +105,7 @@ const definitions = [
 	},
 	{
 		id: 'timer',
+		hotkey: 'Digit4',
 		label: 'Таймер',
 		icon: Timer,
 		dockGroup: 'main',
@@ -112,6 +118,7 @@ const definitions = [
 	},
 	{
 		id: 'tasks',
+		hotkey: 'Digit5',
 		label: 'Задачи',
 		icon: SquareKanban,
 		dockGroup: 'main',
@@ -123,6 +130,7 @@ const definitions = [
 	},
 	{
 		id: 'wallpaper',
+		hotkey: 'Digit6',
 		label: 'Обои',
 		icon: Image,
 		dockGroup: 'view',
@@ -135,6 +143,7 @@ const definitions = [
 	},
 	{
 		id: 'youtube',
+		hotkey: 'Digit7',
 		label: 'YouTube',
 		icon: MonitorPlay,
 		dockGroup: 'view',
@@ -147,6 +156,7 @@ const definitions = [
 	},
 	{
 		id: 'tv',
+		hotkey: 'Digit8',
 		label: 'ТВ',
 		icon: Tv,
 		dockGroup: 'view',
@@ -159,6 +169,7 @@ const definitions = [
 	},
 	{
 		id: 'effects',
+		hotkey: 'Digit9',
 		label: 'Эффекты',
 		icon: Sparkles,
 		dockGroup: 'view',
@@ -171,6 +182,7 @@ const definitions = [
 	},
 	{
 		id: 'dimmer',
+		hotkey: 'Digit0',
 		label: 'Затемнение',
 		icon: Contrast,
 		dockGroup: 'view',

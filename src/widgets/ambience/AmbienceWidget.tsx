@@ -26,8 +26,7 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 					size="icon-sm"
 					onClick={ambience.resetSounds}
 					disabled={ambience.pristine}
-					title="Сбросить звуки"
-					aria-label="Сбросить звуки"
+					hint="Сбросить звуки"
 				>
 					<RotateCcw />
 				</Button>
@@ -36,8 +35,7 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 					size="icon-sm"
 					onClick={ambience.togglePlaying}
 					disabled={!ambience.anyOn}
-					title={ambience.playing ? 'Остановить звуки' : 'Включить звуки'}
-					aria-label={ambience.playing ? 'Остановить звуки' : 'Включить звуки'}
+					hint={ambience.playing ? 'Остановить звуки' : 'Включить звуки'}
 				>
 					{ambience.playing ? <Pause /> : <Play />}
 				</Button>

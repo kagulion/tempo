@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Hint } from '@/components/Hint';
 import { cn } from '@/lib/utils';
 
 import { maxNoteLength, monthAverage, monthGrid, moodLevels } from './mood';
@@ -57,22 +58,22 @@ export function MoodCard({ today: todayKey }: MoodCardProps) {
 
 			<div className="flex justify-between gap-1">
 				{moodLevels.map(({ level, emoji, label }) => (
-					<button
-						key={level}
-						type="button"
-						title={label}
-						aria-label={label}
-						aria-pressed={current?.level === level}
-						onClick={() => mood.rate(level)}
-						className={cn(
-							'flex h-9 flex-1 items-center justify-center rounded-lg border border-transparent text-xl transition-colors outline-none hover:bg-white/10 focus-visible:ring-3 focus-visible:ring-white/20',
-							current?.level === level
-								? 'border-white/30 bg-white/15'
-								: 'opacity-70 hover:opacity-100'
-						)}
-					>
-						{emoji}
-					</button>
+					<Hint key={level} label={label}>
+						<button
+							type="button"
+							aria-label={label}
+							aria-pressed={current?.level === level}
+							onClick={() => mood.rate(level)}
+							className={cn(
+								'flex h-9 flex-1 items-center justify-center rounded-lg border border-transparent text-xl transition-colors outline-none hover:bg-white/10 focus-visible:ring-3 focus-visible:ring-white/20',
+								current?.level === level
+									? 'border-white/30 bg-white/15'
+									: 'opacity-70 hover:opacity-100'
+							)}
+						>
+							{emoji}
+						</button>
+					</Hint>
 				))}
 			</div>
 

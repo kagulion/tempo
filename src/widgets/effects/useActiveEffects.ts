@@ -31,6 +31,11 @@ export function parseState(saved: unknown): EffectsState | undefined {
 // после перезагрузки включатся эффекты по умолчанию
 const store = createPersistentStore(storageKeys.effects, defaultState, parseState);
 
+// Включает ровно эти эффекты (пустой список — ни одного) и снимает паузу. Для готовых сцен первого экрана
+export function setActiveEffects(ids: EffectId[]) {
+	store.set({ active: ids, paused: false });
+}
+
 // Какие эффекты включены (можно несколько сразу или ни одного) и стоят ли они на паузе
 export function useActiveEffects() {
 	const state = useSyncExternalStore(store.subscribe, store.get);

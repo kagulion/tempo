@@ -221,8 +221,7 @@ function StationRow({ corner = false }: { corner?: boolean }) {
 						event.stopPropagation();
 						toggleNowPlaying();
 					}}
-					title={label}
-					aria-label={label}
+					hint={label}
 				>
 					{playing.playing ? <Pause /> : <Play />}
 				</Button>
@@ -251,8 +250,7 @@ function PositionButton() {
 					if (timeEl) rememberClockRect(timeEl.getBoundingClientRect());
 					toggle();
 				}}
-				title={label}
-				aria-label={label}
+				hint={label}
 			>
 				{position === 'center' ? <PictureInPicture2 /> : <Maximize2 />}
 			</Button>

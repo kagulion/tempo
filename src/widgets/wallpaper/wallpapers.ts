@@ -71,7 +71,19 @@ export type TvWallpaper = {
 	url: string;
 };
 
-export type Wallpaper = FileWallpaper | YouTubeWallpaper | TvWallpaper;
+// Файл, который посетитель загрузил сам. Лежит в IndexedDB его браузера, см. customStore.ts
+export type CustomWallpaper = {
+	// custom/<ключ>
+	id: string;
+	title: string;
+	kind: 'custom';
+	// Картинка или зацикленное видео
+	media: 'image' | 'video';
+	// Адрес object URL, действует, пока открыта страница
+	url: string;
+};
+
+export type Wallpaper = FileWallpaper | CustomWallpaper | YouTubeWallpaper | TvWallpaper;
 
 const youtubeTitle = 'Видео YouTube';
 

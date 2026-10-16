@@ -146,14 +146,7 @@ export function TasksWidget({ className }: TasksWidgetProps) {
 					aria-label="Новая задача"
 					autoComplete="off"
 				/>
-				<Button
-					type="submit"
-					variant="glass"
-					size="icon"
-					disabled={!draft.trim()}
-					title="Добавить"
-					aria-label="Добавить"
-				>
+				<Button type="submit" variant="glass" size="icon" disabled={!draft.trim()} hint="Добавить">
 					<Plus />
 				</Button>
 			</form>

@@ -22,21 +22,14 @@ export function PlaybackControls({
 
 	return (
 		<>
-			<Button
-				variant="glass"
-				size="icon-sm"
-				onClick={onTogglePause}
-				title={pauseLabel}
-				aria-label={pauseLabel}
-			>
+			<Button variant="glass" size="icon-sm" onClick={onTogglePause} hint={pauseLabel}>
 				{stopped ? <Play /> : <Pause />}
 			</Button>
 			<Button
 				variant="glass"
 				size="icon-sm"
 				onClick={onToggleSound}
-				title={soundLabel}
-				aria-label={soundLabel}
+				hint={soundLabel}
 				aria-pressed={soundOn}
 			>
 				{soundOn ? <Volume2 /> : <VolumeX />}

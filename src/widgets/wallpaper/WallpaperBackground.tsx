@@ -9,12 +9,12 @@ import { setYouTubeTitle } from '@/widgets/youtube/useYouTubeHistory';
 import { YouTubeLayer } from '@/widgets/youtube/YouTubeLayer';
 
 import { defaultWallpaperId, useWallpaper } from './useWallpaper';
-import type { FileWallpaper, Wallpaper } from './wallpapers';
+import type { CustomWallpaper, FileWallpaper, Wallpaper } from './wallpapers';
 
 const layerClass = 'absolute inset-0 h-full w-full object-cover';
 
 type LayerProps = {
-	wallpaper: FileWallpaper;
+	wallpaper: FileWallpaper | CustomWallpaper;
 	onReady: () => void;
 	// Слой проявился до конца
 	onShown?: () => void;
@@ -43,7 +43,8 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 		return () => document.removeEventListener('visibilitychange', sync);
 	}, [reducedMotion]);
 
-	if (wallpaper.kind === 'image') {
+	const media = wallpaper.kind === 'custom' ? wallpaper.media : wallpaper.kind;
+	if (media === 'image') {
 		return (
 			<img
 				src={wallpaper.url}
@@ -59,7 +60,7 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 		<video
 			ref={videoRef}
 			src={wallpaper.url}
-			poster={wallpaper.thumb}
+			poster={wallpaper.kind === 'custom' ? undefined : wallpaper.thumb}
 			muted
 			loop
 			playsInline

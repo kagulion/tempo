@@ -1,17 +1,33 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 import { Logo } from '@/components/Logo';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { useHotkeys } from '@/hooks/useHotkeys';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { installClickSounds, clickSoundsStore } from '@/lib/clickSound';
+import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
+import { useBigClock } from '@/widgets/clock/useBigClock';
 import { BigClock } from '@/widgets/clock/BigClock';
 import { DimmerLayer } from '@/widgets/dimmer/DimmerLayer';
 import { Dock, dockPanels } from '@/widgets/dock/Dock';
-import { FullscreenButton } from '@/widgets/dock/FullscreenButton';
+import { FullscreenButton, toggleFullscreen } from '@/widgets/dock/FullscreenButton';
 import { useDock } from '@/widgets/dock/useDock';
 import { EffectLayers } from '@/widgets/effects/EffectLayers';
 import { focusVisibility } from '@/widgets/focus/focus';
 import { FocusButton } from '@/widgets/focus/FocusButton';
 import { useFocusMode } from '@/widgets/focus/useFocusMode';
-import { BackgroundMusic, widgets, type WidgetColumn, type WidgetEntry } from '@/widgets/registry';
+import { hotkeyBindings } from '@/widgets/hotkeys/bindings';
+import { HotkeysButton, HotkeysDialog } from '@/widgets/hotkeys/HotkeysDialog';
+import {
+	BackgroundMusic,
+	widgets,
+	type WidgetColumn,
+	type WidgetEntry,
+	type WidgetId
+} from '@/widgets/registry';
+import { ScenesDialog } from '@/widgets/onboarding/ScenesDialog';
+import { useOnboarding } from '@/widgets/onboarding/useOnboarding';
 import { StatsHighlights } from '@/widgets/stats/StatsHighlights';
 import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 
@@ -60,6 +76,31 @@ export default function App() {
 	const focus = useFocusMode();
 	// В фокусе окна и панели только прячутся (hidden), список открытых окон в useDock не трогаем
 	const visibility = focusVisibility(focus.mode);
+	const bigClock = useBigClock();
+	const [helpOpen, setHelpOpen] = useState(false);
+	const closeHelp = () => setHelpOpen(false);
+	const onboarding = useOnboarding();
+	// Клавиатуры на телефоне нет: кнопку со списком клавиш прячем
+	const touchOnly = useMediaQuery(mediaQueries.coarsePointer);
+
+	// Тихие тики при нажатии кнопок, слушатель один на весь документ
+	useEffect(() => installClickSounds(), []);
+
+	useHotkeys(hotkeyBindings, (action) => {
+		// Пока открыты сцены, клавиши сайта молчат (Esc обрабатывает сама карточка)
+		if (onboarding.visible) return;
+		if (action === 'help') return setHelpOpen((open) => !open);
+		// Пока открыт список клавиш, остальные клавиши ждут
+		if (helpOpen) return;
+		if (action === 'scenes') return onboarding.open();
+		if (action === 'clickSounds') return clickSoundsStore.set((enabled) => !enabled);
+		if (action === 'focus') return focus.toggle();
+		if (action === 'fullscreen') return document.fullscreenEnabled ? toggleFullscreen() : undefined;
+		// В фокусе окна и панель спрятаны, их клавиши не работают
+		if (focus.mode !== 'off') return;
+		if (action === 'bigClock') return bigClock.toggle();
+		if (action.startsWith('widget:')) dock.toggle(action.slice('widget:'.length) as WidgetId);
+	});
 	// Свёрнутые часы стоят первым элементом центрального столбца, над статистикой. Если сверху нет видимого окна, которое
 	// само прижато к верху (mb-auto), часы прижимаем сами, иначе столбец (justify-end) спустит их вниз
 	const cornerClockClass = columnWidgets('center').some(
@@ -87,54 +128,66 @@ export default function App() {
 	}
 
 	return (
-		<main className="relative h-screen w-screen overflow-hidden bg-black text-white">
-			<WallpaperBackground />
-			{/* Затемнение только обоев: эффекты, часы и окна выше */}
-			<DimmerLayer />
-			<EffectLayers />
-			{/* Центральные часы: слой на весь экран. свёрнутые стоят наверху центрального столбца ниже */}
-			<BigClock visibility={visibility.bigClock} variant="center" />
-			{/* В фокусе клик по свободному экрану (и по крупным часам) возвращает всё обратно. Ниже кнопок (z-20) */}
-			{focus.mode !== 'off' && (
-				<div aria-hidden="true" className="absolute inset-0 z-[15]" onClick={focus.exit} />
-			)}
-			{/* В фокусе логотипа нет: страница остаётся чистой */}
-			{focus.mode === 'off' && <Logo className="absolute top-4 left-4 z-20 lg:top-8 lg:left-8" />}
-			<div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-8 lg:right-8">
-				{/* С xl: уже, при 1024 с оценкой настроения, пилюля наезжает на окно статистики в центральном столбце. В фокусе её нет */}
-				{focus.mode === 'off' && <StatsHighlights className="hidden xl:flex" />}
-				<FocusButton mode={focus.mode} onToggle={focus.toggle} onHideAll={focus.enterHideAll} />
-				<FullscreenButton />
-			</div>
-
-			{columns.map((column) => (
-				<div
-					key={column.id}
-					// В фокусе окна скрыты, а столбец остаётся ради свёрнутых часов: поднимаем его над
-					// слоем кликов (z-15), чтобы кнопка в строке станции нажималась
-					className={cn(columnClass, focus.mode !== 'off' && 'sm:z-[16]', column.className)}
-				>
-					{column.id === 'center' && (
-						<BigClock
-							visibility={visibility.bigClock}
-							variant="corner"
-							className={cornerClockClass}
-						/>
-					)}
-					{columnWidgets(column.id).map(renderWindow)}
+		<TooltipProvider>
+			<main className="relative h-screen w-screen overflow-hidden bg-black text-white">
+				<WallpaperBackground />
+				{/* Затемнение только обоев: эффекты, часы и окна выше */}
+				<DimmerLayer />
+				<EffectLayers />
+				{/* Центральные часы: слой на весь экран. свёрнутые стоят наверху центрального столбца ниже */}
+				<BigClock visibility={visibility.bigClock} variant="center" />
+				{/* В фокусе клик по свободному экрану (и по крупным часам) возвращает всё обратно. Ниже кнопок (z-20) */}
+				{focus.mode !== 'off' && (
+					<div aria-hidden="true" className="absolute inset-0 z-[15]" onClick={focus.exit} />
+				)}
+				{/* В фокусе логотипа нет: страница остаётся чистой */}
+				{focus.mode === 'off' && <Logo className="absolute top-4 left-4 z-20 lg:top-8 lg:left-8" />}
+				<div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-8 lg:right-8">
+					{/* С xl: уже, при 1024 с оценкой настроения, пилюля наезжает на окно статистики в центральном столбце. В фокусе её нет */}
+					{focus.mode === 'off' && <StatsHighlights className="hidden xl:flex" />}
+					<FocusButton mode={focus.mode} onToggle={focus.toggle} onHideAll={focus.enterHideAll} />
+					{!touchOnly && <HotkeysButton onClick={() => setHelpOpen(true)} />}
+					<FullscreenButton />
 				</div>
-			))}
-			{BackgroundMusic && (
-				<Suspense>
-					<BackgroundMusic />
-				</Suspense>
-			)}
 
-			<div className={cn(dockRowClass, !visibility.dock && 'hidden sm:hidden')}>
-				{dockPanels.map((panel) => (
-					<Dock key={panel.label} panel={panel} isOpen={dock.isOpen} onToggle={dock.toggle} />
+				{columns.map((column) => (
+					<div
+						key={column.id}
+						// В фокусе окна скрыты, а столбец остаётся ради свёрнутых часов: поднимаем его над
+						// слоем кликов (z-15), чтобы кнопка в строке станции нажималась
+						className={cn(columnClass, focus.mode !== 'off' && 'sm:z-[16]', column.className)}
+					>
+						{column.id === 'center' && (
+							<BigClock
+								visibility={visibility.bigClock}
+								variant="corner"
+								className={cornerClockClass}
+							/>
+						)}
+						{columnWidgets(column.id).map(renderWindow)}
+					</div>
 				))}
-			</div>
-		</main>
+				{BackgroundMusic && (
+					<Suspense>
+						<BackgroundMusic />
+					</Suspense>
+				)}
+
+				<div className={cn(dockRowClass, !visibility.dock && 'hidden sm:hidden')}>
+					{dockPanels.map((panel) => (
+						<Dock key={panel.label} panel={panel} isOpen={dock.isOpen} onToggle={dock.toggle} />
+					))}
+				</div>
+				<HotkeysDialog
+					open={helpOpen}
+					onClose={closeHelp}
+					onOpenScenes={() => {
+						closeHelp();
+						onboarding.open();
+					}}
+				/>
+				{onboarding.visible && <ScenesDialog onFinish={onboarding.finish} />}
+			</main>
+		</TooltipProvider>
 	);
 }

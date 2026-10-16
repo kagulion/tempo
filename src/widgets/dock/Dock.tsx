@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 
+import { Hint } from '@/components/Hint';
 import { cn } from '@/lib/utils';
+import { hotkeyLabel } from '@/widgets/hotkeys/bindings';
 import { type DockGroupId, widgets, type WidgetId } from '@/widgets/registry';
 
 import { DockClock } from './DockClock';
@@ -75,17 +77,21 @@ export function Dock({ panel, isOpen, onToggle }: DockProps) {
 								const Icon = widget.icon;
 								const open = isOpen(widget.id);
 								return (
-									<button
+									<Hint
 										key={widget.id}
-										type="button"
-										onClick={() => onToggle(widget.id)}
-										aria-pressed={open}
-										title={widget.label}
-										aria-label={widget.label}
-										className={cn(buttonClass, open && 'bg-white/20 text-white')}
+										label={widget.label}
+										hotkey={hotkeyLabel(`widget:${widget.id}`)}
 									>
-										<Icon className="size-4" />
-									</button>
+										<button
+											type="button"
+											onClick={() => onToggle(widget.id)}
+											aria-pressed={open}
+											aria-label={widget.label}
+											className={cn(buttonClass, open && 'bg-white/20 text-white')}
+										>
+											<Icon className="size-4" />
+										</button>
+									</Hint>
 								);
 							})}
 						{group.extra}

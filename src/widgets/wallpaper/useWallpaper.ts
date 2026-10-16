@@ -1,4 +1,4 @@
-import { useMemo, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useSyncExternalStore } from 'react';
 
 import { createPersistentStore, isRecord, storageKeys } from '@/lib/storage';
 
@@ -8,6 +8,8 @@ import { parseYoutubeWallpaperId } from '@/widgets/youtube/youtube';
 import { setPaused } from '@/widgets/youtube/youtubePlayback';
 import { useYouTubeHistory } from '@/widgets/youtube/useYouTubeHistory';
 
+import { parseCustomWallpaperId } from './custom';
+import { loadCustomWallpapers, useCustomWallpapers } from './useCustomWallpapers';
 import { type Wallpaper, tvWallpaper, wallpapers, youtubeWallpaper } from './wallpapers';
 
 // Обои при первом заходе — как раньше, первые обои Орды
@@ -36,6 +38,8 @@ export function parseSaved(saved: unknown): { id: string } | undefined {
 			? { id: id as string }
 			: undefined;
 	}
+	// Свои обои: по форме custom/<ключ>. Есть ли файл, проверяется после чтения IndexedDB (см. useWallpaper)
+	if (parseCustomWallpaperId(id) !== undefined) return { id: id as string };
 	// Список обоев мог поменяться: неизвестный id сбрасываем на обои по умолчанию
 	return wallpapers.some((item) => item.id === id) ? { id: id as string } : undefined;
 }
@@ -60,13 +64,37 @@ function subscribeError(listener: () => void) {
 	};
 }
 
+// Выбирает обои по id. Отдельно от хука, чтобы первый экран со сценами мог выбрать обои, не подписываясь на остальное
+export function selectWallpaper(next: string) {
+	setLastError(undefined);
+	// Новые обои начинают с чистого листа: видео не должно застыть из-за паузы на прошлом
+	setPaused(undefined);
+	store.set({ id: next });
+}
+
 // Выбранные обои, сохраняются в localStorage
 export function useWallpaper() {
 	const { id } = useSyncExternalStore(store.subscribe, store.get);
 	const history = useYouTubeHistory();
 	const error = useSyncExternalStore(subscribeError, () => lastError);
+	const custom = useCustomWallpapers();
+
+	// Выбраны свои обои: читаем их из IndexedDB, а если файла уже нет (данные сайта очистили) — тихо возвращаем обои по умолчанию
+	const customSelected = parseCustomWallpaperId(id) !== undefined;
+	const customMissing =
+		customSelected && custom.loaded && !custom.items.some((item) => item.wallpaper.id === id);
+	useEffect(() => {
+		if (customSelected) void loadCustomWallpapers();
+		if (customMissing) store.set({ id: defaultWallpaperId });
+	}, [customSelected, customMissing]);
 
 	const current = useMemo((): Wallpaper => {
+		if (parseCustomWallpaperId(id) !== undefined) {
+			const item = custom.items.find((entry) => entry.wallpaper.id === id);
+			// Пока файл читается, показываем обои по умолчанию; выбор в localStorage не трогаем
+			if (item) return item.wallpaper;
+			return wallpapers.find((entry) => entry.id === defaultWallpaperId) ?? wallpapers[0];
+		}
 		const videoId = parseYoutubeWallpaperId(id);
 		if (videoId !== undefined) {
 			return youtubeWallpaper(history.find((item) => item.videoId === videoId) ?? { videoId });
@@ -75,16 +103,11 @@ export function useWallpaper() {
 		const channel = tvChannels.find((item) => item.id === channelId);
 		if (channel) return tvWallpaper(channel);
 		return wallpapers.find((item) => item.id === id) ?? wallpapers[0];
-	}, [id, history]);
+	}, [id, history, custom.items]);
 
 	return {
 		current,
-		select: (next: string) => {
-			setLastError(undefined);
-			// Новые обои начинают с чистого листа: видео не должно застыть из-за паузы на прошлом
-			setPaused(undefined);
-			store.set({ id: next });
-		},
+		select: selectWallpaper,
 		// Выбранное не удалось показать: возвращаем прежние обои и запоминаем причину для окна
 		fail: (message: string, fallbackId: string) => {
 			store.set({ id: fallbackId });

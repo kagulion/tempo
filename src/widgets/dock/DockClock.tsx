@@ -1,7 +1,9 @@
 import { Clock } from 'lucide-react';
 
+import { Hint } from '@/components/Hint';
 import { cn } from '@/lib/utils';
 import { useBigClock } from '@/widgets/clock/useBigClock';
+import { hotkeyLabel } from '@/widgets/hotkeys/bindings';
 
 type DockClockProps = {
 	className?: string;
@@ -14,15 +16,16 @@ export function DockClock({ className }: DockClockProps) {
 	const label = bigClock.shown ? 'Скрыть крупные часы' : 'Крупные часы';
 
 	return (
-		<button
-			type="button"
-			onClick={bigClock.toggle}
-			aria-pressed={bigClock.shown}
-			title={label}
-			aria-label={label}
-			className={cn(className, 'hidden sm:flex', bigClock.shown && 'bg-white/20 text-white')}
-		>
-			<Clock className="size-4" />
-		</button>
+		<Hint label={label} hotkey={hotkeyLabel('bigClock')}>
+			<button
+				type="button"
+				onClick={bigClock.toggle}
+				aria-pressed={bigClock.shown}
+				aria-label={label}
+				className={cn(className, 'hidden sm:flex', bigClock.shown && 'bg-white/20 text-white')}
+			>
+				<Clock className="size-4" />
+			</button>
+		</Hint>
 	);
 }

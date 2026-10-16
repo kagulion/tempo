@@ -24,8 +24,7 @@ export function EffectsWidget({ className }: EffectsWidgetProps) {
 					size="icon-sm"
 					onClick={reset}
 					disabled={!anyActive}
-					title="Выключить все эффекты"
-					aria-label="Выключить все эффекты"
+					hint="Выключить все эффекты"
 				>
 					<RotateCcw />
 				</Button>
@@ -34,8 +33,7 @@ export function EffectsWidget({ className }: EffectsWidgetProps) {
 					size="icon-sm"
 					onClick={togglePaused}
 					disabled={!anyActive}
-					title={playing ? 'Остановить эффекты' : 'Продолжить эффекты'}
-					aria-label={playing ? 'Остановить эффекты' : 'Продолжить эффекты'}
+					hint={playing ? 'Остановить эффекты' : 'Продолжить эффекты'}
 				>
 					{playing ? <Pause /> : <Play />}
 				</Button>
