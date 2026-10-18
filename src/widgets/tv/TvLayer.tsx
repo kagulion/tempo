@@ -6,7 +6,7 @@ import { useUserActivation } from '@/hooks/useUserActivation';
 import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 import type { TvWallpaper } from '@/widgets/wallpaper/wallpapers';
-import { audioTarget, shouldPause } from '@/widgets/youtube/playback';
+import { audioTarget, shouldPause, wantsSound } from '@/widgets/youtube/playback';
 
 import { tvErrors, tvStartTimeoutMs } from './tv';
 import { useTvPlayback } from './tvPlayback';
@@ -47,14 +47,15 @@ export function TvLayer({
 		callbacks.current = { onReady, onError };
 	});
 
-	// Канал стоит на паузе, если её нажали, вкладка скрыта или включено «уменьшить движение» (тогда первый кадр)
+	// Канал стоит на паузе, если её нажали, вкладка скрыта и канал без звука или включено «уменьшить движение» (тогда первый кадр)
 	const syncPlayback = useCallback(() => {
 		const video = videoRef.current;
 		if (!video) return;
-		if (shouldPause({ paused, hidden: document.hidden, reducedMotion })) video.pause();
+		const audible = wantsSound({ soundOn, unlocked, active: soundAllowed });
+		if (shouldPause({ paused, hidden: document.hidden, audible, reducedMotion })) video.pause();
 		// play() у muted-видео браузеры разрешают без клика, но промис может отклониться — тогда остаётся кадр
 		else video.play().catch(() => {});
-	}, [paused, reducedMotion]);
+	}, [paused, reducedMotion, soundOn, unlocked, soundAllowed]);
 
 	// Свежая синхронизация для потока, который создаётся один раз
 	const syncRef = useRef(syncPlayback);

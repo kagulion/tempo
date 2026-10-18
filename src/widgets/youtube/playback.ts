@@ -3,8 +3,10 @@
 type PauseInput = {
 	// Выбор посетителя кнопкой: true — пауза, false — играть. undefined — ещё не выбирал
 	paused: boolean | undefined;
-	// Вкладка скрыта: видео в фоне зря грузит процессор
+	// Вкладка скрыта: беззвучное видео в фоне зря грузит процессор
 	hidden: boolean;
+	// Видео звучит (см. wantsSound): тогда в скрытой вкладке оно играет дальше, как фоновая музыка
+	audible: boolean;
 	// В системе включено «уменьшить движение»: видео стоит на первом кадре
 	reducedMotion: boolean;
 };
@@ -15,8 +17,23 @@ export function isStopped(paused: boolean | undefined, reducedMotion: boolean) {
 	return paused ?? reducedMotion;
 }
 
-export function shouldPause({ paused, hidden, reducedMotion }: PauseInput) {
-	return hidden || isStopped(paused, reducedMotion);
+export function shouldPause({ paused, hidden, audible, reducedMotion }: PauseInput) {
+	return (hidden && !audible) || isStopped(paused, reducedMotion);
+}
+
+type SoundInput = {
+	// Посетитель включил звук
+	soundOn: boolean;
+	// Браузер уже разрешает звук: на странице было действие пользователя
+	unlocked: boolean;
+	// Слой сейчас главный: только у него есть звук
+	active: boolean;
+};
+
+// Звучит ли видео для решения о паузе в скрытой вкладке. Приглушение таймером не учитываем:
+// тишина под сигналом короткая, видео не должно из-за неё вставать и снова запускаться
+export function wantsSound({ soundOn, unlocked, active }: SoundInput) {
+	return soundOn && unlocked && active;
 }
 
 // Сколько после нашей команды pauseVideo/playVideo события плеера считаем откликом на неё, а не чужим действием.

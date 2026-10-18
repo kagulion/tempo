@@ -6,23 +6,59 @@ import {
 	pauseFromPlayer,
 	playerCommandGraceMs,
 	playerVolume,
-	shouldPause
+	shouldPause,
+	wantsSound
 } from './playback';
 
 describe('shouldPause', () => {
 	it('играет, пока ничего не мешает', () => {
-		expect(shouldPause({ paused: false, hidden: false, reducedMotion: false })).toBe(false);
+		expect(
+			shouldPause({ paused: false, hidden: false, audible: false, reducedMotion: false })
+		).toBe(false);
 	});
 
 	it('пауза от кнопки или скрытой вкладки', () => {
-		expect(shouldPause({ paused: true, hidden: false, reducedMotion: false })).toBe(true);
-		expect(shouldPause({ paused: false, hidden: true, reducedMotion: false })).toBe(true);
+		expect(shouldPause({ paused: true, hidden: false, audible: false, reducedMotion: false })).toBe(
+			true
+		);
+		expect(shouldPause({ paused: false, hidden: true, audible: false, reducedMotion: false })).toBe(
+			true
+		);
 	});
 
 	it('при «уменьшить движение» стоит, пока посетитель сам не запустит', () => {
-		expect(shouldPause({ paused: undefined, hidden: false, reducedMotion: true })).toBe(true);
-		expect(shouldPause({ paused: false, hidden: false, reducedMotion: true })).toBe(false);
-		expect(shouldPause({ paused: false, hidden: true, reducedMotion: true })).toBe(true);
+		expect(
+			shouldPause({ paused: undefined, hidden: false, audible: false, reducedMotion: true })
+		).toBe(true);
+		expect(shouldPause({ paused: false, hidden: false, audible: false, reducedMotion: true })).toBe(
+			false
+		);
+		expect(shouldPause({ paused: false, hidden: true, audible: false, reducedMotion: true })).toBe(
+			true
+		);
+	});
+});
+
+describe('shouldPause в скрытой вкладке', () => {
+	it('видео со звуком играет дальше, как фоновая музыка', () => {
+		expect(shouldPause({ paused: false, hidden: true, audible: true, reducedMotion: false })).toBe(
+			false
+		);
+	});
+
+	it('пауза от кнопки действует и в скрытой вкладке', () => {
+		expect(shouldPause({ paused: true, hidden: true, audible: true, reducedMotion: false })).toBe(
+			true
+		);
+	});
+});
+
+describe('wantsSound', () => {
+	it('звучит только главный слой со включённым и разрешённым звуком', () => {
+		expect(wantsSound({ soundOn: true, unlocked: true, active: true })).toBe(true);
+		expect(wantsSound({ soundOn: false, unlocked: true, active: true })).toBe(false);
+		expect(wantsSound({ soundOn: true, unlocked: false, active: true })).toBe(false);
+		expect(wantsSound({ soundOn: true, unlocked: true, active: false })).toBe(false);
 	});
 });
 

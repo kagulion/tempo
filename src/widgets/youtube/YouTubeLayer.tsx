@@ -6,7 +6,7 @@ import { useUserActivation } from '@/hooks/useUserActivation';
 import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
-import { audioTarget, pauseFromPlayer, shouldPause } from './playback';
+import { audioTarget, pauseFromPlayer, shouldPause, wantsSound } from './playback';
 import { coverScale, qualityFrameSize } from './quality';
 import type { YouTubeWallpaper } from '@/widgets/wallpaper/wallpapers';
 import { youtubeErrorMessage } from './youtube';
@@ -123,13 +123,23 @@ export function YouTubeLayer({
 			else player.playVideo();
 		}
 
+		// Видео звучит: тогда в скрытой вкладке оно не встаёт, как фоновая музыка
+		function audible() {
+			return wantsSound({
+				soundOn: latest.current.soundOn,
+				unlocked: latest.current.unlocked,
+				active: latest.current.soundAllowed
+			});
+		}
+
 		// Видео остановили или запустили в обход кнопки окна (клавиши мультимедиа, системный плеер):
 		// кнопка должна показывать то, что на самом деле. Возвращает true, если событие так и объяснилось
 		function followPlayer(state: 'playing' | 'paused') {
 			const next = pauseFromPlayer({
 				state,
 				appliedPause,
-				hidden: document.hidden,
+				// Звучащее видео в скрытой вкладке мы не останавливаем: пауза там — это клавиши мультимедиа
+				hidden: document.hidden && !audible(),
 				started,
 				sinceCommandMs: performance.now() - commandAt
 			});
@@ -139,12 +149,13 @@ export function YouTubeLayer({
 			return true;
 		}
 
-		// Видео стоит на паузе, если её нажали, вкладка скрыта или включено «уменьшить движение» (тогда первый кадр)
+		// Видео стоит на паузе, если её нажали, вкладка скрыта и видео без звука или включено «уменьшить движение» (тогда первый кадр)
 		function syncPlayback() {
 			if (!player || !playerReady) return;
 			const pause = shouldPause({
 				paused: latest.current.paused,
 				hidden: document.hidden,
+				audible: audible(),
 				reducedMotion: latest.current.reducedMotion
 			});
 			if (pause === appliedPause) return;
@@ -278,7 +289,8 @@ export function YouTubeLayer({
 	// Эффекты объявлены после «latest», поэтому видят уже свежие значения
 	useEffect(() => {
 		syncRef.current.playback();
-	}, [reducedMotion, paused]);
+		// Звук решает, играть ли в скрытой вкладке
+	}, [reducedMotion, paused, soundOn, unlocked, soundAllowed]);
 
 	useEffect(() => {
 		syncRef.current.audio();
