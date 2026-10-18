@@ -88,7 +88,7 @@ const definitions = [
 		column: 'left',
 		anchor: 'top',
 		// Длинный список звуков сжимается до места над радио и прокручивается
-		placement: 'sm:w-[22rem]'
+		placement: 'sm:w-[26rem]'
 	},
 	{
 		id: 'stats',

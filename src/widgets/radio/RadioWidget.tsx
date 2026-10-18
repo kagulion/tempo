@@ -161,7 +161,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 			    чтобы звук не прерывался при сворачивании */}
 			<audio {...radio.audio} />
 
-			<WidgetHeader title="Radio">
+			<WidgetHeader title="Радио">
 				<Button
 					variant="glass"
 					size="icon-sm"
