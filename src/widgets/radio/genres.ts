@@ -1,7 +1,8 @@
 // Пресеты для фокуса: наборы станций «Радио Рекорд», заданные списками prefix.
 // Порядок prefix — порядок станций в режиме «По порядку». Станции, которых нет в ответе API, пропускаются
 
-export type GenreId = 'lofi' | 'chillout' | 'ambient' | 'deep' | 'lounge' | 'melodic';
+export type GenreId =
+	'lofi' | 'chillout' | 'ambient' | 'deep' | 'lounge' | 'melodic' | 'synthwave' | 'dnb' | 'house';
 
 export type Genre = {
 	id: GenreId;
@@ -21,7 +22,10 @@ export const genres: Genre[] = [
 	{ id: 'ambient', label: 'Ambient', prefixes: ['ambient', 'chil', 'dream-pop'] },
 	{ id: 'deep', label: 'Deep', prefixes: ['deep', 'organic', 'mini', 'progr'] },
 	{ id: 'lounge', label: 'Lounge', prefixes: ['summerlounge', 'trop', 'afro', 'beach'] },
-	{ id: 'melodic', label: 'Melodic', prefixes: ['melodic', 'feel', 'tm', 'trancehouse'] }
+	{ id: 'melodic', label: 'Melodic', prefixes: ['melodic', 'feel', 'tm', 'trancehouse'] },
+	{ id: 'synthwave', label: 'Synthwave', prefixes: ['synth', 'mt', 'technopop'] },
+	{ id: 'dnb', label: "Liquid D'n'B", prefixes: ['liquidfunk', 'drumhits'] },
+	{ id: 'house', label: 'House', prefixes: ['househits', 'techouse', 'vip', 'discofunk'] }
 ];
 
 export function getGenre(id: GenreId) {

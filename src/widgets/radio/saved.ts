@@ -102,7 +102,8 @@ export const parseStationMap: Parse<Record<string, RecordStation>> = (saved) => 
 const legacyGenres: Record<string, GenreId> = {
 	lofi: 'lofi',
 	ambient: 'ambient',
-	chillout: 'chillout'
+	chillout: 'chillout',
+	synthwave: 'synthwave'
 };
 
 export const parseSource: Parse<StationSource> = (saved) => {

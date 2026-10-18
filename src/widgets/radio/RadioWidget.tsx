@@ -201,23 +201,8 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 					</div>
 				) : (
 					<>
-						{/* Порядок станций и источники (все станции и пресеты) одним потоком с переносом строк:
-					    так помещаются в две строки, без скрытой прокрутки */}
+						{/* Источники (все станции и пресеты) одним потоком с переносом строк, без скрытой прокрутки */}
 						<div className="flex flex-wrap items-center gap-1">
-							<Button
-								variant="glass"
-								size="icon-sm"
-								onClick={() => radio.changeSort(shuffled ? 'default' : 'shuffle')}
-								title={
-									shuffled
-										? 'Порядок: перемешать. Переключить на «По порядку»'
-										: 'Порядок: по порядку. Переключить на «Перемешать»'
-								}
-								aria-label={shuffled ? 'Порядок: перемешать' : 'Порядок: по порядку'}
-							>
-								{shuffled ? <Shuffle /> : <ListOrdered />}
-							</Button>
-							<div className="mx-0.5 h-4 w-px shrink-0 bg-white/15" />
 							<div role="group" aria-label="Источник станций" className="contents">
 								<button
 									type="button"
@@ -261,6 +246,21 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 										: statusText[status === 'idle' ? 'loading' : status]}
 								</p>
 							)}
+							<Button
+								variant="glass"
+								size="icon-sm"
+								className="shrink-0"
+								onClick={() => radio.changeSort(shuffled ? 'default' : 'shuffle')}
+								title={
+									shuffled
+										? 'Порядок: перемешать. Переключить на «По порядку»'
+										: 'Порядок: по порядку. Переключить на «Перемешать»'
+								}
+								aria-pressed={shuffled}
+								aria-label={shuffled ? 'Порядок: перемешать' : 'Порядок: по порядку'}
+							>
+								{shuffled ? <Shuffle /> : <ListOrdered />}
+							</Button>
 						</div>
 
 						{status === 'idle' && radio.track && <TrackLine track={radio.track} className="px-1" />}

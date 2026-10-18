@@ -177,6 +177,10 @@ describe('радио', () => {
 			kind: 'genre',
 			genre: 'chillout'
 		});
+		expect(parseSource({ kind: 'genre', genre: 'synthwave' })).toEqual({
+			kind: 'genre',
+			genre: 'synthwave'
+		});
 		expect(parseSource({ kind: 'genre', genre: 'jazz' })).toEqual({ kind: 'all' });
 		expect(parseSource('DE')).toBeUndefined();
 	});
