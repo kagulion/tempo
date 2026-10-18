@@ -28,6 +28,10 @@ export const storageKeys = {
 	tasks: 'tempo:tasks',
 	timerRuns: 'tempo:timer-runs',
 	timerSettings: 'tempo:timer-settings',
+	// Последний канал окна Twitch: login или null, см. src/widgets/twitch/useTwitch.ts
+	twitchChannel: 'tempo:twitch-channel',
+	// Звук окна Twitch (true — включён)
+	twitchSound: 'tempo:twitch-sound',
 	// Строка без JSON, см. src/widgets/stats/useOnline.ts
 	visitorId: 'tempo:visitor-id',
 	wallpaper: 'tempo:wallpaper',

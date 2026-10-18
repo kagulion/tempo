@@ -11,6 +11,7 @@ import { parseEffectsOff } from './effects/effectsOff';
 import { parseSoundMuted } from '@/lib/soundMute';
 import { parseMood } from './stats/mood';
 import { parseSaved } from './wallpaper/useWallpaper';
+import { parseSavedChannel } from './twitch/twitch';
 import { parseSoundOn } from './youtube/playback';
 import { parseVideoQuality } from './youtube/quality';
 import { parseHistory } from './youtube/youtube';
@@ -239,5 +240,29 @@ describe('кнопки «Без звука» и «Без эффектов»', ()
 		expect(parseSoundMuted(null)).toBeUndefined();
 		expect(parseEffectsOff(1)).toBeUndefined();
 		expect(parseEffectsOff({})).toBeUndefined();
+	});
+});
+
+describe('Twitch', () => {
+	it('читает последний канал', () => {
+		expect(parseSavedChannel('lofigirl')).toBe('lofigirl');
+		expect(parseSavedChannel('19barko')).toBe('19barko');
+		expect(parseSavedChannel(null)).toBeNull();
+	});
+
+	it('плохой канал отбрасывает', () => {
+		expect(parseSavedChannel('abc')).toBeUndefined();
+		expect(parseSavedChannel('lofi-girl')).toBeUndefined();
+		expect(parseSavedChannel('a'.repeat(26))).toBeUndefined();
+		expect(parseSavedChannel('')).toBeUndefined();
+		expect(parseSavedChannel(5)).toBeUndefined();
+		expect(parseSavedChannel({ login: 'lofigirl' })).toBeUndefined();
+	});
+
+	it('звук читает только boolean (twitchSound идёт через parseSoundOn)', () => {
+		expect(parseSoundOn(true)).toBe(true);
+		expect(parseSoundOn(false)).toBe(false);
+		expect(parseSoundOn('true')).toBeUndefined();
+		expect(parseSoundOn(1)).toBeUndefined();
 	});
 });

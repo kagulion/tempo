@@ -12,6 +12,7 @@
 - [Об обоях](docs/wallpaper.md)
 - [О YouTube-фоне](docs/youtube.md)
 - [О Rutube-фоне](docs/rutube.md)
+- [Об окне Twitch](docs/twitch.md)
 - [Об эффектах](docs/effects.md)
 
 ## Стек

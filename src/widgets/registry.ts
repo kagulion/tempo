@@ -20,7 +20,7 @@ import { RadioWidget } from './radio/RadioWidget';
 import { StatsWidget } from './stats/StatsWidget';
 import { TasksWidget } from './tasks/TasksWidget';
 import { TimerWidget } from './timer/TimerWidget';
-import { RutubeWidget } from './rutube/RutubeWidget';
+import { TwitchWidget } from './twitch/TwitchWidget';
 import { WallpaperGallery } from './wallpaper/WallpaperGallery';
 import { YouTubeWidget } from './youtube/YouTubeWidget';
 
@@ -156,16 +156,19 @@ const definitions = [
 		slot: 'view'
 	},
 	{
-		id: 'rutube',
+		id: 'twitch',
 		hotkey: 'Digit8',
-		label: 'Rutube',
+		label: 'Twitch',
 		icon: Tv,
 		dockGroup: 'view',
-		component: RutubeWidget,
+		component: TwitchWidget,
 		column: 'right',
 		anchor: 'bottom',
-		// На месте галереи: открывается вместо неё. Эфиры прокручиваются внутри
-		placement: 'max-h-[min(34rem,calc(100dvh-11rem))] sm:max-h-[34rem] sm:w-[30rem]',
+		// Окно-плеер, а не фон (Twitch не играет под интерфейсом, см. docs/twitch.md). Слот 'view' оставлен ради раскладки:
+		// окно открывается вместо галереи в той же колонке справа внизу и не наезжает на соседей. Плеер 16:9 держит
+		// высоту (shrink-0), при нехватке места прокручивается список каналов. На телефоне окно не выше, чем в windowClass
+		// (App.tsx), чтобы не залезать под верхние кнопки
+		placement: 'max-h-[calc(100dvh-20rem)] sm:max-h-[36rem] sm:w-[30rem]',
 		slot: 'view'
 	},
 	{
