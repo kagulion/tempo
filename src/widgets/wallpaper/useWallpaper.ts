@@ -2,15 +2,14 @@ import { useEffect, useMemo, useSyncExternalStore } from 'react';
 
 import { createPersistentStore, isRecord, storageKeys } from '@/lib/storage';
 
-import { tvChannels } from '@/widgets/tv/channels';
-import { parseTvWallpaperId } from '@/widgets/tv/tv';
+import { parseRutubeWallpaperId } from '@/widgets/rutube/rutube';
 import { parseYoutubeWallpaperId } from '@/widgets/youtube/youtube';
 import { setPaused } from '@/widgets/youtube/youtubePlayback';
 import { useYouTubeHistory } from '@/widgets/youtube/useYouTubeHistory';
 
 import { parseCustomWallpaperId } from './custom';
 import { loadCustomWallpapers, useCustomWallpapers } from './useCustomWallpapers';
-import { type Wallpaper, tvWallpaper, wallpapers, youtubeWallpaper } from './wallpapers';
+import { type Wallpaper, rutubeWallpaper, wallpapers, youtubeWallpaper } from './wallpapers';
 
 // Обои при первом заходе — как раньше, первые обои Орды
 export const defaultWallpaperId = 'horde/orcs-tavern';
@@ -31,13 +30,9 @@ export function parseSaved(saved: unknown): { id: string } | undefined {
 	}
 	// Видео с YouTube в списке обоев нет: достаточно, чтобы id был по форме youtube/<id видео>
 	if (parseYoutubeWallpaperId(id) !== undefined) return { id: id as string };
-	// Каналы ТВ в списке обоев тоже нет: id должен быть tv/<id канала>, а канал — в списке (его могли убрать)
-	const channelId = parseTvWallpaperId(id);
-	if (channelId !== undefined) {
-		return tvChannels.some((channel) => channel.id === channelId)
-			? { id: id as string }
-			: undefined;
-	}
+	// Эфиров Rutube в списке обоев тоже нет: достаточно, чтобы id был по форме rutube/<id эфира>.
+	// Раньше были каналы ТВ (tv/<id канала>): такой id не годится и сбрасывается на обои по умолчанию
+	if (parseRutubeWallpaperId(id) !== undefined) return { id: id as string };
 	// Свои обои: по форме custom/<ключ>. Есть ли файл, проверяется после чтения IndexedDB (см. useWallpaper)
 	if (parseCustomWallpaperId(id) !== undefined) return { id: id as string };
 	// Список обоев мог поменяться: неизвестный id сбрасываем на обои по умолчанию
@@ -47,7 +42,7 @@ export function parseSaved(saved: unknown): { id: string } | undefined {
 // Общее для фона и окон выбора. Хранилище недоступно (приватный режим) — после перезагрузки откроются обои по умолчанию
 const store = createPersistentStore(storageKeys.wallpaper, { id: defaultWallpaperId }, parseSaved);
 
-// Почему не удалось включить последнее видео или канал. Не сохраняется: после перезагрузки ошибка уже не важна
+// Почему не удалось включить последнее видео или эфир. Не сохраняется: после перезагрузки ошибка уже не важна
 let lastError: string | undefined;
 const errorListeners = new Set<() => void>();
 
@@ -99,9 +94,8 @@ export function useWallpaper() {
 		if (videoId !== undefined) {
 			return youtubeWallpaper(history.find((item) => item.videoId === videoId) ?? { videoId });
 		}
-		const channelId = parseTvWallpaperId(id);
-		const channel = tvChannels.find((item) => item.id === channelId);
-		if (channel) return tvWallpaper(channel);
+		const streamId = parseRutubeWallpaperId(id);
+		if (streamId !== undefined) return rutubeWallpaper(streamId);
 		return wallpapers.find((item) => item.id === id) ?? wallpapers[0];
 	}, [id, history, custom.items]);
 

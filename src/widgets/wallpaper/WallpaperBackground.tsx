@@ -4,7 +4,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
-import { TvLayer } from '@/widgets/tv/TvLayer';
+import { RutubeLayer } from '@/widgets/rutube/RutubeLayer';
 import { setYouTubeTitle } from '@/widgets/youtube/useYouTubeHistory';
 import { YouTubeLayer } from '@/widgets/youtube/YouTubeLayer';
 
@@ -73,10 +73,10 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 	);
 }
 
-// Фон на весь экран: картинка, зацикленное видео без звука, видео с YouTube или телеканал.
+// Фон на весь экран: картинка, зацикленное видео без звука, видео с YouTube или эфир Rutube.
 // Новые обои кладутся поверх старых и проявляются, когда загрузились, — без чёрной вспышки между ними
 export function WallpaperBackground() {
-	const { current: wallpaper, fail } = useWallpaper();
+	const { current: wallpaper, fail, select } = useWallpaper();
 	// Обои, которые уже полностью видны. Пока новые грузятся, они остаются под ними
 	const [shown, setShown] = useState(wallpaper);
 	const [readyId, setReadyId] = useState<string | null>(null);
@@ -90,7 +90,7 @@ export function WallpaperBackground() {
 
 	const layers = shown.id === wallpaper.id ? [shown] : [shown, wallpaper];
 
-	// Видео или канал не заиграли. Новое откатываем на то, что сейчас видно, а на уже показанном видео
+	// Видео или эфир не заиграли. Новое откатываем на то, что сейчас видно, а на уже показанном видео
 	// (его удалили или закрыли доступ) остаётся вернуться к обоям по умолчанию.
 	// Если не загрузился сам плеер (permanent: false), показанные обои не трогаем: превью остаётся на месте
 	function handleError(item: Wallpaper, message: string, permanent: boolean) {
@@ -125,14 +125,16 @@ export function WallpaperBackground() {
 						/>
 					);
 				}
-				if (item.kind === 'tv') {
+				if (item.kind === 'rutube') {
 					return (
-						<TvLayer
+						<RutubeLayer
 							key={item.id}
 							wallpaper={item}
 							// Звучит только главный слой: выбранный и уже проявившийся
 							soundAllowed={item.id === wallpaper.id && readyId === item.id}
 							onError={(message) => handleError(item, message, true)}
+							// Запуск отменён: прежние обои, а если слой и был фоном (после перезагрузки) — обои по умолчанию
+							onCancel={() => select(item.id !== shown.id ? shown.id : defaultWallpaperId)}
 							{...common}
 						/>
 					);

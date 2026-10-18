@@ -27,8 +27,7 @@ import dragonflight from '@/assets/wallpapers/warcraft/dragonflight.mp4';
 import pandaria from '@/assets/wallpapers/warcraft/mists-of-pandaria.mp4';
 import nightElf from '@/assets/wallpapers/warcraft/night-elf.mp4';
 
-import { tvWallpaperId } from '@/widgets/tv/tv';
-import type { TvChannel } from '@/widgets/tv/channels';
+import { rutubeWallpaperId } from '@/widgets/rutube/rutube';
 import {
 	type YouTubeHistoryItem,
 	youtubeThumb,
@@ -61,14 +60,13 @@ export type YouTubeWallpaper = {
 	thumb: string;
 };
 
-// Телеканал из списка ТВ: поток HLS. Как и YouTube, живёт не в списке обоев
-export type TvWallpaper = {
-	// tv/<id канала>
+// Эфир или видео Rutube: iframe плеера. Как и YouTube, живёт не в списке обоев
+export type RutubeWallpaper = {
+	// rutube/<id эфира>
 	id: string;
 	title: string;
-	kind: 'tv';
-	// Ссылка на плейлист HLS
-	url: string;
+	kind: 'rutube';
+	streamId: string;
 };
 
 // Файл, который посетитель загрузил сам. Лежит в IndexedDB его браузера, см. customStore.ts
@@ -83,7 +81,7 @@ export type CustomWallpaper = {
 	url: string;
 };
 
-export type Wallpaper = FileWallpaper | CustomWallpaper | YouTubeWallpaper | TvWallpaper;
+export type Wallpaper = FileWallpaper | CustomWallpaper | YouTubeWallpaper | RutubeWallpaper;
 
 const youtubeTitle = 'Видео YouTube';
 
@@ -99,12 +97,12 @@ export function youtubeWallpaper(item: YouTubeHistoryItem): YouTubeWallpaper {
 	};
 }
 
-export function tvWallpaper(channel: TvChannel): TvWallpaper {
+export function rutubeWallpaper(streamId: string): RutubeWallpaper {
 	return {
-		id: tvWallpaperId(channel.id),
-		title: channel.title,
-		kind: 'tv',
-		url: channel.url
+		id: rutubeWallpaperId(streamId),
+		title: 'Эфир Rutube',
+		kind: 'rutube',
+		streamId
 	};
 }
 

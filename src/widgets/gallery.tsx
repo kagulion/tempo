@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 
+import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
 // Общее для окон-галерей (обои, YouTube, ТВ): плитки, кнопки-переходы по секциям и прокрутка к секции
@@ -27,7 +28,8 @@ export function useSectionScroll() {
 		scrollTo: (section: string) => {
 			scrollRef.current?.scrollTo({
 				top: sectionRefs.current[section]?.offsetTop ?? 0,
-				behavior: 'smooth'
+				// При «уменьшить движение» прокручиваем сразу, без анимации
+				behavior: window.matchMedia(mediaQueries.reducedMotion).matches ? 'auto' : 'smooth'
 			});
 		}
 	};

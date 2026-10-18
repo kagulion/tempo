@@ -20,7 +20,7 @@ import { RadioWidget } from './radio/RadioWidget';
 import { StatsWidget } from './stats/StatsWidget';
 import { TasksWidget } from './tasks/TasksWidget';
 import { TimerWidget } from './timer/TimerWidget';
-import { TvWidget } from './tv/TvWidget';
+import { RutubeWidget } from './rutube/RutubeWidget';
 import { WallpaperGallery } from './wallpaper/WallpaperGallery';
 import { YouTubeWidget } from './youtube/YouTubeWidget';
 
@@ -156,15 +156,15 @@ const definitions = [
 		slot: 'view'
 	},
 	{
-		id: 'tv',
+		id: 'rutube',
 		hotkey: 'Digit8',
-		label: 'ТВ',
+		label: 'Rutube',
 		icon: Tv,
 		dockGroup: 'view',
-		component: TvWidget,
+		component: RutubeWidget,
 		column: 'right',
 		anchor: 'bottom',
-		// На месте галереи: открывается вместо неё. Каналы прокручиваются внутри
+		// На месте галереи: открывается вместо неё. Эфиры прокручиваются внутри
 		placement: 'max-h-[min(34rem,calc(100dvh-11rem))] sm:max-h-[34rem] sm:w-[30rem]',
 		slot: 'view'
 	},

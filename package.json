@@ -13,7 +13,8 @@
 		"format": "prettier --write .",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"record:snapshot": "node scripts/record-snapshot.ts"
+		"record:snapshot": "node scripts/record-snapshot.ts",
+		"rutube:snapshot": "node scripts/rutube-snapshot.ts"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.9.0",
@@ -23,7 +24,6 @@
 		"@supabase/supabase-js": "^2.117.3",
 		"class-variance-authority": "^0.7.1",
 		"cn": "^0.4.0",
-		"hls.js": "^1.7.3",
 		"lucide-react": "^1.54.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0",

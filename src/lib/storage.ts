@@ -20,13 +20,14 @@ export const storageKeys = {
 	radioCompact: 'tempo:radio-compact',
 	radioSort: 'tempo:radio-sort',
 	radioSource: 'tempo:radio-source',
+	// Звук Rutube-фона (true — включён), см. src/widgets/rutube/useRutube.ts
+	rutubeSound: 'tempo:rutube-sound',
 	// Кнопка «Без звука» в правом верхнем углу: true — весь звук сайта заглушён
 	soundMuted: 'tempo:sound-muted',
 	stats: 'tempo:stats',
 	tasks: 'tempo:tasks',
 	timerRuns: 'tempo:timer-runs',
 	timerSettings: 'tempo:timer-settings',
-	tvSound: 'tempo:tv-sound',
 	// Строка без JSON, см. src/widgets/stats/useOnline.ts
 	visitorId: 'tempo:visitor-id',
 	wallpaper: 'tempo:wallpaper',

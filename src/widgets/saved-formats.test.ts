@@ -10,7 +10,6 @@ import { parseState } from './effects/useActiveEffects';
 import { parseEffectsOff } from './effects/effectsOff';
 import { parseSoundMuted } from '@/lib/soundMute';
 import { parseMood } from './stats/mood';
-import { tvChannels } from './tv/channels';
 import { parseSaved } from './wallpaper/useWallpaper';
 import { parseSoundOn } from './youtube/playback';
 import { parseVideoQuality } from './youtube/quality';
@@ -32,13 +31,19 @@ describe('обои', () => {
 		expect(parseSaved({ id: 'youtube/dQw4w9WgXcQ' })).toEqual({ id: 'youtube/dQw4w9WgXcQ' });
 	});
 
-	it('читает телеканал из списка по id вида tv/<id канала>', () => {
-		const id = `tv/${tvChannels[0].id}`;
+	it('читает эфир Rutube по id вида rutube/<id эфира>', () => {
+		const id = 'rutube/546602986e6a424d74d594876ddb3f04';
 		expect(parseSaved({ id })).toEqual({ id });
 	});
 
-	it('канал, которого нет в списке, отбрасывает', () => {
-		expect(parseSaved({ id: 'tv/Removed.channel' })).toBeUndefined();
+	it('плохие id Rutube отбрасывает', () => {
+		expect(parseSaved({ id: 'rutube/' })).toBeUndefined();
+		expect(parseSaved({ id: 'rutube/short' })).toBeUndefined();
+		expect(parseSaved({ id: 'rutube/546602986e6a424d74d594876ddb3f04/x' })).toBeUndefined();
+	});
+
+	it('старый телеканал tv/<id> превращается в обои по умолчанию', () => {
+		expect(parseSaved({ id: 'tv/Some.channel' })).toBeUndefined();
 		expect(parseSaved({ id: 'tv/' })).toBeUndefined();
 	});
 
