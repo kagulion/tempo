@@ -11,7 +11,10 @@ export type YouTubePlayer = {
 	playVideo: () => void;
 	pauseVideo: () => void;
 	seekTo: (seconds: number, allowSeekAhead: boolean) => void;
-	getVideoData: () => { title?: string };
+	// Секунды от начала видео
+	getCurrentTime: () => number;
+	// isLive нет в документации, но плеер его отдаёт: true у прямой трансляции
+	getVideoData: () => { title?: string; isLive?: boolean };
 };
 
 export type YouTubePlayerOptions = {
@@ -29,7 +32,7 @@ export type YouTubePlayerOptions = {
 
 export type YouTubeApi = {
 	Player: new (element: HTMLElement, options: YouTubePlayerOptions) => YouTubePlayer;
-	PlayerState: { ENDED: number; PLAYING: number };
+	PlayerState: { ENDED: number; PLAYING: number; PAUSED: number };
 };
 
 declare global {

@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react';
 import { createPersistentStore, storageKeys } from '@/lib/storage';
 
 import { parseSoundOn } from './playback';
+import { defaultVideoQuality, parseVideoQuality, type VideoQuality } from './quality';
 
 // Управление видео-фоном с YouTube, общее для фона и окна YouTube. Пауза общая и для ТВ-фона: фон один
 
@@ -30,13 +31,23 @@ export function usePaused() {
 // Звук сохраняется. Громкость отдельно не настраивается: 100 с учётом приглушения таймером
 const soundStore = createPersistentStore(storageKeys.youtubeSound, false, parseSoundOn);
 
+// Потолок качества сохраняется: он нужен и окну (выбор), и фону (размер плеера), поэтому хранилище общее
+const qualityStore = createPersistentStore<VideoQuality>(
+	storageKeys.youtubeQuality,
+	defaultVideoQuality,
+	parseVideoQuality
+);
+
 export function useYouTubePlayback() {
 	const pausedNow = usePaused();
 	const soundOn = useSyncExternalStore(soundStore.subscribe, soundStore.get);
+	const quality = useSyncExternalStore(qualityStore.subscribe, qualityStore.get);
 
 	return {
 		paused: pausedNow,
 		soundOn,
-		toggleSound: () => soundStore.set((value) => !value)
+		toggleSound: () => soundStore.set((value) => !value),
+		quality,
+		setQuality: (next: VideoQuality) => qualityStore.set(next)
 	};
 }

@@ -19,6 +19,37 @@ export function shouldPause({ paused, hidden, reducedMotion }: PauseInput) {
 	return hidden || isStopped(paused, reducedMotion);
 }
 
+// Сколько после нашей команды pauseVideo/playVideo события плеера считаем откликом на неё, а не чужим действием.
+// Команда и событие идут через postMessage, поэтому PLAYING, отправленное до нашей паузы, может прийти после неё
+export const playerCommandGraceMs = 1000;
+
+type PlayerStateInput = {
+	// Что плеер сообщил: видео пошло или встало на паузу
+	state: 'playing' | 'paused';
+	// Что мы последним сказали плееру: true — пауза, false — играть, undefined — ещё ничего
+	appliedPause: boolean | undefined;
+	// Вкладка скрыта: тогда паузу ставим мы сами (а иногда и браузер), это не выбор посетителя
+	hidden: boolean;
+	// Видео уже хоть раз пошло. До этого PLAYING — запоздалый автозапуск, а не действие посетителя
+	started: boolean;
+	// Сколько миллисекунд прошло с нашей последней команды плееру
+	sinceCommandMs: number;
+};
+
+// Видео остановили или запустили в обход кнопки окна: клавишами мультимедиа, из системного плеера.
+// Возвращает новое значение паузы для кнопки или undefined, если это отклик на нашу же команду
+export function pauseFromPlayer({
+	state,
+	appliedPause,
+	hidden,
+	started,
+	sinceCommandMs
+}: PlayerStateInput): boolean | undefined {
+	if (hidden || sinceCommandMs < playerCommandGraceMs) return undefined;
+	if (state === 'paused') return appliedPause === false ? true : undefined;
+	return appliedPause === true && started ? false : undefined;
+}
+
 type AudioInput = {
 	// Посетитель включил звук
 	soundOn: boolean;

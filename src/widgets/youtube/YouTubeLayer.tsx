@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import { useDuckLevel } from '@/hooks/useDuckLevel';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -6,11 +6,12 @@ import { useUserActivation } from '@/hooks/useUserActivation';
 import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
-import { audioTarget, shouldPause } from './playback';
+import { audioTarget, pauseFromPlayer, shouldPause } from './playback';
+import { coverScale, qualityFrameSize } from './quality';
 import type { YouTubeWallpaper } from '@/widgets/wallpaper/wallpapers';
 import { youtubeErrorMessage } from './youtube';
 import { loadYouTubeApi, type YouTubePlayer } from './youtubeApi';
-import { useYouTubePlayback } from './youtubePlayback';
+import { setPaused, useYouTubePlayback } from './youtubePlayback';
 
 // Если видео не заиграло за это время (автозапуск запрещён, плохая сеть), показываем хотя бы превью
 const startTimeoutMs = 10_000;
@@ -20,6 +21,21 @@ const iframeClass = cn(
 	'[&_iframe]:absolute [&_iframe]:top-1/2 [&_iframe]:left-1/2 [&_iframe]:max-w-none [&_iframe]:-translate-1/2',
 	'[&_iframe]:h-[max(100vh,56.25vw)] [&_iframe]:w-[max(100vw,177.78vh)]'
 );
+
+// Размер окна для масштаба iframe с потолком качества. Строка, чтобы useSyncExternalStore видел, что ничего не менялось
+function subscribeResize(listener: () => void) {
+	window.addEventListener('resize', listener);
+	return () => window.removeEventListener('resize', listener);
+}
+
+function viewportKey() {
+	return `${window.innerWidth}x${window.innerHeight}`;
+}
+
+function useViewport() {
+	const [width, height] = useSyncExternalStore(subscribeResize, viewportKey).split('x').map(Number);
+	return { width, height };
+}
 
 type YouTubeLayerProps = {
 	wallpaper: YouTubeWallpaper;
@@ -51,9 +67,16 @@ export function YouTubeLayer({
 	const hostRef = useRef<HTMLDivElement>(null);
 	const reducedMotion = useMediaQuery(mediaQueries.reducedMotion);
 	const [playing, setPlaying] = useState(false);
-	const { paused, soundOn } = useYouTubePlayback();
+	const { paused, soundOn, quality } = useYouTubePlayback();
 	const duck = useDuckLevel();
 	const unlocked = useUserActivation();
+	const viewport = useViewport();
+	// Потолок качества: iframe своего размера, растянутый на экран. undefined — «Авто», iframe во весь экран
+	const frame = qualityFrameSize(quality);
+	// Плеер выбирает качество при загрузке и потом размер iframe не замечает, поэтому смена качества пересоздаёт плеер
+	const frameKey = frame ? `${frame.width}x${frame.height}` : 'auto';
+	// Откуда продолжить после пересоздания плеера, чтобы видео не начиналось заново
+	const resumeAt = useRef<number>(undefined);
 
 	// Колбэки приходят заново при каждой отрисовке; плеер создаём один раз и берём из ссылки свежие
 	const callbacks = useRef({ onReady, onError, onTitle });
@@ -90,6 +113,31 @@ export function YouTubeLayer({
 		let appliedPause: boolean | undefined;
 		let appliedMuted: boolean | undefined;
 		let appliedVolume: number | undefined;
+		// Когда последний раз командовали паузой или запуском: события сразу после — отклик на команду
+		let commandAt = Number.NEGATIVE_INFINITY;
+
+		function command(pause: boolean) {
+			if (!player) return;
+			commandAt = performance.now();
+			if (pause) player.pauseVideo();
+			else player.playVideo();
+		}
+
+		// Видео остановили или запустили в обход кнопки окна (клавиши мультимедиа, системный плеер):
+		// кнопка должна показывать то, что на самом деле. Возвращает true, если событие так и объяснилось
+		function followPlayer(state: 'playing' | 'paused') {
+			const next = pauseFromPlayer({
+				state,
+				appliedPause,
+				hidden: document.hidden,
+				started,
+				sinceCommandMs: performance.now() - commandAt
+			});
+			if (next === undefined) return false;
+			appliedPause = next;
+			setPaused(next);
+			return true;
+		}
 
 		// Видео стоит на паузе, если её нажали, вкладка скрыта или включено «уменьшить движение» (тогда первый кадр)
 		function syncPlayback() {
@@ -101,8 +149,7 @@ export function YouTubeLayer({
 			});
 			if (pause === appliedPause) return;
 			appliedPause = pause;
-			if (pause) player.pauseVideo();
-			else player.playVideo();
+			command(pause);
 		}
 
 		function syncAudio() {
@@ -131,6 +178,9 @@ export function YouTubeLayer({
 		syncRef.current = { playback: syncPlayback, audio: syncAudio };
 
 		const timeout = setTimeout(reveal, startTimeoutMs);
+		// После смены качества продолжаем с того же места. Метка одноразовая: новое видео начнётся со своего start
+		const from = resumeAt.current ?? start;
+		resumeAt.current = undefined;
 
 		loadYouTubeApi().then(
 			(api) => {
@@ -154,7 +204,7 @@ export function YouTubeLayer({
 						iv_load_policy: 3,
 						fs: 0,
 						origin: window.location.origin,
-						...(start === undefined ? {} : { start })
+						...(from === undefined ? {} : { start: from })
 					},
 					events: {
 						onReady: () => {
@@ -166,7 +216,7 @@ export function YouTubeLayer({
 							if (disposed || !player) return;
 							if (data === api.PlayerState.PLAYING) {
 								// Автозапуск мог сработать уже после паузы: вкладку скрыли или нажали паузу, пока видео грузилось
-								if (appliedPause) player.pauseVideo();
+								if (!followPlayer('playing') && appliedPause) command(true);
 								if (!started) {
 									started = true;
 									setPlaying(true);
@@ -179,10 +229,12 @@ export function YouTubeLayer({
 										callbacks.current.onTitle(title);
 									}
 								}
+							} else if (data === api.PlayerState.PAUSED) {
+								followPlayer('paused');
 							} else if (data === api.PlayerState.ENDED) {
 								// Свой цикл вместо параметра loop: так видео возвращается к метке старта, а не в начало
 								player.seekTo(start ?? 0, true);
-								player.playVideo();
+								command(false);
 							}
 						},
 						onError: ({ data }) => {
@@ -205,13 +257,23 @@ export function YouTubeLayer({
 			clearTimeout(timeout);
 			document.removeEventListener('visibilitychange', syncPlayback);
 			syncRef.current = { playback: () => {}, audio: () => {} };
+			// Пока новый плеер грузится, видно превью, а не чёрный iframe
+			setPlaying(false);
+			try {
+				// Трансляции не продолжаем с метки: новый плеер сам встанет на прямой эфир
+				if (player && started && !player.getVideoData().isLive) {
+					resumeAt.current = Math.floor(player.getCurrentTime());
+				}
+			} catch {
+				// Плеер не ответил — начнём со start
+			}
 			try {
 				player?.destroy();
 			} catch {
 				// Плеер уже разрушен или не успел создаться — убирать нечего
 			}
 		};
-	}, [videoId, start]);
+	}, [videoId, start, frameKey]);
 
 	// Эффекты объявлены после «latest», поэтому видят уже свежие значения
 	useEffect(() => {
@@ -240,10 +302,19 @@ export function YouTubeLayer({
 			{/* Iframe скрыт, пока видео не пошло: иначе мелькнут заставка и название */}
 			<div
 				ref={hostRef}
+				style={
+					frame && {
+						width: frame.width,
+						height: frame.height,
+						transform: `translate(-50%, -50%) scale(${coverScale(frame, viewport)})`
+					}
+				}
 				className={cn(
-					'absolute inset-0 opacity-0 transition-opacity duration-700',
+					'opacity-0 transition-opacity duration-700',
 					playing && 'opacity-100',
-					iframeClass
+					frame
+						? 'absolute top-1/2 left-1/2 [&_iframe]:h-full [&_iframe]:w-full'
+						: cn('absolute inset-0', iframeClass)
 				)}
 			/>
 		</div>

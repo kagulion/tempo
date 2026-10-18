@@ -13,6 +13,7 @@ import { parseMood } from './stats/mood';
 import { tvChannels } from './tv/channels';
 import { parseSaved } from './wallpaper/useWallpaper';
 import { parseSoundOn } from './youtube/playback';
+import { parseVideoQuality } from './youtube/quality';
 import { parseHistory } from './youtube/youtube';
 
 describe('обои', () => {
@@ -78,6 +79,19 @@ describe('звук видео-обоев (YouTube и ТВ)', () => {
 		expect(parseSoundOn('true')).toBeUndefined();
 		expect(parseSoundOn({ on: true })).toBeUndefined();
 		expect(parseSoundOn(null)).toBeUndefined();
+	});
+});
+
+describe('качество видео YouTube', () => {
+	it('читает сохранённый выбор', () => {
+		expect(parseVideoQuality('auto')).toBe('auto');
+		expect(parseVideoQuality('720')).toBe('720');
+	});
+
+	it('мусор и неизвестные варианты отбрасывает', () => {
+		expect(parseVideoQuality('hd720')).toBeUndefined();
+		expect(parseVideoQuality(1080)).toBeUndefined();
+		expect(parseVideoQuality(null)).toBeUndefined();
 	});
 });
 

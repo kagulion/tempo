@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { audioTarget, parseSoundOn, playerVolume, shouldPause } from './playback';
+import {
+	audioTarget,
+	parseSoundOn,
+	pauseFromPlayer,
+	playerCommandGraceMs,
+	playerVolume,
+	shouldPause
+} from './playback';
 
 describe('shouldPause', () => {
 	it('играет, пока ничего не мешает', () => {
@@ -67,5 +74,48 @@ describe('parseSoundOn', () => {
 		expect(parseSoundOn('true')).toBeUndefined();
 		expect(parseSoundOn(1)).toBeUndefined();
 		expect(parseSoundOn(null)).toBeUndefined();
+	});
+});
+
+describe('pauseFromPlayer', () => {
+	const later = playerCommandGraceMs + 1;
+	const base = { hidden: false, started: true, sinceCommandMs: later };
+
+	it('видео встало само, хотя мы просили играть, — кнопка переходит в паузу', () => {
+		expect(pauseFromPlayer({ ...base, state: 'paused', appliedPause: false })).toBe(true);
+	});
+
+	it('видео пошло само, хотя стояло на паузе, — кнопка переходит в «играет»', () => {
+		expect(pauseFromPlayer({ ...base, state: 'playing', appliedPause: true })).toBe(false);
+	});
+
+	it('отклик на нашу же команду ничего не меняет', () => {
+		expect(pauseFromPlayer({ ...base, state: 'paused', appliedPause: true })).toBeUndefined();
+		expect(pauseFromPlayer({ ...base, state: 'playing', appliedPause: false })).toBeUndefined();
+	});
+
+	it('событие сразу после команды считается откликом на неё', () => {
+		expect(
+			pauseFromPlayer({ ...base, state: 'playing', appliedPause: true, sinceCommandMs: 200 })
+		).toBeUndefined();
+	});
+
+	it('в скрытой вкладке паузу ставим мы или браузер: выбор посетителя не трогаем', () => {
+		expect(
+			pauseFromPlayer({ ...base, state: 'paused', appliedPause: false, hidden: true })
+		).toBeUndefined();
+		expect(
+			pauseFromPlayer({ ...base, state: 'playing', appliedPause: true, hidden: true })
+		).toBeUndefined();
+	});
+
+	it('запоздалый автозапуск до первого старта — не действие посетителя', () => {
+		expect(
+			pauseFromPlayer({ ...base, state: 'playing', appliedPause: true, started: false })
+		).toBeUndefined();
+	});
+
+	it('пока плееру ничего не говорили, событиям не верим', () => {
+		expect(pauseFromPlayer({ ...base, state: 'paused', appliedPause: undefined })).toBeUndefined();
 	});
 });

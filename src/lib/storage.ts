@@ -31,6 +31,8 @@ export const storageKeys = {
 	visitorId: 'tempo:visitor-id',
 	wallpaper: 'tempo:wallpaper',
 	youtubeHistory: 'tempo:youtube-history',
+	// Потолок качества YouTube-фона: 'auto', '1080', '720' или '480', см. src/widgets/youtube/quality.ts
+	youtubeQuality: 'tempo:youtube-quality',
 	youtubeSound: 'tempo:youtube-sound'
 } as const;
 
