@@ -41,7 +41,7 @@ export function MoodCard({ today: todayKey }: MoodCardProps) {
 
 	return (
 		<StatCard className="flex flex-col gap-3">
-			<div className="flex items-start justify-between gap-3">
+			<div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
 				<div className="flex flex-col gap-0.5">
 					<StatLabel>Настроение</StatLabel>
 					<span className="text-xs text-white/40">

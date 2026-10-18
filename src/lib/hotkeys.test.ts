@@ -37,6 +37,8 @@ function press(code: string, extra: Partial<Parameters<typeof matchHotkey>[0]> =
 describe('сопоставление клавиш', () => {
 	it('находит действие по коду клавиши, не зависит от раскладки', () => {
 		expect(press('KeyF')).toBe('fullscreen');
+		expect(press('KeyM')).toBe('soundMuted');
+		expect(press('KeyE')).toBe('effectsOff');
 		expect(press('Digit1')).toBe('widget:radio');
 	});
 

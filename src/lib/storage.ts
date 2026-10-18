@@ -9,6 +9,8 @@ export const storageKeys = {
 	clickSounds: 'tempo:click-sounds',
 	dimmer: 'tempo:dimmer',
 	effects: 'tempo:effects',
+	// Кнопка «Без эффектов» в правом верхнем углу: true — эффекты и затемнение скрыты
+	effectsOff: 'tempo:effects-off',
 	favoriteStations: 'tempo:favorite-stations',
 	lastStation: 'tempo:last-station',
 	mood: 'tempo:mood',
@@ -18,6 +20,8 @@ export const storageKeys = {
 	radioCompact: 'tempo:radio-compact',
 	radioSort: 'tempo:radio-sort',
 	radioSource: 'tempo:radio-source',
+	// Кнопка «Без звука» в правом верхнем углу: true — весь звук сайта заглушён
+	soundMuted: 'tempo:sound-muted',
 	stats: 'tempo:stats',
 	tasks: 'tempo:tasks',
 	timerRuns: 'tempo:timer-runs',

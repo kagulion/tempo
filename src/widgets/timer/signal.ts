@@ -2,6 +2,7 @@
 // AudioContext общий для страницы, разблокируется по клику «Старт» (unlockAudio из src/lib/audio.ts)
 
 import { runningAudioContext } from '@/lib/audio';
+import { isSoundMuted } from '@/lib/soundMute';
 
 // Сколько мс звучит колокольчик: последняя нота начинается через 0,36 с и гаснет за 1,2 с
 export const chimeLength = 1600;
@@ -11,6 +12,8 @@ export function playChime() {
 	const context = runningAudioContext();
 	// Web Audio недоступен или страницу ещё не кликали — таймер работает без звука
 	if (!context) return;
+	// Режим «без звука»: таймер работает, уведомление приходит, но колокольчика нет
+	if (isSoundMuted()) return;
 	const start = context.currentTime;
 	[880, 1108.73, 1318.51].forEach((frequency, index) => {
 		const oscillator = context.createOscillator();

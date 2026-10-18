@@ -177,7 +177,8 @@ export function useRadio() {
 		const audio = audioRef.current;
 		if (!audio) return;
 		audio.volume = volume * duck;
-		audio.muted = muted;
+		// Нулевой множитель (режим «без звука» или сигнал таймера) — глушим: на iPhone громкость <audio> не меняется
+		audio.muted = muted || duck <= 0;
 	}, [volume, muted, duck]);
 
 	useAutoplay(audioRef, station?.stream, playing);

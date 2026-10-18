@@ -16,7 +16,12 @@ export function StatLabel({ children, className }: { children: ReactNode; classN
 // Значение счётчика: крупно и моноширинными цифрами, чтобы не прыгало при обновлении
 export function StatValue({ children, className }: { children: ReactNode; className?: string }) {
 	return (
-		<span className={cn('flex items-center gap-1.5 text-lg font-semibold tabular-nums', className)}>
+		<span
+			className={cn(
+				'flex items-center gap-1.5 text-lg font-semibold whitespace-nowrap tabular-nums',
+				className
+			)}
+		>
 			{children}
 		</span>
 	);

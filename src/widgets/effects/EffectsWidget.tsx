@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Widget, WidgetHeader } from '@/widgets/Widget';
 
 import { effects } from './effects';
+import { EffectsOffNotice } from './EffectsOffNotice';
 import { useActiveEffects } from './useActiveEffects';
 
 type EffectsWidgetProps = {
@@ -38,6 +39,7 @@ export function EffectsWidget({ className }: EffectsWidgetProps) {
 					{playing ? <Pause /> : <Play />}
 				</Button>
 			</WidgetHeader>
+			<EffectsOffNotice />
 
 			<div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
 				{effects.map((effect) => {

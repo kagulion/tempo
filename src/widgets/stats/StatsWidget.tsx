@@ -12,22 +12,25 @@ type StatsWidgetProps = {
 	className?: string;
 };
 
-// Окно статистики: собирает карточки онлайна, серии дней и времени на сайте
+// Окно статистики: карточки онлайна, серии дней, времени на сайте и настроения.
+// С sm — две колонки: слева онлайн, серия и время столбиком (12rem, значения не переносятся: пары серия/рекорд и сегодня/всего стоят друг под другом), справа настроение с календарём; на телефоне один столбец
 export function StatsWidget({ className }: StatsWidgetProps) {
 	const online = useOnline();
 	const stats = useVisitStats();
 
 	return (
 		<Widget aria-label="Статистика" className={cn('flex flex-col gap-2.5 p-4', className)}>
-			<div className="flex flex-col">
-				<WidgetTitle>Статистика</WidgetTitle>
-				<span className="text-xs text-white/40">Серия дней, время на сайте и настроение</span>
-			</div>
+			<WidgetTitle>Статистика</WidgetTitle>
 
-			<OnlineCard count={online} />
-			<StreakCard streak={stats.streak} best={stats.best} />
-			<TimeCard todayMs={stats.todayMs} totalMs={stats.totalMs} />
-			<MoodCard today={stats.lastDay} />
+			{/* items-start: колонки не растягивают карточки друг до друга */}
+			<div className="flex flex-col gap-2.5 sm:grid sm:grid-cols-[12rem_minmax(0,1fr)] sm:items-start">
+				<div className="flex flex-col gap-2.5">
+					<OnlineCard count={online} />
+					<StreakCard streak={stats.streak} best={stats.best} />
+					<TimeCard todayMs={stats.todayMs} totalMs={stats.totalMs} />
+				</div>
+				<MoodCard today={stats.lastDay} />
+			</div>
 		</Widget>
 	);
 }

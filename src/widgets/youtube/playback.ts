@@ -38,7 +38,9 @@ export function playerVolume(duck: number) {
 }
 
 export function audioTarget({ soundOn, unlocked, active, duck }: AudioInput): AudioTarget {
-	if (!soundOn || !unlocked || !active) return { muted: true };
+	// Нулевой множитель — тишина под сигналом таймера или режим «без звука»: глушим, а не ставим громкость 0,
+	// потому что на iPhone громкость видео не меняется, работает только mute
+	if (!soundOn || !unlocked || !active || duck <= 0) return { muted: true };
 	return { muted: false, volume: playerVolume(duck) };
 }
 

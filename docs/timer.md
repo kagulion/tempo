@@ -12,7 +12,7 @@
 | [`src/widgets/timer/SettingSlider.tsx`](../src/widgets/timer/SettingSlider.tsx) | Строка настройки во всю ширину на Base UI Slider: заливка фона показывает значение                                      |
 | [`src/widgets/timer/signal.ts`](../src/widgets/timer/signal.ts)                 | Сигнал о конце фазы: колокольчик через Web Audio и системное уведомление                                                |
 | [`src/lib/ducking.ts`](../src/lib/ducking.ts)                                   | Приглушение музыки вокруг сигнала: таймер сообщает момент сигнала, радио и звуки берут множитель громкости              |
-| [`src/hooks/useDuckLevel.ts`](../src/hooks/useDuckLevel.ts)                     | Хук для звуковых виджетов: текущий множитель громкости, тикает только во время приглушения                              |
+| [`src/hooks/useDuckLevel.ts`](../src/hooks/useDuckLevel.ts)                     | Хук для звуковых виджетов: текущий множитель громкости, тикает только во время приглушения. В режиме «без звука» — 0    |
 | [`src/components/ui/tabs.tsx`](../src/components/ui/tabs.tsx)                   | Вкладки base-nova на Base UI в стиле стеклянной панели                                                                  |
 | [`src/components/ui/progress.tsx`](../src/components/ui/progress.tsx)           | Полоса прогресса base-nova на Base UI в стиле стеклянной панели                                                         |
 

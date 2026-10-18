@@ -1,5 +1,3 @@
-import { Users } from 'lucide-react';
-
 import { cn } from '@/lib/utils';
 
 import { StatCard, StatLabel, StatValue } from './StatCard';
@@ -12,10 +10,10 @@ type OnlineCardProps = {
 // Сколько пользователей сейчас на сайте, с мигающей точкой «в эфире»
 export function OnlineCard({ count }: OnlineCardProps) {
 	return (
-		<StatCard className="flex items-center justify-between gap-3">
+		<StatCard>
 			<div className="flex flex-col gap-0.5">
 				<StatLabel>Сейчас на сайте</StatLabel>
-				<StatValue>
+				<StatValue className="text-[15px]">
 					<span className="relative flex size-2" aria-hidden>
 						<span
 							className={cn(
@@ -33,7 +31,6 @@ export function OnlineCard({ count }: OnlineCardProps) {
 					<span aria-live="polite">{count ?? '—'}</span>
 				</StatValue>
 			</div>
-			<Users className="size-5 text-white/40" aria-hidden />
 		</StatCard>
 	);
 }

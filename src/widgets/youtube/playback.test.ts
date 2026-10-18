@@ -43,6 +43,10 @@ describe('audioTarget', () => {
 		expect(audioTarget({ ...on, duck: 0.5 })).toEqual({ muted: false, volume: 50 });
 	});
 
+	it('глушит при нулевом множителе: режим «без звука» или сигнал таймера', () => {
+		expect(audioTarget({ ...on, duck: 0 })).toEqual({ muted: true });
+	});
+
 	it('без звука, если он выключен', () => {
 		expect(audioTarget({ ...on, soundOn: false })).toEqual({ muted: true });
 	});

@@ -26,7 +26,9 @@ export const staticHotkeys = [
 	{ action: 'fullscreen', code: 'KeyF', label: 'На весь экран', group: 'view' },
 	{ action: 'scenes', code: 'KeyS', label: 'Сменить сцену', group: 'view' },
 	{ action: 'bigClock', code: 'KeyC', label: 'Крупные часы', group: 'view' },
+	{ action: 'effectsOff', code: 'KeyE', label: 'Без эффектов', group: 'view' },
 	{ action: 'help', code: 'Slash', shift: true, label: 'Список горячих клавиш', group: 'other' },
+	{ action: 'soundMuted', code: 'KeyM', label: 'Без звука', group: 'other' },
 	{ action: 'clickSounds', code: 'KeyK', label: 'Звуки нажатий', group: 'other' }
 ] as const satisfies readonly HotkeyBinding[];
 

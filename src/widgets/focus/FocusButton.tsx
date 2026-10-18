@@ -41,10 +41,16 @@ export function FocusButton({ mode, onToggle, onHideAll, className }: FocusButto
 					onClick={onToggle}
 					aria-pressed={active}
 					aria-label={label}
-					className={cn(partClass, 'gap-1.5 pl-3 text-sm', active ? 'pr-3.5' : 'pr-2')}
+					className={cn(
+						partClass,
+						'gap-1.5 pl-3 text-sm',
+						active ? 'pr-3.5' : 'pr-2 sm:max-2xl:pr-1.5 sm:max-2xl:pl-2.5'
+					)}
 				>
 					<Focus className="size-4" />
-					Фокус
+					{/* С sm до 2xl подписи нет, только значок (название — в подсказке): иначе ряд кнопок в углу
+					    наезжает на окно таймера. В самом фокусе окон нет, и подпись «Фокус» остаётся */}
+					<span className={cn(!active && 'sm:max-2xl:hidden')}>Фокус</span>
 				</button>
 			</Hint>
 			{!active && (

@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { useHotkeys } from '@/hooks/useHotkeys';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { installClickSounds, clickSoundsStore } from '@/lib/clickSound';
+import { toggleSoundMuted } from '@/lib/soundMute';
 import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 import { useBigClock } from '@/widgets/clock/useBigClock';
@@ -12,8 +13,10 @@ import { BigClock } from '@/widgets/clock/BigClock';
 import { DimmerLayer } from '@/widgets/dimmer/DimmerLayer';
 import { Dock, dockPanels } from '@/widgets/dock/Dock';
 import { FullscreenButton, toggleFullscreen } from '@/widgets/dock/FullscreenButton';
+import { QuietButtons } from '@/widgets/dock/QuietButtons';
 import { useDock } from '@/widgets/dock/useDock';
 import { EffectLayers } from '@/widgets/effects/EffectLayers';
+import { toggleEffectsOff } from '@/widgets/effects/effectsOff';
 import { focusVisibility } from '@/widgets/focus/focus';
 import { FocusButton } from '@/widgets/focus/FocusButton';
 import { useFocusMode } from '@/widgets/focus/useFocusMode';
@@ -56,7 +59,9 @@ const dockRowClass =
 const columns: { id: WidgetColumn; className: string }[] = [
 	// Начинается ниже логотипа в левом верхнем углу
 	{ id: 'left', className: 'sm:top-16 sm:left-4 sm:items-start lg:top-24 lg:left-8' },
-	{ id: 'center', className: 'sm:left-1/2 sm:-translate-x-1/2 sm:items-center' },
+	// С sm до lg начинается ниже ряда кнопок в правом верхнем углу: на узком экране таймер иначе уходит под них.
+	// С lg кнопки в углу короче окна и стоят правее, столбец снова от верха
+	{ id: 'center', className: 'sm:top-16 sm:left-1/2 sm:-translate-x-1/2 sm:items-center lg:top-8' },
 	// Начинается ниже кнопки полного экрана в правом верхнем углу
 	{ id: 'right', className: 'sm:top-16 sm:right-4 sm:items-end lg:top-20 lg:right-8' }
 ];
@@ -70,7 +75,7 @@ function columnWidgets(column: WidgetColumn) {
 	];
 }
 
-// Раскладка страницы: фон, эффекты, крупные часы, кнопки фокуса и полного экрана, окна виджетов и панель. Список окон и их места — в src/widgets/registry.ts
+// Раскладка страницы: фон, эффекты, крупные часы, кнопки звука, эффектов, фокуса и полного экрана, окна виджетов и панель. Список окон и их места — в src/widgets/registry.ts
 export default function App() {
 	const dock = useDock();
 	const focus = useFocusMode();
@@ -94,6 +99,9 @@ export default function App() {
 		if (helpOpen) return;
 		if (action === 'scenes') return openScenes();
 		if (action === 'clickSounds') return clickSoundsStore.set((enabled) => !enabled);
+		// Звук и эффекты переключаются и в фокусе: их кнопки в углу видны всегда
+		if (action === 'soundMuted') return toggleSoundMuted();
+		if (action === 'effectsOff') return toggleEffectsOff();
 		if (action === 'focus') return focus.toggle();
 		if (action === 'fullscreen') return document.fullscreenEnabled ? toggleFullscreen() : undefined;
 		// В фокусе окна и панель спрятаны, их клавиши не работают
@@ -145,6 +153,8 @@ export default function App() {
 				<div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-8 lg:right-8">
 					{/* С xl: уже, при 1024 с оценкой настроения, пилюля наезжает на окно статистики в центральном столбце. В фокусе её нет */}
 					{focus.mode === 'off' && <StatsHighlights className="hidden xl:flex" />}
+					{/* Без звука и без эффектов: видны и в фокусе, чтобы выключить всё, не выходя из него */}
+					<QuietButtons />
 					<FocusButton mode={focus.mode} onToggle={focus.toggle} onHideAll={focus.enterHideAll} />
 					{!touchOnly && <HotkeysButton onClick={() => setHelpOpen(true)} />}
 					<FullscreenButton />

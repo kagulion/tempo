@@ -3,6 +3,7 @@ import { RotateCcw, SunDim } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { SettingSlider } from '@/widgets/timer/SettingSlider';
+import { EffectsOffNotice } from '@/widgets/effects/EffectsOffNotice';
 import { Widget, WidgetHeader } from '@/widgets/Widget';
 
 import { dimmerDefault, dimmerMax, dimmerMin, dimmerStep } from './dimmer';
@@ -29,6 +30,7 @@ export function DimmerWidget({ className }: DimmerWidgetProps) {
 					<RotateCcw />
 				</Button>
 			</WidgetHeader>
+			<EffectsOffNotice />
 
 			<SettingSlider
 				icon={SunDim}

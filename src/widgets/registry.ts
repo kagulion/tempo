@@ -99,8 +99,9 @@ const definitions = [
 		component: StatsWidget,
 		column: 'center',
 		anchor: 'top',
-		// Между звуками и окнами справа: свободно по ширине от ~1200px, на более узких экранах может перекрыть соседей
-		placement: 'sm:w-[18rem]',
+		// Той же ширины, что таймер и задачи, поэтому при смене статистики и таймера окно не прыгает.
+		// Между звуками и окнами справа: на узких экранах может перекрыть соседей
+		placement: 'sm:w-[28rem]',
 		slot: 'center-top'
 	},
 	{
@@ -113,7 +114,7 @@ const definitions = [
 		column: 'center',
 		anchor: 'top',
 		// На месте статистики: открывается вместо неё. Не сжимается: при нехватке высоты сжимаются задачи под ним
-		placement: 'sm:w-[26rem] sm:shrink-0',
+		placement: 'sm:w-[28rem] sm:shrink-0',
 		slot: 'center-top'
 	},
 	{
@@ -126,7 +127,7 @@ const definitions = [
 		column: 'center',
 		anchor: 'bottom',
 		// Под статистикой, у панели. Не shrink-0: при нехватке высоты сжимается и список секций прокручивается внутри
-		placement: 'sm:w-[24rem]'
+		placement: 'sm:w-[28rem]'
 	},
 	{
 		id: 'wallpaper',

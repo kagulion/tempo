@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from 'react';
 
 import { getAudioContext } from './audio';
+import { isSoundMuted } from './soundMute';
 import { createPersistentStore, storageKeys } from './storage';
 
 function parseEnabled(saved: unknown): boolean | undefined {
@@ -29,6 +30,8 @@ const frequencies: Record<ClickKind, number> = { tap: 1000, on: 1300, off: 760 }
 const peakGain = 0.035;
 
 export function playClick(kind: ClickKind = 'tap') {
+	// Режим «без звука»: тики тоже молчат, а их собственная настройка не меняется
+	if (isSoundMuted()) return;
 	const context = getAudioContext();
 	if (!context) return;
 	// Внутри обработчика нажатия браузер разрешает запустить звук

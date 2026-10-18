@@ -7,6 +7,8 @@ import { parseDimmer } from './dimmer/dimmer';
 import { parseOpen } from './dock/useDock';
 import { parseSort, parseSource, parseStation, parseStationMap } from './radio/saved';
 import { parseState } from './effects/useActiveEffects';
+import { parseEffectsOff } from './effects/effectsOff';
+import { parseSoundMuted } from '@/lib/soundMute';
 import { parseMood } from './stats/mood';
 import { tvChannels } from './tv/channels';
 import { parseSaved } from './wallpaper/useWallpaper';
@@ -202,5 +204,21 @@ describe('затемнение', () => {
 		expect(parseDimmer('40')).toBeUndefined();
 		expect(parseDimmer(95)).toBeUndefined();
 		expect(parseDimmer(null)).toBeUndefined();
+	});
+});
+
+describe('кнопки «Без звука» и «Без эффектов»', () => {
+	it('читают сохранённый флаг', () => {
+		expect(parseSoundMuted(true)).toBe(true);
+		expect(parseSoundMuted(false)).toBe(false);
+		expect(parseEffectsOff(true)).toBe(true);
+		expect(parseEffectsOff(false)).toBe(false);
+	});
+
+	it('мусор отбрасывают', () => {
+		expect(parseSoundMuted('true')).toBeUndefined();
+		expect(parseSoundMuted(null)).toBeUndefined();
+		expect(parseEffectsOff(1)).toBeUndefined();
+		expect(parseEffectsOff({})).toBeUndefined();
 	});
 });

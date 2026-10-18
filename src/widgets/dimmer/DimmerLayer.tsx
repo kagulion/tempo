@@ -1,10 +1,14 @@
+import { useEffectsOff } from '@/widgets/effects/effectsOff';
+
 import { dimmerOpacity } from './dimmer';
 import { useDimmer } from './useDimmer';
 
-// Чёрный слой над обоями и под всем остальным. При 0 в DOM его нет
+// Чёрный слой над обоями и под всем остальным. При 0 и в режиме «без эффектов» в DOM его нет
 export function DimmerLayer() {
 	const { value } = useDimmer();
-	if (value === 0) return null;
+	// «Без эффектов» убирает и затемнение, а ползунок остаётся на месте
+	const off = useEffectsOff();
+	if (value === 0 || off) return null;
 	return (
 		<div
 			aria-hidden="true"

@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useAutoplay } from '@/hooks/useAutoplay';
+import { useSoundMuted } from '@/lib/soundMute';
 
 import hearthsideLullaby from '@/assets/music/hearthside-lullaby.mp3';
 import tavernBeforeBattle from '@/assets/music/tavern-before-battle.mp3';
@@ -14,7 +15,14 @@ export function BackgroundMusic() {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const [currentTrack, setCurrentTrack] = useState(0);
 
+	const muted = useSoundMuted();
+
 	useAutoplay(audioRef, playlist[currentTrack], true);
+
+	// Режим «без звука» (кнопка в правом верхнем углу)
+	useEffect(() => {
+		if (audioRef.current) audioRef.current.muted = muted;
+	}, [muted]);
 
 	return (
 		<audio
