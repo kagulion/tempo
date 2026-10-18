@@ -27,6 +27,7 @@ import {
 	type WidgetId
 } from '@/widgets/registry';
 import { ScenesDialog } from '@/widgets/onboarding/ScenesDialog';
+import { openScenes } from '@/widgets/onboarding/scenesReopen';
 import { useOnboarding } from '@/widgets/onboarding/useOnboarding';
 import { StatsHighlights } from '@/widgets/stats/StatsHighlights';
 import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
@@ -91,7 +92,7 @@ export default function App() {
 		if (action === 'help') return setHelpOpen((open) => !open);
 		// Пока открыт список клавиш, остальные клавиши ждут
 		if (helpOpen) return;
-		if (action === 'scenes') return onboarding.open();
+		if (action === 'scenes') return openScenes();
 		if (action === 'clickSounds') return clickSoundsStore.set((enabled) => !enabled);
 		if (action === 'focus') return focus.toggle();
 		if (action === 'fullscreen') return document.fullscreenEnabled ? toggleFullscreen() : undefined;
@@ -177,14 +178,7 @@ export default function App() {
 						<Dock key={panel.label} panel={panel} isOpen={dock.isOpen} onToggle={dock.toggle} />
 					))}
 				</div>
-				<HotkeysDialog
-					open={helpOpen}
-					onClose={closeHelp}
-					onOpenScenes={() => {
-						closeHelp();
-						onboarding.open();
-					}}
-				/>
+				<HotkeysDialog open={helpOpen} onClose={closeHelp} />
 				{onboarding.visible && <ScenesDialog onFinish={onboarding.finish} />}
 			</main>
 		</TooltipProvider>

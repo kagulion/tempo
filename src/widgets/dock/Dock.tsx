@@ -5,7 +5,9 @@ import { cn } from '@/lib/utils';
 import { hotkeyLabel } from '@/widgets/hotkeys/bindings';
 import { type DockGroupId, widgets, type WidgetId } from '@/widgets/registry';
 
+import { ClickSoundsButton } from './ClickSoundsButton';
 import { DockClock } from './DockClock';
+import { ScenesButton } from './ScenesButton';
 
 const buttonClass =
 	'flex size-9 items-center justify-center rounded-full text-white/70 transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20';
@@ -13,7 +15,7 @@ const buttonClass =
 type DockGroup = {
 	id: DockGroupId;
 	label: string;
-	// Не окна, а что-то своё после кнопок окон: часы
+	// Не окна, а что-то своё после кнопок окон: часы, звуки нажатий, смена сцены
 	extra?: ReactNode;
 };
 
@@ -29,12 +31,12 @@ export const dockPanels: DockPanel[] = [
 	{
 		label: 'Звук',
 		className: 'sm:absolute sm:bottom-4 sm:left-4 lg:bottom-8 lg:left-8',
-		groups: [{ id: 'sound', label: 'Звук' }]
+		groups: [{ id: 'sound', label: 'Звук', extra: <ClickSoundsButton className={buttonClass} /> }]
 	},
-	// Снизу по центру
+	// Снизу. От sm до md стоит сразу справа от «Звука» (с отступом около 16px), с md — по центру
 	{
 		label: 'Главное',
-		className: 'sm:absolute sm:bottom-4 sm:left-1/2 sm:-translate-x-1/2 lg:bottom-8',
+		className: 'sm:absolute sm:bottom-4 sm:left-40 md:left-1/2 md:-translate-x-1/2 lg:bottom-8',
 		groups: [
 			{
 				id: 'main',
@@ -47,7 +49,7 @@ export const dockPanels: DockPanel[] = [
 	{
 		label: 'Вид',
 		className: 'sm:absolute sm:right-4 sm:bottom-4 lg:right-8 lg:bottom-8',
-		groups: [{ id: 'view', label: 'Вид' }]
+		groups: [{ id: 'view', label: 'Вид', extra: <ScenesButton className={buttonClass} /> }]
 	}
 ];
 

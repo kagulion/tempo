@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react';
 
 import { Hint, Kbd } from '@/components/Hint';
 import { Button } from '@/components/ui/button';
-import { useClickSounds } from '@/lib/clickSound';
 import { bindingName, hotkeyGroupLabels, type HotkeyGroup } from '@/lib/hotkeys';
 import { cn } from '@/lib/utils';
 import { Widget, WidgetHeader } from '@/widgets/Widget';
@@ -13,16 +12,13 @@ import { hotkeyBindings } from './bindings';
 type HotkeysDialogProps = {
 	open: boolean;
 	onClose: () => void;
-	// Открыть первый экран со сценами снова
-	onOpenScenes: () => void;
 };
 
 const groups: HotkeyGroup[] = ['windows', 'view', 'other'];
 
-// Окно со списком горячих клавиш и переключателем звуков нажатий. Закрывается по Esc, по клику мимо и по крестику.
+// Окно со списком горячих клавиш. Закрывается по Esc, по клику мимо и по крестику.
 // Закрытое не рисуется вовсе
-export function HotkeysDialog({ open, onClose, onOpenScenes }: HotkeysDialogProps) {
-	const clickSounds = useClickSounds();
+export function HotkeysDialog({ open, onClose }: HotkeysDialogProps) {
 	const closeRef = useRef<HTMLButtonElement>(null);
 
 	// Обработчик меняется при каждой отрисовке: чтобы не ставить слушатель заново, держим его в ref
@@ -90,35 +86,6 @@ export function HotkeysDialog({ open, onClose, onOpenScenes }: HotkeysDialogProp
 						</section>
 					);
 				})}
-
-				<div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3 text-sm">
-					<span>Готовые сцены</span>
-					<Button variant="glass-solid" size="sm" onClick={onOpenScenes}>
-						Сменить сцену
-					</Button>
-				</div>
-
-				<div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3 text-sm">
-					<span id="click-sounds-label">Звуки нажатий</span>
-					<button
-						type="button"
-						role="switch"
-						aria-checked={clickSounds.enabled}
-						aria-labelledby="click-sounds-label"
-						onClick={clickSounds.toggle}
-						className={cn(
-							'relative h-5 w-9 shrink-0 rounded-full transition-colors outline-none focus-visible:ring-3 focus-visible:ring-white/20',
-							clickSounds.enabled ? 'bg-white/60' : 'bg-white/15'
-						)}
-					>
-						<span
-							className={cn(
-								'absolute top-0.5 left-0.5 size-4 rounded-full bg-white transition-transform',
-								clickSounds.enabled && 'translate-x-4'
-							)}
-						/>
-					</button>
-				</div>
 			</Widget>
 		</div>
 	);
