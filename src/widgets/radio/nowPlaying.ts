@@ -1,16 +1,21 @@
 import { useSyncExternalStore } from 'react';
 
-import { countryName } from './api';
-
 // Текущая станция радио. Нужна не только радио: крупные часы показывают её под датой и могут включить или
 // выключить звук. Станция держится и на паузе. playing — намерение пользователя (радио включено),
 // audible — звук реально идёт. Нет радио или станции — null.
 // Хранится только в памяти, в localStorage не пишем — это текущее состояние, а не настройка
+export type NowPlayingTrack = {
+	artist: string;
+	song: string;
+	cover?: string;
+};
+
+// track — что играет на станции сейчас; его нет, пока прокси Рекорда не отвечает
 export type NowPlaying = {
 	name: string;
-	countrycode: string;
 	playing: boolean;
 	audible: boolean;
+	track?: NowPlayingTrack;
 } | null;
 
 const fallbackName = 'Без названия';
@@ -28,6 +33,12 @@ export function getNowPlaying() {
 	return current;
 }
 
+function sameTrack(a: NowPlayingTrack | undefined, b: NowPlayingTrack | undefined) {
+	return (
+		a === b || (!!a && !!b && a.artist === b.artist && a.song === b.song && a.cover === b.cover)
+	);
+}
+
 // Одинаковое значение не рассылаем, чтобы подписчики не перерисовывались впустую
 export function setNowPlaying(next: NowPlaying) {
 	const same =
@@ -35,9 +46,9 @@ export function setNowPlaying(next: NowPlaying) {
 		(current !== null &&
 			next !== null &&
 			current.name === next.name &&
-			current.countrycode === next.countrycode &&
 			current.playing === next.playing &&
-			current.audible === next.audible);
+			current.audible === next.audible &&
+			sameTrack(current.track, next.track));
 	if (same) return;
 	current = next;
 	notify();
@@ -71,19 +82,16 @@ export function toggleNowPlaying() {
 	toggleHandler?.();
 }
 
-// Название (с запасным) и страна по отдельности: название обрезается многоточием, страна — нет.
-// Без кода страны country пустая
-export function nowPlayingParts(station: { name: string; countrycode: string }) {
-	return {
-		name: station.name.trim() || fallbackName,
-		country: station.countrycode ? countryName(station.countrycode) : ''
-	};
+// Название станции для подписи под часами; пустое заменяется запасным
+export function nowPlayingName(station: { name: string }) {
+	return station.name.trim() || fallbackName;
 }
 
-// Текст для строки «Станция · Страна». Без названия или кода страны — только то, что есть
-export function nowPlayingLabel(station: { name: string; countrycode: string }) {
-	const { name, country } = nowPlayingParts(station);
-	return country ? `${name} · ${country}` : name;
+// Подпись трека: «Исполнитель — Песня», без исполнителя только песня
+export function trackLabel(track: NowPlayingTrack) {
+	const artist = track.artist.trim();
+	const song = track.song.trim();
+	return artist && song ? `${artist} — ${song}` : artist || song;
 }
 
 export function useNowPlaying() {

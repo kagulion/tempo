@@ -5,13 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { parsePosition } from './clock/useBigClock';
 import { parseDimmer } from './dimmer/dimmer';
 import { parseOpen } from './dock/useDock';
-import {
-	normalizeStation,
-	parseLiked,
-	parseSort,
-	parseSource,
-	parseStationMap
-} from './radio/stations';
+import { parseSort, parseSource, parseStation, parseStationMap } from './radio/saved';
 import { parseState } from './effects/useActiveEffects';
 import { parseMood } from './stats/mood';
 import { tvChannels } from './tv/channels';
@@ -157,32 +151,40 @@ describe('настроение', () => {
 });
 
 describe('радио', () => {
-	it('станция из старого сохранения получает votes, clickcount и tags', () => {
-		const saved = {
-			stationuuid: 'u',
-			name: 'Old',
-			country: 'Germany',
-			countrycode: 'DE',
-			url_resolved: 'https://example.com/a.mp3',
-			codec: 'MP3',
-			hls: 0
-		};
-		expect(normalizeStation(saved)).toEqual({ ...saved, votes: 0, clickcount: 0, tags: '' });
-		expect(parseStationMap({ u: saved })?.u.votes).toBe(0);
+	const oldStation = {
+		stationuuid: 'u',
+		name: 'Record Ambient',
+		country: 'Russia',
+		countrycode: 'RU',
+		url_resolved: 'http://radiorecord.hostingradio.ru/AMBIENT96.aacp',
+		codec: 'AAC',
+		hls: 0
+	};
+
+	it('станция Radio Browser переводится в станцию Рекорда, чужие отбрасываются', () => {
+		expect(parseStation(oldStation)?.prefix).toBe('ambient');
+		expect(parseStationMap({ u: oldStation })?.['42650']?.title).toBe('Ambient');
+		expect(
+			parseStation({ ...oldStation, url_resolved: 'https://example.com/a.mp3' })
+		).toBeUndefined();
 	});
 
-	it('источник станций: читает страну, жанр и поиск, мусор отбрасывает', () => {
-		expect(parseSource({ kind: 'country', code: 'DE' })).toEqual({ kind: 'country', code: 'DE' });
+	it('источник станций: старые страна и поиск становятся «все станции», жанры переводятся', () => {
+		expect(parseSource({ kind: 'country', code: 'DE' })).toEqual({ kind: 'all' });
+		expect(parseSource({ kind: 'search', query: 'jazz' })).toEqual({ kind: 'all' });
 		expect(parseSource({ kind: 'genre', genre: 'lofi' })).toEqual({ kind: 'genre', genre: 'lofi' });
-		expect(parseSource({ kind: 'genre', genre: 'removed' })).toBeUndefined();
+		expect(parseSource({ kind: 'genre', genre: 'chillout' })).toEqual({
+			kind: 'genre',
+			genre: 'chillout'
+		});
+		expect(parseSource({ kind: 'genre', genre: 'jazz' })).toEqual({ kind: 'all' });
 		expect(parseSource('DE')).toBeUndefined();
 	});
 
-	it('порядок станций и лайки', () => {
-		expect(parseSort('popular')).toBe('popular');
+	it('порядок станций: «популярные» становятся «по порядку»', () => {
+		expect(parseSort('default')).toBe('default');
+		expect(parseSort('popular')).toBe('default');
 		expect(parseSort(1)).toBeUndefined();
-		expect(parseLiked({ u: 1 })).toEqual({ u: 1 });
-		expect(parseLiked(['u'])).toBeUndefined();
 	});
 });
 

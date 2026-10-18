@@ -11,7 +11,6 @@ export const storageKeys = {
 	effects: 'tempo:effects',
 	favoriteStations: 'tempo:favorite-stations',
 	lastStation: 'tempo:last-station',
-	likedStations: 'tempo:liked-stations',
 	mood: 'tempo:mood',
 	// Первый экран со сценами: 'pending' — ещё не выбрали, 'done' — закрыт навсегда
 	onboarding: 'tempo:onboarding',

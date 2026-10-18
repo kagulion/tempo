@@ -1,5 +1,7 @@
 import { useEffect, type RefObject } from 'react';
 
+import { unlockAudio } from '@/lib/audio';
+
 // Играет src, пока playing = true. Браузеры блокируют звук до первого взаимодействия со страницей —
 // в этом случае запускаем воспроизведение по первому клику или нажатию клавиши
 export function useAutoplay(
@@ -21,6 +23,8 @@ export function useAutoplay(
 		// Пробуем запустить воспроизведение сразу
 		audio.play().catch(() => {
 			const startAudio = () => {
+				// Заодно разблокируем AudioContext: через него идёт анализатор эквалайзера
+				unlockAudio();
 				audio.play().catch(() => {});
 				listeners.abort();
 			};

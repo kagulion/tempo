@@ -3,53 +3,27 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	getNowPlaying,
 	hasNowPlayingToggle,
-	nowPlayingLabel,
-	nowPlayingParts,
+	nowPlayingName,
 	registerNowPlayingToggle,
 	setNowPlaying,
 	subscribeNowPlaying,
-	toggleNowPlaying
+	toggleNowPlaying,
+	trackLabel
 } from './nowPlaying';
 
-const rock = { name: 'Rock', countrycode: 'DE', playing: true, audible: true };
+const rock = { name: 'Rock', playing: true, audible: true };
 
 afterEach(() => {
 	setNowPlaying(null);
 });
 
-describe('nowPlayingParts', () => {
-	it('отдаёт название и страну по отдельности', () => {
-		expect(nowPlayingParts({ name: ' Jazz FM ', countrycode: 'DE' })).toEqual({
-			name: 'Jazz FM',
-			country: new Intl.DisplayNames(['ru'], { type: 'region' }).of('DE')
-		});
-	});
-
-	it('пустое название заменяет на «Без названия», без кода страны страна пустая', () => {
-		expect(nowPlayingParts({ name: '   ', countrycode: '' })).toEqual({
-			name: 'Без названия',
-			country: ''
-		});
-	});
-});
-
-describe('nowPlayingLabel', () => {
-	it('склеивает название и страну через точку', () => {
-		expect(nowPlayingLabel({ name: 'Radio Lounge', countrycode: 'DE' })).toBe(
-			`Radio Lounge · ${new Intl.DisplayNames(['ru'], { type: 'region' }).of('DE')}`
-		);
-	});
-
+describe('nowPlayingName', () => {
 	it('обрезает пробелы у названия', () => {
-		expect(nowPlayingLabel({ name: '  Jazz FM  ', countrycode: '' })).toBe('Jazz FM');
+		expect(nowPlayingName({ name: '  Lo-Fi  ' })).toBe('Lo-Fi');
 	});
 
 	it('пустое название заменяет на «Без названия»', () => {
-		expect(nowPlayingLabel({ name: '   ', countrycode: '' })).toBe('Без названия');
-	});
-
-	it('без кода страны показывает только название', () => {
-		expect(nowPlayingLabel({ name: 'Rock', countrycode: '' })).toBe('Rock');
+		expect(nowPlayingName({ name: '   ' })).toBe('Без названия');
 	});
 });
 
@@ -66,7 +40,6 @@ describe('nowPlaying store', () => {
 		setNowPlaying({ ...rock, playing: false, audible: false });
 		expect(getNowPlaying()).toEqual({
 			name: 'Rock',
-			countrycode: 'DE',
 			playing: false,
 			audible: false
 		});
@@ -88,7 +61,7 @@ describe('nowPlaying store', () => {
 		expect(listener).toHaveBeenCalledTimes(3);
 
 		unsubscribe();
-		setNowPlaying({ name: 'Jazz', countrycode: 'FR', playing: true, audible: true });
+		setNowPlaying({ name: 'Jazz', playing: true, audible: true });
 		expect(listener).toHaveBeenCalledTimes(3);
 	});
 });
@@ -134,5 +107,32 @@ describe('переключатель радио', () => {
 
 		unregisterSecond();
 		expect(hasNowPlayingToggle()).toBe(false);
+	});
+});
+
+describe('трек в nowPlaying', () => {
+	const track = { artist: 'Artist', song: 'Song', cover: 'https://example.com/c.jpg' };
+
+	it('смена трека — изменение, такой же трек — нет', () => {
+		const listener = vi.fn();
+		const unsubscribe = subscribeNowPlaying(listener);
+
+		setNowPlaying({ ...rock, track });
+		setNowPlaying({ ...rock, track: { ...track } });
+		expect(listener).toHaveBeenCalledTimes(1);
+
+		setNowPlaying({ ...rock, track: { ...track, song: 'Other' } });
+		expect(listener).toHaveBeenCalledTimes(2);
+
+		// Трек пропал
+		setNowPlaying(rock);
+		expect(listener).toHaveBeenCalledTimes(3);
+		expect(getNowPlaying()?.track).toBeUndefined();
+		unsubscribe();
+	});
+
+	it('trackLabel: «Исполнитель — Песня», без исполнителя только песня', () => {
+		expect(trackLabel(track)).toBe('Artist — Song');
+		expect(trackLabel({ artist: ' ', song: 'Song' })).toBe('Song');
 	});
 });

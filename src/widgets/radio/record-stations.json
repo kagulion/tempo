@@ -1,0 +1,1172 @@
+[
+	{
+		"id": 15016,
+		"prefix": "record",
+		"title": "Record",
+		"genres": ["HOUSE", "POP"],
+		"stream": "https://radiorecord.hostingradio.ru/rr_main64.aacp",
+		"sort": 0,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/record_image600_colored_fill.png?a=5472547440f0ce6fa85daa049a160964"
+	},
+	{
+		"id": 537,
+		"prefix": "rus",
+		"title": "Russian Mix",
+		"genres": ["POP", "RUSSIAN"],
+		"stream": "https://radiorecord.hostingradio.ru/rus96.aacp",
+		"sort": 1,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-rus/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/rus_image600_colored_fill.png?a=26a6cdb9e3a3248cbf3a7e7446bfe744"
+	},
+	{
+		"id": 44905,
+		"prefix": "khity-vsekh-vremen",
+		"title": "Хиты всех времен",
+		"genres": ["HOUSE", "OLDSCHOOL", "POP", "Эпохи"],
+		"stream": "https://radiorecord.hostingradio.ru/alltimers64.aacp",
+		"sort": 2,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-alltimers/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/khity-vsekh-vremen_image600_colored_fill.png?a=9b9d647f47f3a6a78dc7cc332339ed89"
+	},
+	{
+		"id": 539,
+		"prefix": "sd90",
+		"title": "Супердискотека 90-х",
+		"genres": ["OLDSCHOOL", "POP", "RUSSIAN", "Эпохи"],
+		"stream": "https://radiorecord.hostingradio.ru/sd9096.aacp",
+		"sort": 4,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-sd90/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/sd90_image600_colored_fill.png?a=212d01c6522af9ca384eb30b145e3bbc"
+	},
+	{
+		"id": 519,
+		"prefix": "russianhits",
+		"title": "Russian Hits",
+		"genres": ["POP", "RUSSIAN"],
+		"stream": "https://radiorecord.hostingradio.ru/russianhits64.aacp",
+		"sort": 5,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-russianhits/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/russianhits_image600_colored_fill.png?a=922a83210a1fd1bfbaa51dc3ee66a20a"
+	},
+	{
+		"id": 553,
+		"prefix": "pump",
+		"title": "Колбасный Цех",
+		"genres": ["OLDSCHOOL"],
+		"stream": "https://radiorecord.hostingradio.ru/pump96.aacp",
+		"sort": 5,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-pump/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/pump_image600_colored_fill.png?a=d9ac53522b4dda202eefed1c4b8e5d7d"
+	},
+	{
+		"id": 43173,
+		"prefix": "live-dj-sets",
+		"title": "Festivals",
+		"genres": ["HOUSE", "TECHNO", "TRANCE"],
+		"stream": "https://radiorecord.hostingradio.ru/livedjsets96.aacp",
+		"sort": 6,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-livedjsets/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/live-dj-sets_image600_colored_fill.png?a=c8906e95096eb2a785c89c42021c0e94"
+	},
+	{
+		"id": 528,
+		"prefix": "deep",
+		"title": "Deep",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/deep96.aacp",
+		"sort": 6,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-deep/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/deep_image600_colored_fill.png?a=59436285ec662ed06fa76e2b154d7a32"
+	},
+	{
+		"id": 534,
+		"prefix": "chil",
+		"title": "Chill-Out",
+		"genres": ["CHILL", "Сон"],
+		"stream": "https://radiorecord.hostingradio.ru/chil96.aacp",
+		"sort": 7,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-chil/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/chil_image600_colored_fill.png?a=fc3cc778994a647e15f95c76c2092511"
+	},
+	{
+		"id": 44373,
+		"prefix": "skazki",
+		"title": "Сказки MC V",
+		"genres": ["CHILL", "Сон", "Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/skazki64.aacp",
+		"sort": 7,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-skazki/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/skazki_image600_colored_fill.png?a=60eb474daacbbb938bcd3e1b61c86ea4"
+	},
+	{
+		"id": 43817,
+		"prefix": "nashashlyki",
+		"title": "На шашлыки!",
+		"genres": ["POP", "RUSSIAN", "Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/nashashlyki96.aacp",
+		"sort": 7,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-nashashlyki/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/nashashlyki_image600_colored_fill.png?a=22d61dca4789d571da10ac4f8cb32412"
+	},
+	{
+		"id": 520,
+		"prefix": "mix",
+		"title": "Megamix",
+		"genres": ["HOUSE", "POP", "Спорт"],
+		"stream": "https://radiorecord.hostingradio.ru/mix96.aacp",
+		"sort": 8,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-mix/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/mix_image600_colored_fill.png?a=ac95c8b3b6e202a8371298391c79538b"
+	},
+	{
+		"id": 554,
+		"prefix": "rock",
+		"title": "Rock",
+		"genres": ["Прикол"],
+		"stream": "https://radiorecord.hostingradio.ru/rock96.aacp",
+		"sort": 9,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-rock/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/rock_image600_colored_fill.png?a=a991bb988d32d61473a533696f775699"
+	},
+	{
+		"id": 548,
+		"prefix": "rmx",
+		"title": "Remix",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/rmx96.aacp",
+		"sort": 10,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-rmx/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/rmx_image600_colored_fill.png?a=657178bc333099502cdcf1e892d0c56e"
+	},
+	{
+		"id": 556,
+		"prefix": "gop",
+		"title": "Гоп FM",
+		"genres": ["POP", "RUSSIAN", "Прикол"],
+		"stream": "https://radiorecord.hostingradio.ru/gop64.aacp",
+		"sort": 11,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-gop/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/gop_image600_colored_fill.png?a=49f701f15e42cf13f79801eff2983a1f"
+	},
+	{
+		"id": 501,
+		"prefix": "bighits",
+		"title": "Big Hits",
+		"genres": ["POP"],
+		"stream": "https://radiorecord.hostingradio.ru/bighits96.aacp",
+		"sort": 13,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-bighits/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/bighits_image600_colored_fill.png?a=8f6d7d2ee88f5ab5c73836508fda0699"
+	},
+	{
+		"id": 515,
+		"prefix": "chillhouse",
+		"title": "Chill House",
+		"genres": ["CHILL", "HOUSE", "Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/chillhouse96.aacp",
+		"sort": 14,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-chillhouse/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/chillhouse_image600_colored_fill.png?a=6e5665fa09cddf8172eb080be21299f0"
+	},
+	{
+		"id": 43264,
+		"prefix": "record00",
+		"title": "Рекорд 00-х",
+		"genres": ["OLDSCHOOL", "Эпохи"],
+		"stream": "https://radiorecord.hostingradio.ru/200096.aacp",
+		"sort": 14,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-2000/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/record00_image600_colored_fill.png?a=5c38048c31d6abc88efc613d086d899e"
+	},
+	{
+		"id": 44688,
+		"prefix": "melodic",
+		"title": "Melodic Techno",
+		"genres": ["TECHNO"],
+		"stream": "https://radiorecord.hostingradio.ru/melodic64.aacp",
+		"sort": 15,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-melodic/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/melodic_image600_colored_fill.png?a=d052562aae13ed3a8c66f809f90dd3c4"
+	},
+	{
+		"id": 514,
+		"prefix": "1980",
+		"title": "Record 80-х",
+		"genres": ["OLDSCHOOL", "POP", "Эпохи"],
+		"stream": "https://radiorecord.hostingradio.ru/198096.aacp",
+		"sort": 15,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-1980/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/1980_image600_colored_fill.png?a=6fe6d2ea156b9fd049986229729b7945"
+	},
+	{
+		"id": 561,
+		"prefix": "naft",
+		"title": "Нафталин FM",
+		"genres": ["POP", "RUSSIAN", "Прикол"],
+		"stream": "https://radiorecord.hostingradio.ru/naft96.aacp",
+		"sort": 18,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-naft/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/naft_image600_colored_fill.png?a=b73eb8fde206f313c6efa22003d22d0c"
+	},
+	{
+		"id": 495,
+		"prefix": "mf",
+		"title": "Маятник Фуко",
+		"genres": ["RAP/URBAN", "RUSSIAN"],
+		"stream": "https://radiorecord.hostingradio.ru/mf96.aacp",
+		"sort": 19,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-mf/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/mf_image600_colored_fill.png?a=1868db228e2b8a51ace15c84a06de66a"
+	},
+	{
+		"id": 533,
+		"prefix": "tm",
+		"title": "Trancemission",
+		"genres": ["TRANCE"],
+		"stream": "https://radiorecord.hostingradio.ru/tm96.aacp",
+		"sort": 20,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-tm/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/tm_image600_colored_fill.png?a=79ec551cb8f6e23cb7dfcb461f5c099e"
+	},
+	{
+		"id": 42725,
+		"prefix": "summer-dance",
+		"title": "Summer Dance",
+		"genres": ["HOUSE", "POP", "Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/summerparty96.aacp",
+		"sort": 20,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-summerparty/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/summer-dance_image600_colored_fill.png?a=285572a6557a69cf39660ba9c6d9dc01"
+	},
+	{
+		"id": 524,
+		"prefix": "russiangold",
+		"title": "Russian Gold",
+		"genres": ["POP", "RUSSIAN"],
+		"stream": "https://radiorecord.hostingradio.ru/russiangold96.aacp",
+		"sort": 22,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-russiangold/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/russiangold_image600_colored_fill.png?a=b2d76cbf2fe2c3b5327e56b70f518795"
+	},
+	{
+		"id": 44331,
+		"prefix": "beach",
+		"title": "Beach Party",
+		"genres": ["HOUSE", "Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/beach64.aacp",
+		"sort": 22,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-beach/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/beach_image600_colored_fill.png?a=f79681081cbf330fbf3a7c31f60ebd78"
+	},
+	{
+		"id": 536,
+		"prefix": "ps",
+		"title": "Pirate Station",
+		"genres": ["DRUM"],
+		"stream": "https://radiorecord.hostingradio.ru/ps96.aacp",
+		"sort": 23,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-ps/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/ps_image600_colored_fill.png?a=2522907c95c3454702c5ac6fdc17aebe"
+	},
+	{
+		"id": 44787,
+		"prefix": "mashup",
+		"title": "Mashup",
+		"genres": ["Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/mashup64.aacp",
+		"sort": 23,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-mashup/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/mashup_image600_colored_fill.png?a=d18b5e2d1bb26ba494b3290508d49447"
+	},
+	{
+		"id": 494,
+		"prefix": "ibiza",
+		"title": "Innocence",
+		"genres": ["HOUSE", "TECHNO"],
+		"stream": "https://radiorecord.hostingradio.ru/ibiza96.aacp",
+		"sort": 24,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-ibiza/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/ibiza_image600_colored_fill.png?a=22a056ec62766c579585922d2c8f1431"
+	},
+	{
+		"id": 555,
+		"prefix": "mdl",
+		"title": "Медляк FM",
+		"genres": ["CHILL", "POP", "Прикол"],
+		"stream": "https://radiorecord.hostingradio.ru/mdl96.aacp",
+		"sort": 25,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-mdl/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/mdl_image600_colored_fill.png?a=1648b1416889f124c39be4c179df0180"
+	},
+	{
+		"id": 42891,
+		"prefix": "party-24-7",
+		"title": "Party 24/7",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/party96.aacp",
+		"sort": 26,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-party/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/party-24-7_image600_colored_fill.png?a=98b1652b88b9b9df9e164b299c2dc914"
+	},
+	{
+		"id": 43174,
+		"prefix": "phonk",
+		"title": "Phonk",
+		"genres": ["RAP/URBAN", "Спорт"],
+		"stream": "https://radiorecord.hostingradio.ru/phonk96.aacp",
+		"sort": 27,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-phonk/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/phonk_image600_colored_fill.png?a=861926d87f6a341c249007ace175b936"
+	},
+	{
+		"id": 493,
+		"prefix": "gold",
+		"title": "Record Gold",
+		"genres": ["OLDSCHOOL"],
+		"stream": "https://radiorecord.hostingradio.ru/gold96.aacp",
+		"sort": 28,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-gold/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/gold_image600_colored_fill.png?a=1dea094d11026e31e78c5e0059bab5b4"
+	},
+	{
+		"id": 14954,
+		"prefix": "rv19",
+		"title": "Руки Вверх!",
+		"genres": ["OLDSCHOOL", "POP", "RUSSIAN", "Прикол"],
+		"stream": "https://radiorecord.hostingradio.ru/rv96.aacp",
+		"sort": 29,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-rv/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/rv19_image600_colored_fill.png?a=3070ffc2bd22741de97d4fed55323880"
+	},
+	{
+		"id": 43455,
+		"prefix": "hype",
+		"title": "На Хайпе",
+		"genres": ["POP", "RAP/URBAN"],
+		"stream": "https://radiorecord.hostingradio.ru/hype96.aacp",
+		"sort": 30,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-hype/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/hype_image600_colored_fill.png?a=a7b310af0981ee06ff67cba3c40058da"
+	},
+	{
+		"id": 511,
+		"prefix": "rap",
+		"title": "Rap Hits",
+		"genres": ["RAP/URBAN"],
+		"stream": "https://radiorecord.hostingradio.ru/rap96.aacp",
+		"sort": 31,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-rap/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/rap_image600_colored_fill.png?a=d6e8a4c2759719567f676e509c15169b"
+	},
+	{
+		"id": 512,
+		"prefix": "rapclassics",
+		"title": "Rap Classics",
+		"genres": ["RAP/URBAN"],
+		"stream": "https://radiorecord.hostingradio.ru/rapclassics96.aacp",
+		"sort": 32,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-rapclassics/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/rapclassics_image600_colored_fill.png?a=f7a57fcf6f7c69ef954e2c7f67e689e6"
+	},
+	{
+		"id": 510,
+		"prefix": "trancehits",
+		"title": "Trance Classics",
+		"genres": ["TRANCE"],
+		"stream": "https://radiorecord.hostingradio.ru/trancehits96.aacp",
+		"sort": 33,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-trancehits/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/trancehits_image600_colored_fill.png?a=6bd99ad96a78c216468155bbe48e6864"
+	},
+	{
+		"id": 523,
+		"prefix": "drumhits",
+		"title": "D'n'B Classics",
+		"genres": ["DRUM"],
+		"stream": "https://radiorecord.hostingradio.ru/drumhits96.aacp",
+		"sort": 35,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-drumhits/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/drumhits_image600_colored_fill.png?a=b8a7ba90ccc656a84f0b52443e424d61"
+	},
+	{
+		"id": 43697,
+		"prefix": "armin",
+		"title": "Armin van Buuren",
+		"genres": ["TRANCE"],
+		"stream": "https://radiorecord.hostingradio.ru/armin96.aacp",
+		"sort": 36,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-armin/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/armin_image600_colored_fill.png?a=670ce8f7207ae82efd596bf172abda51"
+	},
+	{
+		"id": 43337,
+		"prefix": "summerlounge",
+		"title": "Summer Lounge",
+		"genres": ["CHILL", "Лето", "Сон"],
+		"stream": "https://radiorecord.hostingradio.ru/summerlounge64.aacp",
+		"sort": 37,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-summerlounge/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/summerlounge_image600_colored_fill.png?a=8c2ca1639783c72ebff8c40d3f04f5d7"
+	},
+	{
+		"id": 42715,
+		"prefix": "organic",
+		"title": "Organic",
+		"genres": ["CHILL", "HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/organic96.aacp",
+		"sort": 38,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-organic/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/organic_image600_colored_fill.png?a=4ce0dee84546e4cf00cf726cebe5bb44"
+	},
+	{
+		"id": 44215,
+		"prefix": "ultra",
+		"title": "Ultra Music Festival",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/ultra64.aacp",
+		"sort": 39,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-ultra/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/ultra_image600_colored_fill.png?a=7b73be077a338adb6c4eb2260ebe67b8"
+	},
+	{
+		"id": 538,
+		"prefix": "vip",
+		"title": "VIP House",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/vip96.aacp",
+		"sort": 40,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-vip/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/vip_image600_colored_fill.png?a=acf9d89f0f47d88bca8dcdc40c89c455"
+	},
+	{
+		"id": 544,
+		"prefix": "brks",
+		"title": "Breaks",
+		"genres": ["BASS", "BREAKS"],
+		"stream": "https://radiorecord.hostingradio.ru/brks96.aacp",
+		"sort": 41,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-brks/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/brks_image600_colored_fill.png?a=0aa3b1bdf9fc14b36283dc6da3d46368"
+	},
+	{
+		"id": 522,
+		"prefix": "liquidfunk",
+		"title": "Liquid Funk",
+		"genres": ["DRUM"],
+		"stream": "https://radiorecord.hostingradio.ru/liquidfunk96.aacp",
+		"sort": 42,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-liquidfunk/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/liquidfunk_image600_colored_fill.png?a=b4c492909fd0d50b986c0bcfb01ae9d9"
+	},
+	{
+		"id": 43339,
+		"prefix": "workout",
+		"title": "Workout",
+		"genres": ["HOUSE", "HARD", "Спорт"],
+		"stream": "https://radiorecord.hostingradio.ru/workout64.aacp",
+		"sort": 43,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-workout/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/workout_image600_colored_fill.png?a=d5bbfa7e5fd5ec228aa85d61d4f71da2"
+	},
+	{
+		"id": 529,
+		"prefix": "club",
+		"title": "EDM",
+		"genres": ["HOUSE", "Спорт"],
+		"stream": "https://radiorecord.hostingradio.ru/club96.aacp",
+		"sort": 44,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-club/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/club_image600_colored_fill.png?a=d1a0d750540ea47f126e919514a2e971"
+	},
+	{
+		"id": 541,
+		"prefix": "jackin",
+		"title": "Bass House",
+		"genres": ["BASS", "HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/jackin96.aacp",
+		"sort": 45,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-jackin/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/jackin_image600_colored_fill.png?a=cd07856ee6784b5f48636f38464e22e8"
+	},
+	{
+		"id": 531,
+		"prefix": "goa",
+		"title": "GOA/PSY",
+		"genres": ["HARD", "TRANCE"],
+		"stream": "https://radiorecord.hostingradio.ru/goa96.aacp",
+		"sort": 46,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-goa/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/goa_image600_colored_fill.png?a=3912a2cd4748fadee00b8d6676c5380b"
+	},
+	{
+		"id": 43451,
+		"prefix": "2010",
+		"title": "10's Dance",
+		"genres": ["HOUSE", "POP", "Эпохи"],
+		"stream": "https://radiorecord.hostingradio.ru/201096.aacp",
+		"sort": 47,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-2010/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/2010_image600_colored_fill.png?a=20ca949d239e60b17aa9dc04b9a2d40a"
+	},
+	{
+		"id": 542,
+		"prefix": "trancehouse",
+		"title": "Trancehouse",
+		"genres": ["CHILL", "HOUSE", "TRANCE"],
+		"stream": "https://radiorecord.hostingradio.ru/trancehouse96.aacp",
+		"sort": 48,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-trancehouse/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/trancehouse_image600_colored_fill.png?a=681faab870cf8bb3e3f5f226bcfe239d"
+	},
+	{
+		"id": 558,
+		"prefix": "yo",
+		"title": "Black Rap",
+		"genres": ["RAP/URBAN"],
+		"stream": "https://radiorecord.hostingradio.ru/yo96.aacp",
+		"sort": 49,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-yo/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/yo_image600_colored_fill.png?a=51d4553786ca1e86f0b226d229a43911"
+	},
+	{
+		"id": 547,
+		"prefix": "techno",
+		"title": "Techno",
+		"genres": ["HARD", "TECHNO"],
+		"stream": "https://radiorecord.hostingradio.ru/techno96.aacp",
+		"sort": 50,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-techno/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/techno_image600_colored_fill.png?a=9dadd3d6b2c597b1f55360fa70e241ae"
+	},
+	{
+		"id": 530,
+		"prefix": "trop",
+		"title": "Tropical",
+		"genres": ["CHILL", "HOUSE", "Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/trop96.aacp",
+		"sort": 51,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-trop/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/trop_image600_colored_fill.png?a=b3020dc37f601adf22cc0a6ae00447d2"
+	},
+	{
+		"id": 42532,
+		"prefix": "lofi",
+		"title": "Lo-Fi",
+		"genres": ["CHILL", "Сон"],
+		"stream": "https://radiorecord.hostingradio.ru/lofi96.aacp",
+		"sort": 52,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-lofi/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/lofi_image600_colored_fill.png?a=861ae1a11cd3d16b3a5d9246983044d4"
+	},
+	{
+		"id": 42509,
+		"prefix": "techouse",
+		"title": "Tech House",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/techouse96.aacp",
+		"sort": 53,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-techouse/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/techouse_image600_colored_fill.png?a=d80827e6430b60cffbb3ce64d8baa5ac"
+	},
+	{
+		"id": 552,
+		"prefix": "trap",
+		"title": "Trap",
+		"genres": ["BASS", "RAP/URBAN", "Спорт"],
+		"stream": "https://radiorecord.hostingradio.ru/trap96.aacp",
+		"sort": 54,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-trap/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/trap_image600_colored_fill.png?a=c0e6f3c89a085ab4d06924a5dab9124c"
+	},
+	{
+		"id": 526,
+		"prefix": "technopop",
+		"title": "Technopop",
+		"genres": ["OLDSCHOOL"],
+		"stream": "https://radiorecord.hostingradio.ru/technopop96.aacp",
+		"sort": 55,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-technopop/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/technopop_image600_colored_fill.png?a=6ad027e6d732612197f1cb726d2b3273"
+	},
+	{
+		"id": 516,
+		"prefix": "1970",
+		"title": "70's Dance",
+		"genres": ["POP", "Эпохи"],
+		"stream": "https://radiorecord.hostingradio.ru/197096.aacp",
+		"sort": 56,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-1970/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/1970_image600_colored_fill.png?a=5f86112ce6bb30ad0d35a752a7b5198e"
+	},
+	{
+		"id": 502,
+		"prefix": "dream",
+		"title": "Dream Dance",
+		"genres": ["OLDSCHOOL", "TRANCE"],
+		"stream": "https://radiorecord.hostingradio.ru/dream64.aacp",
+		"sort": 57,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-dream/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/dream_image600_colored_fill.png?a=a03304ae591d8c1a29ed6771f2bfcaee"
+	},
+	{
+		"id": 507,
+		"prefix": "neurofunk",
+		"title": "Neurofunk",
+		"genres": ["DRUM"],
+		"stream": "https://radiorecord.hostingradio.ru/neurofunk96.aacp",
+		"sort": 58,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-neurofunk/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/neurofunk_image600_colored_fill.png?a=84bbb5a2e3a5de86ce5846fd728dfe20"
+	},
+	{
+		"id": 42650,
+		"prefix": "ambient",
+		"title": "Ambient",
+		"genres": ["CHILL", "Сон"],
+		"stream": "https://radiorecord.hostingradio.ru/ambient96.aacp",
+		"sort": 59,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-ambient/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/ambient_image600_colored_fill.png?a=cee8fa934626d4370d35b85aac623c70"
+	},
+	{
+		"id": 44183,
+		"prefix": "recordclassix",
+		"title": "Record Classix",
+		"genres": ["HOUSE", "OLDSCHOOL", "Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/classix64.aacp",
+		"sort": 60,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-classix/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/recordclassix_image600_colored_fill.png?a=ca7cb0112cf822a8473c491b396e3b67"
+	},
+	{
+		"id": 44188,
+		"prefix": "recordclubshow",
+		"title": "Record Club Show",
+		"genres": ["HOUSE", "Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/clubshow64.aacp",
+		"sort": 61,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-clubshow/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/recordclubshow_image600_colored_fill.png?a=fa3129ee0bbd92a557f16e4e58a5199a"
+	},
+	{
+		"id": 525,
+		"prefix": "eurodance",
+		"title": "Eurodance",
+		"genres": ["OLDSCHOOL", "POP"],
+		"stream": "https://radiorecord.hostingradio.ru/eurodance96.aacp",
+		"sort": 62,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-eurodance/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/eurodance_image600_colored_fill.png?a=2808ef347ea5633861a8dd792d2173e7"
+	},
+	{
+		"id": 43925,
+		"prefix": "lo-fi-house",
+		"title": "Lo-Fi House",
+		"genres": ["CHILL", "HOUSE", "Сон"],
+		"stream": "https://radiorecord.hostingradio.ru/lofihouse64.aacp",
+		"sort": 63,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-lofihouse/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/lo-fi-house_image600_colored_fill.png?a=81bd17cea7a546318a25b37be680263f"
+	},
+	{
+		"id": 500,
+		"prefix": "househits",
+		"title": "House Hits",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/househits96.aacp",
+		"sort": 64,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-househits/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/househits_image600_colored_fill.png?a=5a8bd1c683d61f7de8f13ad53245c97a"
+	},
+	{
+		"id": 504,
+		"prefix": "uplift",
+		"title": "Uplifting",
+		"genres": ["HARD", "TRANCE"],
+		"stream": "https://radiorecord.hostingradio.ru/uplift96.aacp",
+		"sort": 65,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-uplift/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/uplift_image600_colored_fill.png?a=7dfb9a8d2d6926523742e254aaecca85"
+	},
+	{
+		"id": 44168,
+		"prefix": "feel",
+		"title": "Feel",
+		"genres": ["TRANCE", "Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/feel64.aacp",
+		"sort": 66,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-feel/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/feel_image600_colored_fill.png?a=d69a413086e080afc02431eccef62a55"
+	},
+	{
+		"id": 43696,
+		"prefix": "tiesto",
+		"title": "Tiesto",
+		"genres": ["HOUSE", "POP"],
+		"stream": "https://radiorecord.hostingradio.ru/tiesto96.aacp",
+		"sort": 67,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-tiesto/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/tiesto_image600_colored_fill.png?a=c8bb665e6026f6f1d33e8eea07c428a2"
+	},
+	{
+		"id": 44166,
+		"prefix": "a-state-of-trance",
+		"title": "A State of Trance",
+		"genres": ["TRANCE", "Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/asot64.aacp",
+		"sort": 68,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-asot/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/a-state-of-trance_image600_colored_fill.png?a=081cdb563a05b3e28faa109859cdbe84"
+	},
+	{
+		"id": 14718,
+		"prefix": "deti",
+		"title": "Веснушка FM",
+		"genres": ["RUSSIAN", "Прикол"],
+		"stream": "https://radiorecord.hostingradio.ru/deti96.aacp",
+		"sort": 69,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-deti/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/deti_image600_colored_fill.png?a=e3a05d0580a8c66f397392c02f19dbd9"
+	},
+	{
+		"id": 557,
+		"prefix": "symph",
+		"title": "Симфония FM",
+		"genres": ["Прикол", "Сон"],
+		"stream": "https://radiorecord.hostingradio.ru/symph96.aacp",
+		"sort": 70,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-symph/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/symph_image600_colored_fill.png?a=af3c8785a28e8587d52dc93858b0895a"
+	},
+	{
+		"id": 535,
+		"prefix": "mini",
+		"title": "Minimal/Tech",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/mini96.aacp",
+		"sort": 71,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-mini/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/mini_image600_colored_fill.png?a=184c9744be6a1f44c776bdb457053f3f"
+	},
+	{
+		"id": 43172,
+		"prefix": "top-100-edm",
+		"title": "TOP 100 EDM",
+		"genres": ["HOUSE", "TECHNO"],
+		"stream": "https://radiorecord.hostingradio.ru/top100edm96.aacp",
+		"sort": 72,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-top100edm/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/top-100-edm_image600_colored_fill.png?a=392bf6a75cf4fa4ce741a60892992cba"
+	},
+	{
+		"id": 42602,
+		"prefix": "dream-pop",
+		"title": "Dream Pop",
+		"genres": ["CHILL", "Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/dreampop96.aacp",
+		"sort": 73,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-dreampop/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/dream-pop_image600_colored_fill.png?a=447a220be1ce5dcfa05bcdcaa907f189"
+	},
+	{
+		"id": 505,
+		"prefix": "houseclss",
+		"title": "House Classics",
+		"genres": ["HOUSE", "OLDSCHOOL"],
+		"stream": "https://radiorecord.hostingradio.ru/houseclss96.aacp",
+		"sort": 74,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-houseclss/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/houseclss_image600_colored_fill.png?a=a20d9f2231a21f633241bd86a27e4c9f"
+	},
+	{
+		"id": 43695,
+		"prefix": "guetta",
+		"title": "David Guetta",
+		"genres": ["HOUSE", "POP"],
+		"stream": "https://radiorecord.hostingradio.ru/guetta96.aacp",
+		"sort": 75,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-guetta/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/guetta_image600_colored_fill.png?a=d33fd5395a6dcf178eda3c4f6fd0ef27"
+	},
+	{
+		"id": 44212,
+		"prefix": "tsvetkov",
+		"title": "DJ Цветкоff",
+		"genres": ["Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/tsvetkov64.aacp",
+		"sort": 76,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-tsvetkov/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/tsvetkov_image600_colored_fill.png?a=31d2765a1e4146f9ce3834e14dc22746"
+	},
+	{
+		"id": 527,
+		"prefix": "discofunk",
+		"title": "Disco/Funk",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/discofunk96.aacp",
+		"sort": 77,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-discofunk/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/discofunk_image600_colored_fill.png?a=50ff33233cecc7b9d90d26805e8a2870"
+	},
+	{
+		"id": 551,
+		"prefix": "hbass",
+		"title": "Hard Bass",
+		"genres": ["BASS", "HARD", "OLDSCHOOL"],
+		"stream": "https://radiorecord.hostingradio.ru/hbass96.aacp",
+		"sort": 78,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-hbass/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/hbass_image600_colored_fill.png?a=c2653c0ccac5a60152139bf15b3bae3a"
+	},
+	{
+		"id": 43927,
+		"prefix": "afro",
+		"title": "Afro House",
+		"genres": ["HOUSE", "Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/afro64.aacp",
+		"sort": 79,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-afro/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/afro_image600_colored_fill.png?a=dec486947ceb2b3e970064f7df486098"
+	},
+	{
+		"id": 559,
+		"prefix": "rave",
+		"title": "Rave FM",
+		"genres": ["HARD", "OLDSCHOOL", "Прикол"],
+		"stream": "https://radiorecord.hostingradio.ru/rave96.aacp",
+		"sort": 80,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-rave/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/rave_image600_colored_fill.png?a=0371492320e617a0dbbc891f9ddfc948"
+	},
+	{
+		"id": 43926,
+		"prefix": "nu-dance",
+		"title": "Nu Dance",
+		"genres": ["TECHNO", "Спорт"],
+		"stream": "https://radiorecord.hostingradio.ru/nudance64.aacp",
+		"sort": 81,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-nudance/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/nu-dance_image600_colored_fill.png?a=d9b19b0a12904fca45892fade237f3b3"
+	},
+	{
+		"id": 513,
+		"prefix": "cadillac",
+		"title": "60's Dance",
+		"genres": ["POP", "Эпохи"],
+		"stream": "https://radiorecord.hostingradio.ru/cadillac96.aacp",
+		"sort": 82,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-cadillac/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/cadillac_image600_colored_fill.png?a=6564a296ce42eaa1ef9abf8bf1c52a8f"
+	},
+	{
+		"id": 44167,
+		"prefix": "lady-waks",
+		"title": "Lady Waks",
+		"genres": ["BREAKS", "Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/ladywaks64.aacp",
+		"sort": 83,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-ladywaks/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/lady-waks_image600_colored_fill.png?a=1d7a489c542e1e147c52624a6077c8f8"
+	},
+	{
+		"id": 546,
+		"prefix": "dc",
+		"title": "Dancecore",
+		"genres": ["OLDSCHOOL"],
+		"stream": "https://radiorecord.hostingradio.ru/dc96.aacp",
+		"sort": 84,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-dc/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/dc_image600_colored_fill.png?a=1dc372645956dec8601acf6dc47916f4"
+	},
+	{
+		"id": 532,
+		"prefix": "fut",
+		"title": "Future House",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/fut96.aacp",
+		"sort": 85,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-fut/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/fut_image600_colored_fill.png?a=a26f6c5a594af7e536a384e9f705b6e4"
+	},
+	{
+		"id": 503,
+		"prefix": "darkside",
+		"title": "Darkside",
+		"genres": ["DRUM"],
+		"stream": "https://radiorecord.hostingradio.ru/darkside96.aacp",
+		"sort": 86,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-darkside/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/darkside_image600_colored_fill.png?a=0cebd16d5f64fe36742c5b2d1086fdf8"
+	},
+	{
+		"id": 43454,
+		"prefix": "futurerave",
+		"title": "Future Rave",
+		"genres": ["HOUSE", "HARD", "TECHNO", "TRANCE"],
+		"stream": "https://radiorecord.hostingradio.ru/futurerave96.aacp",
+		"sort": 87,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-futurerave/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/futurerave_image600_colored_fill.png?a=a8654c92d9a6695c26cd49ae4b520a2d"
+	},
+	{
+		"id": 43338,
+		"prefix": "reggae",
+		"title": "Reggae",
+		"genres": ["OLDSCHOOL", "Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/reggae64.aacp",
+		"sort": 88,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-reggae/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/reggae_image600_colored_fill.png?a=dfdd413b7b92c82485bd044564ab841d"
+	},
+	{
+		"id": 496,
+		"prefix": "elect",
+		"title": "Electro",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/elect96.aacp",
+		"sort": 89,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-elect/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/elect_image600_colored_fill.png?a=26bcf263648f04bc4761dac2a851502e"
+	},
+	{
+		"id": 550,
+		"prefix": "teo",
+		"title": "Hardstyle",
+		"genres": ["HARD"],
+		"stream": "https://radiorecord.hostingradio.ru/teo96.aacp",
+		"sort": 90,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-teo/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/teo_image600_colored_fill.png?a=9437ab4585ced8084099074b16d83c4c"
+	},
+	{
+		"id": 545,
+		"prefix": "dub",
+		"title": "Dubstep",
+		"genres": ["BASS", "Спорт"],
+		"stream": "https://radiorecord.hostingradio.ru/dub96.aacp",
+		"sort": 91,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-dub/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/dub_image600_colored_fill.png?a=e7999d521c5d247c8a9745e2dbdd9970"
+	},
+	{
+		"id": 498,
+		"prefix": "progr",
+		"title": "Progressive",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/progr96.aacp",
+		"sort": 92,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-progr/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/progr_image600_colored_fill.png?a=8aec28f66765c913eb447c55823b6edf"
+	},
+	{
+		"id": 44209,
+		"prefix": "nejtrinobaur",
+		"title": "Nejtrino & Baur",
+		"genres": ["Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/nejtrinobaur64.aacp",
+		"sort": 93,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-nejtrinobaur/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/nejtrinobaur_image600_colored_fill.png?a=5b02cdae3c5a656726f38971634e5163"
+	},
+	{
+		"id": 499,
+		"prefix": "synth",
+		"title": "Synthwave",
+		"genres": ["OLDSCHOOL", "POP"],
+		"stream": "https://radiorecord.hostingradio.ru/synth96.aacp",
+		"sort": 94,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-synth/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/synth_image600_colored_fill.png?a=f07a8e3bb6e08e27e0367568ce562fdf"
+	},
+	{
+		"id": 43452,
+		"prefix": "latina",
+		"title": "Latina Dance",
+		"genres": ["POP", "Лето"],
+		"stream": "https://radiorecord.hostingradio.ru/latina96.aacp",
+		"sort": 95,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-latina/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/latina_image600_colored_fill.png?a=c29809095b22052ee94b14f6a211344c"
+	},
+	{
+		"id": 44187,
+		"prefix": "dj-gvozd",
+		"title": "DJ Gvozd",
+		"genres": ["DRUM", "Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/djgvozd64.aacp",
+		"sort": 96,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-djgvozd/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/dj-gvozd_image600_colored_fill.png?a=dd6e8d3291b34d5f8d47e037b3de84ac"
+	},
+	{
+		"id": 506,
+		"prefix": "edmhits",
+		"title": "EDM Classics",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/edmhits96.aacp",
+		"sort": 97,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-edmhits/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/edmhits_image600_colored_fill.png?a=43bcd185c1ba682a891e7035447ab204"
+	},
+	{
+		"id": 508,
+		"prefix": "tecktonik",
+		"title": "Tecktonik",
+		"genres": ["HOUSE", "OLDSCHOOL"],
+		"stream": "https://radiorecord.hostingradio.ru/tecktonik96.aacp",
+		"sort": 98,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-tecktonik/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/tecktonik_image600_colored_fill.png?a=bf38e736b14f64a669f4cbdfa4514d94"
+	},
+	{
+		"id": 521,
+		"prefix": "jungle",
+		"title": "Jungle",
+		"genres": ["DRUM"],
+		"stream": "https://radiorecord.hostingradio.ru/jungle96.aacp",
+		"sort": 99,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-jungle/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/jungle_image600_colored_fill.png?a=af618a0dda5f7ebb10e3f4527626e369"
+	},
+	{
+		"id": 543,
+		"prefix": "hypno",
+		"title": "Hypnotic",
+		"genres": ["HOUSE", "OLDSCHOOL"],
+		"stream": "https://radiorecord.hostingradio.ru/hypno96.aacp",
+		"sort": 100,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-hypno/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/hypno_image600_colored_fill.png?a=cf7f982b803b310349d231494a5f1f7e"
+	},
+	{
+		"id": 43171,
+		"prefix": "uk-garage",
+		"title": "UK Garage",
+		"genres": ["BREAKS", "HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/ukgarage96.aacp",
+		"sort": 101,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-ukgarage/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/uk-garage_image600_colored_fill.png?a=0d89875fc1bd8608e973fc4e88e95e02"
+	},
+	{
+		"id": 560,
+		"prefix": "gast",
+		"title": "Гастарбайтер FM",
+		"genres": ["POP", "Прикол"],
+		"stream": "https://radiorecord.hostingradio.ru/gast96.aacp",
+		"sort": 102,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-gast/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/gast_image600_colored_fill.png?a=63c2ccb6a2d9c249d19108870d780977"
+	},
+	{
+		"id": 497,
+		"prefix": "mt",
+		"title": "Midtempo",
+		"genres": ["BASS"],
+		"stream": "https://radiorecord.hostingradio.ru/mt96.aacp",
+		"sort": 103,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-mt/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/mt_image600_colored_fill.png?a=eee7e5e0a5fdff18972f0dcf2887df61"
+	},
+	{
+		"id": 549,
+		"prefix": "fbass",
+		"title": "Future Bass",
+		"genres": ["BASS"],
+		"stream": "https://radiorecord.hostingradio.ru/fbass96.aacp",
+		"sort": 104,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-fbass/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/fbass_image600_colored_fill.png?a=6ac678c875fc6d2ef606cb240a9fd8f2"
+	},
+	{
+		"id": 44211,
+		"prefix": "martingarrix",
+		"title": "Martin Garrix",
+		"genres": ["Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/martingarrix64.aacp",
+		"sort": 105,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-martingarrix/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/martingarrix_image600_colored_fill.png?a=25779dc4b24b44b6faac9efcbe6802bf"
+	},
+	{
+		"id": 44210,
+		"prefix": "oliverheldens",
+		"title": "Oliver Heldens",
+		"genres": ["Радиошоу"],
+		"stream": "https://radiorecord.hostingradio.ru/oliverheldens64.aacp",
+		"sort": 108,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-oliverheldens/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/oliverheldens_image600_colored_fill.png?a=7affceb8dd2272fbe716585e2eabbf44"
+	},
+	{
+		"id": 540,
+		"prefix": "mmbt",
+		"title": "Moombahton",
+		"genres": ["POP"],
+		"stream": "https://radiorecord.hostingradio.ru/mmbt96.aacp",
+		"sort": 109,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-mmbt/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/mmbt_image600_colored_fill.png?a=44cdb91db317865209a04ff3a19eabc3"
+	},
+	{
+		"id": 509,
+		"prefix": "2step",
+		"title": "2-step",
+		"genres": ["BASS", "BREAKS", "OLDSCHOOL"],
+		"stream": "https://radiorecord.hostingradio.ru/2step96.aacp",
+		"sort": 110,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-2step/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/2step_image600_colored_fill.png?a=c5cbe274a67279498c766d6085c11ecb"
+	},
+	{
+		"id": 517,
+		"prefix": "complextro",
+		"title": "Complextro",
+		"genres": ["BASS", "HOUSE", "HARD"],
+		"stream": "https://radiorecord.hostingradio.ru/complextro96.aacp",
+		"sort": 111,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-complextro/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/complextro_image600_colored_fill.png?a=ec6358105fa4e1e0dea968051549262c"
+	},
+	{
+		"id": 518,
+		"prefix": "groovetribal",
+		"title": "Groove/Tribal",
+		"genres": ["HOUSE"],
+		"stream": "https://radiorecord.hostingradio.ru/groovetribal96.aacp",
+		"sort": 112,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-groovetribal/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/groovetribal_image600_colored_fill.png?a=992d43b8f8334c5206b5bc7483051917"
+	},
+	{
+		"id": 43069,
+		"prefix": "christmas-chill",
+		"title": "Christmas Chill",
+		"genres": ["CHILL", "Сон", "Новый год"],
+		"stream": "https://radiorecord.hostingradio.ru/christmaschill96.aacp",
+		"sort": 115,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-christmaschill/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/christmas-chill_image600_colored_fill.png?a=4c9ec969cf1a3f7c2761d7442e3f76f8"
+	},
+	{
+		"id": 42375,
+		"prefix": "christmas-radio",
+		"title": "Christmas",
+		"genres": ["OLDSCHOOL", "POP", "RUSSIAN", "Новый год"],
+		"stream": "https://radiorecord.hostingradio.ru/christmas96.aacp",
+		"sort": 115,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-christmas/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/christmas-radio_image600_colored_fill.png?a=c5a1636b42a3adf3a12ea2bbdb197939"
+	},
+	{
+		"id": 43601,
+		"prefix": "ruszima",
+		"title": "Русская Зима",
+		"genres": ["RUSSIAN", "Новый год"],
+		"stream": "https://radiorecord.hostingradio.ru/ruszima96.aacp",
+		"sort": 115,
+		"hls": "https://hls-01-radiorecord.hostingradio.ru/record-ruszima/playlist.m3u8",
+		"icon": "https://www.radiorecord.ru/upload/stations_images/ruszima_image600_colored_fill.png?a=c79b236e79530d4c71ed9a538d34b27e"
+	}
+]

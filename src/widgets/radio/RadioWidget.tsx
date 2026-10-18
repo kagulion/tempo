@@ -2,16 +2,14 @@ import {
 	ChevronDown,
 	Dices,
 	Heart,
-	LoaderCircle,
 	Maximize2,
 	Minimize2,
 	Pause,
 	Play,
 	Shuffle,
+	ListOrdered,
 	SkipBack,
 	SkipForward,
-	ThumbsUp,
-	TrendingUp,
 	Volume1,
 	Volume2,
 	VolumeX
@@ -27,9 +25,9 @@ import { usePersistentState } from '@/hooks/usePersistentState';
 import { storageKeys } from '@/lib/storage';
 import { Widget, WidgetHeader } from '@/widgets/Widget';
 
-import { countryName } from './api';
 import { genres } from './genres';
-import { formatCount, minSearchLength, type Station } from './stations';
+import { trackLabel } from './nowPlaying';
+import type { RecordStation, RecordTrack } from './record';
 import { useFavoriteStations } from './useFavoriteStations';
 import { SoundBars } from './SoundBars';
 import { useRadio, type RadioStatus } from './useRadio';
@@ -47,8 +45,34 @@ function parseCompact(saved: unknown) {
 	return typeof saved === 'boolean' ? saved : undefined;
 }
 
-function stationName(station: Station) {
-	return station.name.trim() || 'Без названия';
+function stationName(station: RecordStation) {
+	return station.title.trim() || 'Без названия';
+}
+
+// «Исполнитель — Песня» одной строкой с обрезкой и маленькая обложка, если она есть
+function TrackLine({ track, className }: { track: RecordTrack; className?: string }) {
+	const label = trackLabel(track);
+	return (
+		<div className={cn('flex min-w-0 items-center gap-2 text-xs text-white/70', className)}>
+			{track.cover && (
+				<img
+					// Новая обложка — новый элемент: скрытая по ошибке не мешает следующей
+					key={track.cover}
+					src={track.cover}
+					alt=""
+					loading="lazy"
+					referrerPolicy="no-referrer"
+					onError={(event) => {
+						event.currentTarget.hidden = true;
+					}}
+					className="size-5 shrink-0 rounded object-cover"
+				/>
+			)}
+			<span className="min-w-0 truncate" title={label}>
+				{label}
+			</span>
+		</div>
+	);
 }
 
 type RadioWidgetProps = {
@@ -120,21 +144,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 	}, [compact]);
 
 	const { station, status, sounding, source } = radio;
-	const popular = radio.sort === 'popular';
-	const canVote = Boolean(station) && status === 'idle' && !radio.liked && !radio.voting;
-	const likeTitle = radio.liked
-		? 'Вы проголосовали за эту станцию'
-		: radio.voteError
-			? `Не удалось проголосовать: ${radio.voteError}`
-			: 'Проголосовать за станцию в Radio Browser (голос нельзя отозвать)';
-	const noSearchResults =
-		radio.searchQuery.trim().length < minSearchLength
-			? 'Введите название станции'
-			: radio.searchStatus === 'loading'
-				? 'Ищем…'
-				: radio.searchStatus === 'error'
-					? 'Не удалось выполнить поиск'
-					: 'Станции не найдены';
+	const shuffled = radio.sort === 'shuffle';
 	const favorite = isFavorite(station);
 	const silent = radio.muted || radio.volume === 0;
 	// Полоски двигаются, только пока звук слышен
@@ -142,15 +152,6 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 	const noStations = status === 'loading' || radio.stations.length === 0;
 	const emptyText =
 		source.kind === 'genre' ? 'В этом жанре нет доступных станций' : statusText.empty;
-	// В подсказке: страна (в поиске и жанрах) и голоса (в режиме «Популярные»)
-	function stationHint(item: Station) {
-		const parts = [
-			source.kind === 'country' ? '' : countryName(item.countrycode),
-			popular ? `${formatCount(item.votes)} гол.` : ''
-		];
-		return parts.filter(Boolean).join(' · ');
-	}
-
 	return (
 		<Widget
 			ref={sectionRef}
@@ -178,9 +179,12 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 					<div className="flex items-center gap-2">
 						<SoundBars active={audible} className="shrink-0" />
 						{status === 'idle' && station ? (
-							<p className="min-w-0 flex-1 truncate text-sm" title={stationName(station)}>
-								{stationName(station)}
-							</p>
+							<div className="min-w-0 flex-1">
+								<p className="truncate text-sm" title={stationName(station)}>
+									{stationName(station)}
+								</p>
+								{radio.track && <TrackLine track={radio.track} />}
+							</div>
 						) : (
 							<p className="min-w-0 flex-1 truncate text-sm text-white/70">
 								{statusText[status === 'idle' ? 'loading' : status]}
@@ -197,61 +201,32 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 					</div>
 				) : (
 					<>
-						<Combobox
-							aria-label="Поиск станции по всем странам"
-							items={radio.searchResults}
-							value={null}
-							onValueChange={radio.playSearchResult}
-							onSearch={radio.search}
-							getLabel={stationName}
-							getKey={(item) => item.stationuuid}
-							getHint={stationHint}
-							placeholder="Поиск станции по всем странам"
-							emptyText={noSearchResults}
-							className="w-full"
-						/>
-
-						{/* Порядок станций, голос за текущую станцию и все жанры одним потоком с переносом строк:
+						{/* Порядок станций и источники (все станции и пресеты) одним потоком с переносом строк:
 					    так помещаются в две строки, без скрытой прокрутки */}
 						<div className="flex flex-wrap items-center gap-1">
 							<Button
 								variant="glass"
 								size="icon-sm"
-								onClick={() => radio.changeSort(popular ? 'shuffle' : 'popular')}
+								onClick={() => radio.changeSort(shuffled ? 'default' : 'shuffle')}
 								title={
-									popular
-										? 'Порядок: популярные. Переключить на «Перемешать»'
-										: 'Порядок: перемешать. Переключить на «Популярные»'
+									shuffled
+										? 'Порядок: перемешать. Переключить на «По порядку»'
+										: 'Порядок: по порядку. Переключить на «Перемешать»'
 								}
-								aria-label={popular ? 'Порядок: популярные' : 'Порядок: перемешать'}
+								aria-label={shuffled ? 'Порядок: перемешать' : 'Порядок: по порядку'}
 							>
-								{popular ? <TrendingUp /> : <Shuffle />}
+								{shuffled ? <Shuffle /> : <ListOrdered />}
 							</Button>
-							<div className="flex shrink-0 items-center">
-								<Button
-									variant="glass"
-									size="icon-sm"
-									onClick={radio.likeStation}
-									disabled={!canVote}
-									hint={likeTitle}
-									aria-pressed={radio.liked}
-									className={cn('rounded-r-none', radio.voteError && 'text-red-300')}
-								>
-									{radio.voting ? (
-										<LoaderCircle className="animate-spin" />
-									) : (
-										<ThumbsUp className={cn(radio.liked && 'fill-current')} />
-									)}
-								</Button>
-								<span
-									className="flex h-7 min-w-9 items-center justify-center rounded-r-lg border-l border-white/10 bg-white/10 px-1.5 text-xs text-white/80 tabular-nums"
-									title="Голосов у станции"
-								>
-									{station ? formatCount(station.votes) : '–'}
-								</span>
-							</div>
 							<div className="mx-0.5 h-4 w-px shrink-0 bg-white/15" />
-							<div role="group" aria-label="Жанры" className="contents">
+							<div role="group" aria-label="Источник станций" className="contents">
+								<button
+									type="button"
+									onClick={() => radio.loadStations({ kind: 'all' })}
+									aria-pressed={source.kind === 'all'}
+									className={chipClassName}
+								>
+									Все станции
+								</button>
 								{genres.map((genre) => (
 									<button
 										key={genre.id}
@@ -267,22 +242,6 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 						</div>
 
 						<div className="flex items-center gap-2">
-							<Combobox
-								aria-label="Страна"
-								items={radio.countries}
-								value={
-									source.kind === 'country'
-										? (radio.countries.find((item) => item.code === source.code) ?? null)
-										: null
-								}
-								onValueChange={(item) => radio.loadStations({ kind: 'country', code: item.code })}
-								getLabel={(item) => item.name}
-								getKey={(item) => item.code}
-								placeholder={radio.countries.length === 0 ? 'Загрузка…' : 'Страна'}
-								emptyText="Страна не найдена"
-								className="w-36 shrink-0"
-							/>
-
 							{status === 'idle' && station ? (
 								<Combobox
 									aria-label="Радиостанция"
@@ -290,8 +249,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 									value={station}
 									onValueChange={radio.playStation}
 									getLabel={stationName}
-									getKey={(item) => item.stationuuid}
-									getHint={stationHint}
+									getKey={(item) => String(item.id)}
 									placeholder="Радиостанция"
 									emptyText="Станция не найдена"
 									className="min-w-0 flex-1"
@@ -305,15 +263,17 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 							)}
 						</div>
 
+						{status === 'idle' && radio.track && <TrackLine track={radio.track} className="px-1" />}
+
 						<div className="flex items-center gap-1">
 							<Button
 								variant="glass"
 								size="icon"
-								onClick={radio.randomCountry}
-								disabled={status === 'loading'}
-								hint="Случайное радио"
+								onClick={radio.randomStation}
+								disabled={noStations || radio.stations.length < 2}
+								hint="Случайная станция"
 							>
-								{status === 'loading' ? <LoaderCircle className="animate-spin" /> : <Dices />}
+								<Dices />
 							</Button>
 
 							<div className="mx-1 h-5 w-px shrink-0 bg-white/15" />
@@ -382,8 +342,7 @@ export function RadioWidget({ className }: RadioWidgetProps) {
 									value={favorite ? station : null}
 									onValueChange={radio.playStation}
 									getLabel={stationName}
-									getKey={(item) => item.stationuuid}
-									getHint={(item) => countryName(item.countrycode)}
+									getKey={(item) => String(item.id)}
 									searchPlaceholder="Поиск по избранному"
 									emptyText={
 										favorites.length === 0

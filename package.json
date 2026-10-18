@@ -12,7 +12,8 @@
 		"lint": "oxlint --deny-warnings && prettier --check .",
 		"format": "prettier --write .",
 		"test": "vitest run",
-		"test:watch": "vitest"
+		"test:watch": "vitest",
+		"record:snapshot": "node scripts/record-snapshot.ts"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.9.0",

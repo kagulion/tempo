@@ -6,7 +6,8 @@ import { easeInOutStrong, easeOutStrong, flipTransform, prefersReducedMotion } f
 import { cn } from '@/lib/utils';
 import { SoundBars } from '@/widgets/radio/SoundBars';
 import {
-	nowPlayingParts,
+	nowPlayingName,
+	trackLabel,
 	toggleNowPlaying,
 	useCanToggleNowPlaying,
 	useNowPlaying
@@ -199,7 +200,9 @@ function StationRow({ corner = false }: { corner?: boolean }) {
 	const canToggle = useCanToggleNowPlaying();
 
 	if (!playing) return null;
-	const { name } = nowPlayingParts(playing);
+	const stationName = nowPlayingName(playing);
+	// Под датой трек, если он известен, иначе станция
+	const name = playing.track ? trackLabel(playing.track) : stationName;
 	const label = playing.playing ? 'Выключить радио' : 'Включить радио';
 
 	return (
@@ -210,7 +213,9 @@ function StationRow({ corner = false }: { corner?: boolean }) {
 			)}
 		>
 			<SoundBars active={playing.audible} className="shrink-0" />
-			<span className="min-w-0 truncate">{name}</span>
+			<span className="min-w-0 truncate" title={name === stationName ? undefined : stationName}>
+				{name}
+			</span>
 			{canToggle && (
 				<Button
 					variant="glass"

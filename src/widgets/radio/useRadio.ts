@@ -3,67 +3,52 @@ import { useEffect, useRef, useState } from 'react';
 import { useAutoplay } from '@/hooks/useAutoplay';
 import { useDuckLevel } from '@/hooks/useDuckLevel';
 import { usePersistentState } from '@/hooks/usePersistentState';
+import { unlockAudio } from '@/lib/audio';
 import { loadStored, saveStored, storageKeys } from '@/lib/storage';
 
-import {
-	countStationClick,
-	detectCountryCode,
-	fetchCountries,
-	fetchStations,
-	voteStation,
-	type RadioCountry
-} from './api';
+import { setLevelSource } from './audioAnalyser';
+import { applyMediaInfo, mediaInfo } from './mediaSession';
 import { registerNowPlayingToggle, setNowPlaying } from './nowPlaying';
+import type { RecordStation } from './record';
+import { fetchRecordStations } from './recordApi';
+import { parseSort, parseSource, parseStation } from './saved';
 import {
-	curatedIds,
-	minSearchLength,
-	normalizeStation,
-	parseSort,
-	parseSource,
 	placeStation,
 	sortStations,
+	stationsForSource,
 	type RadioSort,
-	type Station,
 	type StationSource
 } from './stations';
-import { useLikedStations } from './useLikedStations';
+import { useRecordTrack } from './useRecordTrack';
 
 export type RadioStatus = 'idle' | 'loading' | 'empty' | 'error';
 
-// Пауза после последней набранной буквы, чтобы не слать запрос на каждую
-const searchDelay = 400;
-
 // Последняя станция, которая реально заиграла. При загрузке страницы с неё и начинаем, но без звука.
-// Хранилище недоступно (приватный режим) — после перезагрузки начнём со случайной станции
+// Хранилище недоступно (приватный режим) — после перезагрузки начнём с первой станции
 function loadLastStation() {
-	return loadStored<Station | undefined>(storageKeys.lastStation, undefined, normalizeStation);
+	return loadStored<RecordStation | undefined>(storageKeys.lastStation, undefined, parseStation);
 }
 
-function addVote(stations: Station[], uuid: string) {
-	return stations.map((item) =>
-		item.stationuuid === uuid ? { ...item, votes: item.votes + 1 } : item
-	);
-}
-
-// Вся логика радио: источники станций, воспроизведение, голоса и громкость. Разметка — в RadioWidget
+// Вся логика радио: источники станций, воспроизведение и громкость. Разметка — в RadioWidget
 export function useRadio() {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	// Радио всегда стартует выключенным — включает пользователь
 	const [playing, setPlaying] = useState(false);
 	const [volume, setVolume] = useState(0.8);
 	const [muted, setMuted] = useState(false);
+	// Все станции Рекорда (с прокси или из снимка в репозитории)
+	const [catalog, setCatalog] = useState<RecordStation[]>([]);
 	// Очередь воспроизведения: «Следующая станция» идёт по ней
-	const [stations, setStations] = useState<Station[]>([]);
+	const [stations, setStations] = useState<RecordStation[]>([]);
 	const [currentStation, setCurrentStation] = useState(0);
 	// Звук реально идёт: playing — лишь намерение пользователя, а поток может буферизоваться,
 	// ждать первого клика (автозапуск заблокирован) или упасть с ошибкой
 	const [sounding, setSounding] = useState(false);
 	const [status, setStatus] = useState<RadioStatus>('loading');
-	const [countries, setCountries] = useState<RadioCountry[]>([]);
-	// Последний источник запоминаем: страна, жанр или поиск
+	// Последний источник запоминаем: все станции или пресет
 	const [source, setSource] = usePersistentState<StationSource>(
 		storageKeys.radioSource,
-		{ kind: 'country', code: detectCountryCode() },
+		{ kind: 'all' },
 		parseSource
 	);
 	const [sort, setSort] = usePersistentState<RadioSort>(
@@ -71,175 +56,70 @@ export function useRadio() {
 		'shuffle',
 		parseSort
 	);
-	// Результаты поиска по всем странам лежат отдельно от очереди, чтобы поиск не прерывал звук
-	const [searchResults, setSearchResults] = useState<Station[]>([]);
-	const [searchStatus, setSearchStatus] = useState<RadioStatus>('idle');
-	// Набранный запрос живёт отдельно от источника: набор текста не прерывает звук
-	const [searchQuery, setSearchQuery] = useState(source.kind === 'search' ? source.query : '');
-	const [voting, setVoting] = useState(false);
-	const [voteError, setVoteError] = useState<{ uuid: string; message: string }>();
-	const { isLiked, markLiked } = useLikedStations();
-	// Номер последнего запроса станций — ответы на устаревшие запросы игнорируем
-	const stationsRequest = useRef(0);
-	const searchRequest = useRef(0);
-	const searchTimer = useRef<number>(undefined);
 	// Сколько станций подряд не запустилось — чтобы не перебирать список бесконечно
 	const failedStations = useRef(0);
-	// Станции, которым в этой сессии уже засчитали клик
-	const countedClicks = useRef(new Set<string>());
 
 	const station = stations[currentStation];
 
-	// first — станция, с которой начать (например, выбранная из избранного)
-	async function loadStations(next: StationSource, first?: Station) {
-		const request = ++stationsRequest.current;
-		window.clearTimeout(searchTimer.current);
+	// Собирает очередь из источника. first — станция, с которой начать (например, выбранная из избранного)
+	function applySource(all: RecordStation[], next: StationSource, first?: RecordStation) {
 		setSource(next);
-		setStatus('loading');
-		try {
-			const list = await fetchStations(next);
-			if (request !== stationsRequest.current) return;
-			if (list.length === 0 && !first) {
-				setStations([]);
-				setStatus('empty');
-				return;
-			}
-			failedStations.current = 0;
-			const sorted = sortStations(list, sort, curatedIds(next));
-			// Станция могла выпасть из выдачи — тогда ставим её на законное место
-			const placed = first ? placeStation(sorted, first, sort) : { list: sorted, index: 0 };
-			setStations(placed.list);
-			setCurrentStation(placed.index);
-			setStatus('idle');
-		} catch {
-			if (request === stationsRequest.current) setStatus('error');
-		}
-	}
-
-	async function runSearch(query: string) {
-		const request = ++searchRequest.current;
-		try {
-			const list = await fetchStations({ kind: 'search', query });
-			if (request !== searchRequest.current) return;
-			setSearchResults(list);
-			setSearchStatus(list.length === 0 ? 'empty' : 'idle');
-		} catch {
-			if (request === searchRequest.current) setSearchStatus('error');
-		}
-	}
-
-	// После перезагрузки с сохранённым поиском: выдача становится очередью, прошлая станция встаёт
-	// на своё место. Пока выдача не пришла, очередь — одна прошлая станция
-	async function restoreSearch(query: string, last: Station) {
-		const request = ++stationsRequest.current;
-		const searchId = ++searchRequest.current;
-		setSearchStatus('loading');
-		try {
-			const list = await fetchStations({ kind: 'search', query });
-			if (searchId === searchRequest.current) {
-				setSearchResults(list);
-				setSearchStatus(list.length === 0 ? 'empty' : 'idle');
-			}
-			// Посетитель уже выбрал другое — очередь не трогаем
-			if (request !== stationsRequest.current) return;
-			const placed = placeStation(sortStations(list, sort), last, sort);
-			setStations(placed.list);
-			setCurrentStation(placed.index);
-		} catch {
-			if (searchId === searchRequest.current) setSearchStatus('error');
-		}
-	}
-
-	// Запрос уходит после паузы в наборе и только от двух символов. Источник и очередь не меняются:
-	// станция продолжает играть, пока посетитель ищет другую
-	function search(query: string) {
-		// Устаревшие ответы больше не нужны
-		searchRequest.current += 1;
-		window.clearTimeout(searchTimer.current);
-		setSearchQuery(query);
-		if (query.trim().length < minSearchLength) {
-			setSearchResults([]);
-			setSearchStatus('idle');
+		const items = stationsForSource(all, next);
+		if (items.length === 0 && !first) {
+			setStations([]);
+			setStatus('empty');
 			return;
 		}
-		setSearchStatus('loading');
-		searchTimer.current = window.setTimeout(() => runSearch(query), searchDelay);
-	}
-
-	async function loadCountries() {
-		try {
-			const list = await fetchCountries();
-			setCountries(list);
-			return list;
-		} catch {
-			return [];
-		}
-	}
-
-	// Один раз при открытии страницы: последняя станция или источник посетителя. Дальше станции
-	// грузятся только по действию пользователя, поэтому от source эффект не зависит.
-	// loadStations сразу ставит статус «загрузка» — это и есть начало запроса к API
-	useEffect(() => {
-		const last = loadLastStation();
-		if (source.kind === 'genre') {
-			// oxlint-disable-next-line react/set-state-in-effect
-			loadStations(source, last);
-		} else if (source.kind === 'search' && last) {
-			// Пока выдача не пришла, очередь — прошлая станция
-			setStations([last]);
-			setCurrentStation(0);
-			setStatus('idle');
-			if (source.query.trim().length >= minSearchLength) restoreSearch(source.query, last);
-		} else if (last) {
-			// Последняя станция загружает свою страну
-			loadStations({ kind: 'country', code: last.countrycode }, last);
-		} else {
-			loadStations(
-				source.kind === 'country' ? source : { kind: 'country', code: detectCountryCode() }
-			);
-		}
-		loadCountries();
-		return () => window.clearTimeout(searchTimer.current);
-		// oxlint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
-	async function randomCountry() {
-		const list = countries.length > 0 ? countries : await loadCountries();
-		// Для случайного выбора берём страны с большим количеством станций
-		const current = source.kind === 'country' ? source.code : '';
-		const candidates = list.filter((item) => item.stationCount >= 30 && item.code !== current);
-		if (candidates.length === 0) return;
-		await loadStations({
-			kind: 'country',
-			code: candidates[Math.floor(Math.random() * candidates.length)].code
-		});
-	}
-
-	// Станция из результатов поиска: очередь становится выдачей, источник — поиском
-	function playSearchResult(target: Station) {
 		failedStations.current = 0;
-		// Загрузка станций, начатая раньше, больше не нужна
-		stationsRequest.current += 1;
-		window.clearTimeout(searchTimer.current);
-		const queue = sortStations(searchResults, sort);
-		setSource({ kind: 'search', query: searchQuery });
-		setStations(queue);
-		setCurrentStation(
-			Math.max(
-				0,
-				queue.findIndex((item) => item.stationuuid === target.stationuuid)
-			)
-		);
+		const sorted = sortStations(items, sort);
+		// Станция могла не попасть в источник — тогда ставим её в начало. Берём свежую версию из каталога
+		const placed = first
+			? placeStation(sorted, all.find((item) => item.id === first.id) ?? first)
+			: { list: sorted, index: 0 };
+		setStations(placed.list);
+		setCurrentStation(placed.index);
 		setStatus('idle');
 	}
 
-	// Включает станцию: из текущей очереди или избранного сразу, из другой страны — после
-	// загрузки её станций
-	function playStation(target: Station) {
+	function loadStations(next: StationSource, first?: RecordStation) {
+		applySource(catalog, next, first);
+	}
+
+	// Один раз при открытии страницы: загружаем станции и ставим последнюю (без звука).
+	// Дальше очередь меняется только по действию пользователя
+	useEffect(() => {
+		let cancelled = false;
+		fetchRecordStations().then((all) => {
+			if (cancelled) return;
+			setCatalog(all);
+			if (all.length === 0) {
+				setStatus('error');
+				return;
+			}
+			applySource(all, source, loadLastStation());
+		});
+		return () => {
+			cancelled = true;
+		};
+		// oxlint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	// Случайная станция из текущей очереди, кроме играющей
+	function randomStation() {
+		if (stations.length < 2) return;
 		failedStations.current = 0;
-		const index = stations.findIndex((item) => item.stationuuid === target.stationuuid);
+		let index = currentStation;
+		while (index === currentStation) index = Math.floor(Math.random() * stations.length);
+		setCurrentStation(index);
+	}
+
+	// Включает станцию: из текущей очереди сразу, иначе (избранное из другого пресета) —
+	// очередь становится всеми станциями с выбранной в начале или на своём месте
+	function playStation(target: RecordStation) {
+		failedStations.current = 0;
+		const index = stations.findIndex((item) => item.id === target.id);
 		if (index === -1) {
-			loadStations({ kind: 'country', code: target.countrycode }, target);
+			loadStations({ kind: 'all' }, target);
 			return;
 		}
 		setCurrentStation(index);
@@ -248,27 +128,11 @@ export function useRadio() {
 	// Переключает порядок очереди, не прерывая текущую станцию
 	function changeSort(next: RadioSort) {
 		setSort(next);
-		const sorted = sortStations(stations, next, curatedIds(source));
-		const index = sorted.findIndex((item) => item.stationuuid === station?.stationuuid);
-		setStations(sorted);
-		setCurrentStation(Math.max(0, index));
-	}
-
-	// Голос за текущую станцию. Лайкнутой станция становится, только если сервер принял голос
-	async function likeStation() {
-		if (!station || voting || isLiked(station.stationuuid)) return;
-		const uuid = station.stationuuid;
-		setVoting(true);
-		setVoteError(undefined);
-		const result = await voteStation(uuid);
-		setVoting(false);
-		if (result.ok) {
-			markLiked(uuid);
-			setStations((list) => addVote(list, uuid));
-			setSearchResults((list) => addVote(list, uuid));
-		} else {
-			setVoteError({ uuid, message: result.message });
-		}
+		const sorted = sortStations(stationsForSource(catalog, source), next);
+		// Играющая станция могла быть вне источника (избранное) — оставляем её первой
+		const placed = station ? placeStation(sorted, station) : { list: sorted, index: 0 };
+		setStations(placed.list);
+		setCurrentStation(placed.index);
 	}
 
 	function nextStation() {
@@ -290,6 +154,8 @@ export function useRadio() {
 	}
 
 	function togglePlaying() {
+		// Клик разблокирует AudioContext, через который идёт анализатор эквалайзера
+		unlockAudio();
 		// Прямой эфир после паузы отстаёт — перезагружаем поток, чтобы вернуться к живому звуку
 		if (!playing) audioRef.current?.load();
 		setPlaying((on) => !on);
@@ -314,20 +180,57 @@ export function useRadio() {
 		audio.muted = muted;
 	}, [volume, muted, duck]);
 
-	useAutoplay(audioRef, station?.url_resolved, playing);
+	useAutoplay(audioRef, station?.stream, playing);
+
+	// Для эквалайзера (audioAnalyser.ts) нужен сам элемент
+	useEffect(() => {
+		setLevelSource(audioRef.current);
+		return () => setLevelSource(null);
+	}, []);
+
+	// Что играет сейчас. Пока прокси не отвечает, трека нет — радио работает как раньше
+	const track = useRecordTrack(station?.id, playing);
+	const trackArtist = track?.artist;
+	const trackSong = track?.song;
+	const trackCover = track?.cover;
 
 	// Текущая станция для общего стора (строка под крупными часами). Станция держится и на паузе,
 	// а звучит ли она, говорит флаг audible
-	const stationName = station?.name;
-	const stationCountry = station?.countrycode;
+	const stationName = station?.title;
 	useEffect(() => {
 		const audible = sounding && playing && !muted && volume > 0;
 		setNowPlaying(
-			stationName !== undefined && stationCountry !== undefined
-				? { name: stationName, countrycode: stationCountry, playing, audible }
+			stationName !== undefined
+				? {
+						name: stationName,
+						playing,
+						audible,
+						track:
+							trackSong !== undefined
+								? { artist: trackArtist ?? '', song: trackSong, cover: trackCover }
+								: undefined
+					}
 				: null
 		);
-	}, [sounding, playing, muted, volume, stationName, stationCountry]);
+	}, [sounding, playing, muted, volume, stationName, trackArtist, trackSong, trackCover]);
+
+	// Системный плеер: пока радио включено, показываем станцию и трек
+	const stationIcon = station?.icon;
+	useEffect(() => {
+		if (!playing || stationName === undefined) {
+			applyMediaInfo(null);
+			return;
+		}
+		applyMediaInfo(
+			mediaInfo(
+				{ title: stationName, icon: stationIcon },
+				trackSong !== undefined
+					? { artist: trackArtist ?? '', song: trackSong, cover: trackCover }
+					: undefined
+			)
+		);
+	}, [playing, stationName, stationIcon, trackArtist, trackSong, trackCover]);
+	useEffect(() => () => applyMediaInfo(null), []);
 	// При размонтировании радио строка с часов пропадает
 	useEffect(() => () => setNowPlaying(null), []);
 
@@ -343,21 +246,16 @@ export function useRadio() {
 		// Свойства для элемента <audio>, который рендерит виджет
 		audio: {
 			ref: audioRef,
-			src: station?.url_resolved,
+			// Потоки Рекорда отдают CORS, без crossOrigin анализатор выдавал бы тишину. Ставится до src
+			crossOrigin: 'anonymous' as const,
+			src: station?.stream,
 			onEnded: nextStation,
 			// Пока радио выключено, поток не качаем
 			preload: 'none',
 			onPlaying: () => {
 				failedStations.current = 0;
 				setSounding(true);
-				if (station) {
-					saveStored(storageKeys.lastStation, station);
-					// Так Radio Browser считает запуск станции кликом: один раз за сессию
-					if (!countedClicks.current.has(station.stationuuid)) {
-						countedClicks.current.add(station.stationuuid);
-						countStationClick(station.stationuuid);
-					}
-				}
+				if (station) saveStored(storageKeys.lastStation, station);
 			},
 			onWaiting: () => setSounding(false),
 			onPause: () => setSounding(false),
@@ -368,27 +266,18 @@ export function useRadio() {
 			}
 		},
 		sounding,
+		track,
 		status,
-		countries,
 		source,
 		sort,
 		stations,
-		searchResults,
-		searchStatus,
-		searchQuery,
-		voting,
-		liked: isLiked(station?.stationuuid),
-		voteError: voteError?.uuid === station?.stationuuid ? voteError?.message : undefined,
 		station,
 		playing,
 		volume,
 		muted,
 		loadStations,
-		search,
-		playSearchResult,
 		changeSort,
-		likeStation,
-		randomCountry,
+		randomStation,
 		playStation,
 		nextStation,
 		prevStation,
