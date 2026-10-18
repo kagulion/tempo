@@ -7,6 +7,7 @@ export type TwitchPlayer = {
 	addEventListener(event: string, callback: () => void): void;
 	play(): void;
 	pause(): void;
+	isPaused(): boolean;
 	setMuted(muted: boolean): void;
 	setVolume(volume: number): void;
 	destroy?: () => void;
@@ -29,6 +30,7 @@ export type TwitchGlobal = {
 		OFFLINE: string;
 		PLAYING: string;
 		PAUSE: string;
+		PLAY: string;
 		PLAYBACK_BLOCKED: string;
 	};
 };

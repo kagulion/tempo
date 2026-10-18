@@ -5,8 +5,18 @@ import { useDuckLevel } from '@/hooks/useDuckLevel';
 import { useUserActivation } from '@/hooks/useUserActivation';
 import { audioTarget } from '@/widgets/youtube/playback';
 
+import { toast } from '@/components/ui/toast';
+import { requestOpenWidget } from '@/widgets/dock/openRequests';
+
 import { type TwitchPlayer, loadTwitch } from './player';
-import { initialStartTracker, startTimeout, trackStart, twitchErrors } from './twitch';
+import {
+	initialStartTracker,
+	shouldNotifyWindowClosed,
+	startTimeout,
+	trackStart,
+	twitchErrors,
+	twitchPausedToast
+} from './twitch';
 import { useTwitchSound } from './useTwitch';
 
 // idle — плеера нет (канал не выбран или ещё не запускали); loading — плеер создан, эфир ещё не пошёл;
@@ -71,6 +81,14 @@ export function useTwitchPlayer(login: string | null, attempt: number) {
 		}
 
 		let timeout: ReturnType<typeof setTimeout> | undefined;
+		// События play и pause у Twitch приходят не всегда (после рекламной заставки, из скрытого окна), а isPaused()
+		// отвечает за плеер всегда: сверяем с ним статус раз в секунду, пока эфир идёт и окно видно
+		const syncTimer = setInterval(() => {
+			if (disposed || !player || !tracker.started || !windowVisible || resumePending) return;
+			const paused = player.isPaused();
+			if (paused && status === 'playing') setStatus('paused');
+			else if (!paused && status === 'paused') setStatus('playing');
+		}, 1000);
 		function armTimeout() {
 			clearTimeout(timeout);
 			const { ms, error } = startTimeout(tracker);
@@ -106,6 +124,25 @@ export function useTwitchPlayer(login: string | null, attempt: number) {
 			appliedMuted = false;
 		}
 
+		// Тост про паузу: один id, поэтому повторное закрытие окна не множит тосты. «Открыть» открывает окно заново,
+		// дальше эфир продолжается обычной логикой показа окна
+		function notifyPaused() {
+			toast.close(twitchPausedToast.id);
+			toast.add({
+				id: twitchPausedToast.id,
+				title: twitchPausedToast.title,
+				description: twitchPausedToast.description,
+				timeout: twitchPausedToast.timeoutMs,
+				actionProps: {
+					children: twitchPausedToast.action,
+					onClick: () => {
+						toast.close(twitchPausedToast.id);
+						requestOpenWidget('twitch');
+					}
+				}
+			});
+		}
+
 		api.current = {
 			play: () => player?.play(),
 			pause: () => {
@@ -119,8 +156,14 @@ export function useTwitchPlayer(login: string | null, attempt: number) {
 				if (!tracker.started) return;
 				if (!visible) {
 					resumeOnShow = status === 'playing';
-					if (resumeOnShow) player?.pause();
+					if (resumeOnShow) {
+						player?.pause();
+						if (shouldNotifyWindowClosed({ playing: true, tabHidden: document.hidden })) {
+							notifyPaused();
+						}
+					}
 				} else if (resumeOnShow) {
+					toast.close(twitchPausedToast.id);
 					resumeOnShow = false;
 					resumePending = true;
 					clearTimeout(resumeTimer);
@@ -170,6 +213,11 @@ export function useTwitchPlayer(login: string | null, attempt: number) {
 					appliedVolume = undefined;
 					syncAudio();
 				});
+				// Эфир пошёл снова (после паузы или перезапуска потока) без повторного PLAYING: ▶ в шапке больше не нужен
+				created.addEventListener(Twitch.Player.PLAY, () => {
+					if (disposed || !tracker.started) return;
+					setStatus('playing');
+				});
 				// Паузу поставили мы или Twitch (перекрыли плеер, скрыли окно): в любом случае показываем ▶
 				created.addEventListener(Twitch.Player.PAUSE, () => {
 					if (disposed || !tracker.started) return;
@@ -201,6 +249,7 @@ export function useTwitchPlayer(login: string | null, attempt: number) {
 			disposed = true;
 			clearTimeout(timeout);
 			clearTimeout(resumeTimer);
+			clearInterval(syncTimer);
 			observer?.disconnect();
 			api.current = noopApi;
 			try {

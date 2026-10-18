@@ -146,3 +146,25 @@ export function startTimeout(tracker: StartTracker): { ms: number; error: string
 		? { ms: twitchPlayTimeoutMs, error: twitchErrors.timeout }
 		: { ms: twitchReadyTimeoutMs, error: twitchErrors.noChannel };
 }
+
+// Тост, когда окно Twitch закрыли и эфир из-за этого встал на паузу. Один id: повторное закрытие не множит тосты
+export const twitchPausedToast = {
+	id: 'twitch-paused',
+	title: 'Эфир Twitch на паузе',
+	description: 'Плеер Twitch играет только в открытом окне',
+	action: 'Открыть',
+	// Тост видно примерно столько, потом он уходит сам
+	timeoutMs: 5500
+} as const;
+
+type WindowClosedInput = {
+	// Эфир в этот момент играл. На паузе, в ошибке, при загрузке или без запуска говорить не о чем
+	playing: boolean;
+	// Вкладка скрыта: закрыли вкладку или ушли на другую, окно при этом не закрывали
+	tabHidden: boolean;
+};
+
+// Нужно ли сказать, что эфир встал на паузу из-за закрытия окна
+export function shouldNotifyWindowClosed({ playing, tabHidden }: WindowClosedInput) {
+	return playing && !tabHidden;
+}

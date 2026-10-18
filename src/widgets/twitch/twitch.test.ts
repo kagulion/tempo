@@ -6,6 +6,7 @@ import {
 	normalizeLogin,
 	parseTwitchUrl,
 	parseSavedChannel,
+	shouldNotifyWindowClosed,
 	startTimeout,
 	trackStart,
 	twitchErrors,
@@ -145,5 +146,20 @@ describe('каналы темы «Музыка»', () => {
 		]);
 		for (const item of channels) expect(normalizeLogin(item.login)).toBe(item.login);
 		expect(topicsWithChannels.map((topic) => topic.label)).toEqual(['Музыка']);
+	});
+});
+
+describe('shouldNotifyWindowClosed', () => {
+	it('говорит только когда эфир играл и вкладка видна', () => {
+		expect(shouldNotifyWindowClosed({ playing: true, tabHidden: false })).toBe(true);
+	});
+
+	it('молчит, если эфир не играл', () => {
+		expect(shouldNotifyWindowClosed({ playing: false, tabHidden: false })).toBe(false);
+	});
+
+	it('молчит, если вкладка скрыта', () => {
+		expect(shouldNotifyWindowClosed({ playing: true, tabHidden: true })).toBe(false);
+		expect(shouldNotifyWindowClosed({ playing: false, tabHidden: true })).toBe(false);
 	});
 });

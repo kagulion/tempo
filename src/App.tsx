@@ -1,6 +1,7 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 
 import { Logo } from '@/components/Logo';
+import { Toaster } from '@/components/ui/toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useHotkeys } from '@/hooks/useHotkeys';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -14,6 +15,7 @@ import { DimmerLayer } from '@/widgets/dimmer/DimmerLayer';
 import { Dock, dockPanels } from '@/widgets/dock/Dock';
 import { FullscreenButton, toggleFullscreen } from '@/widgets/dock/FullscreenButton';
 import { QuietButtons } from '@/widgets/dock/QuietButtons';
+import { onOpenWidgetRequest } from '@/widgets/dock/openRequests';
 import { useDock } from '@/widgets/dock/useDock';
 import { EffectLayers } from '@/widgets/effects/EffectLayers';
 import { toggleEffectsOff } from '@/widgets/effects/effectsOff';
@@ -87,6 +89,19 @@ export default function App() {
 	const onboarding = useOnboarding();
 	// Клавиатуры на телефоне нет: кнопку со списком клавиш прячем
 	const touchOnly = useMediaQuery(mediaQueries.coarsePointer);
+
+	// Окна открывает не только панель, но и тосты (кнопка «Открыть»): они присылают просьбу через openRequests
+	const dockRef = useRef(dock);
+	useEffect(() => {
+		dockRef.current = dock;
+	});
+	useEffect(
+		() =>
+			onOpenWidgetRequest((id) => {
+				if (!dockRef.current.isOpen(id)) dockRef.current.toggle(id);
+			}),
+		[]
+	);
 
 	// Тихие тики при нажатии кнопок, слушатель один на весь документ
 	useEffect(() => installClickSounds(), []);
@@ -191,6 +206,8 @@ export default function App() {
 				<HotkeysDialog open={helpOpen} onClose={closeHelp} />
 				{onboarding.visible && <ScenesDialog onFinish={onboarding.finish} />}
 			</main>
+			{/* Уведомления (src/components/ui/toast.tsx): один раз на всю страницу */}
+			<Toaster />
 		</TooltipProvider>
 	);
 }

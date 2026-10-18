@@ -4,7 +4,7 @@ function channel(login: string, title: string, author: string): TwitchChannel {
 	return { login, title, author };
 }
 
-// Ручные списки каналов по темам, в порядке показа. Каналы проверены пробой (docs/twitch-spike.md): встраиваются,
+// Ручные списки каналов по темам, в порядке показа. Каналы проверены пробой 18.10.2026: встраиваются,
 // в эфире, автозапуск без звука работает. Круглосуточность не гарантирована. Чтобы добавить канал, впиши его в тему
 const channels: Record<TwitchTopicId, TwitchChannel[]> = {
 	music: [
