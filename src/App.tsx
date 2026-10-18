@@ -35,7 +35,7 @@ import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 // С sm окно стоит в своём столбце: не выше столбца, может сжаться (min-h-0) и прокручиваться внутри.
 // Столбец не ловит клики, а окно — ловит
 const windowClass =
-	'absolute inset-x-4 bottom-[7.25rem] max-h-[calc(100dvh-12.25rem)] scrollbar-glass overflow-y-auto sm:pointer-events-auto sm:static sm:max-h-full sm:min-h-0';
+	'absolute inset-x-4 bottom-[15rem] max-h-[calc(100dvh-20rem)] scrollbar-glass overflow-y-auto sm:pointer-events-auto sm:static sm:max-h-full sm:min-h-0';
 
 // Столбцы с компьютера: от верхнего края до панели. Окна с anchor: 'top' прижаты к верху (mb-auto),
 // остальные — к низу, к кнопкам панели, даже когда верхнее окно закрыто. Окна в столбце не наезжают друг на друга.
@@ -46,12 +46,11 @@ const windowClass =
 const columnClass =
 	'contents sm:pointer-events-none sm:absolute sm:z-10 sm:top-4 sm:bottom-24 sm:flex sm:flex-col sm:justify-end sm:gap-4 lg:top-8 lg:bottom-28';
 
-// Панели внизу. На телефоне — ряд во всю ширину с равными промежутками между панелями; все кнопки в одну строку
-// не помещаются, поэтому последняя панель переносится на вторую строку вправо (ml-auto в Dock.tsx).
+// Панели внизу. На телефоне — столбик у левого края: панели стоят друг под другом, подписи групп слева.
 // С sm ряда нет (contents): каждая панель стоит в своём углу (className в dockPanels).
 // Промежутки между панелями не ловят клики
 const dockRowClass =
-	'pointer-events-none absolute inset-x-4 bottom-4 flex flex-wrap items-end justify-between gap-y-2 *:pointer-events-auto sm:contents';
+	'pointer-events-none absolute inset-x-4 bottom-4 flex flex-col items-start gap-2 *:pointer-events-auto sm:contents';
 
 const columns: { id: WidgetColumn; className: string }[] = [
 	// Начинается ниже логотипа в левом верхнем углу

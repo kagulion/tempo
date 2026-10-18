@@ -46,7 +46,7 @@ export const dockPanels: DockPanel[] = [
 	// Правый нижний угол, под столбцом обоев, эффектов и затемнения
 	{
 		label: 'Вид',
-		className: 'ml-auto sm:ml-0 sm:absolute sm:right-4 sm:bottom-4 lg:right-8 lg:bottom-8',
+		className: 'sm:absolute sm:right-4 sm:bottom-4 lg:right-8 lg:bottom-8',
 		groups: [{ id: 'view', label: 'Вид' }]
 	}
 ];
@@ -57,7 +57,7 @@ type DockProps = {
 	onToggle: (id: WidgetId) => void;
 };
 
-// Панель с кнопками, которые открывают и закрывают окна виджетов. Подпись группы по центру над кнопками. В группе «Главное» ещё часы
+// Панель с кнопками, которые открывают и закрывают окна виджетов. Подпись группы над кнопками: на телефоне слева, с sm по центру. В группе «Главное» ещё часы
 export function Dock({ panel, isOpen, onToggle }: DockProps) {
 	return (
 		<nav
@@ -65,11 +65,8 @@ export function Dock({ panel, isOpen, onToggle }: DockProps) {
 			className={cn('z-20 flex items-end gap-2 sm:gap-4', panel.className)}
 		>
 			{panel.groups.map((group) => (
-				<div key={group.id} className="flex flex-col items-center gap-1">
-					{/* На телефоне подписи групп не помещаются */}
-					<span className="hidden px-2 text-xs font-medium text-white/80 drop-shadow sm:block">
-						{group.label}
-					</span>
+				<div key={group.id} className="flex flex-col items-start gap-1 sm:items-center">
+					<span className="px-2 text-xs font-medium text-white/80 drop-shadow">{group.label}</span>
 					<div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/50 p-1 shadow-2xl backdrop-blur-md">
 						{widgets
 							.filter((widget) => widget.dockGroup === group.id)
