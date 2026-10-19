@@ -19,6 +19,7 @@ import { useLayoutEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Combobox, ComboboxButton } from '@/components/ui/combobox';
 import { Slider } from '@/components/ui/slider';
+import { iosWebKit } from '@/lib/platform';
 import { easeInOutStrong, easeOutStrong, prefersReducedMotion } from '@/lib/flip';
 import { cn } from '@/lib/utils';
 import { usePersistentState } from '@/hooks/usePersistentState';
@@ -315,15 +316,18 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 							>
 								{silent ? <VolumeX /> : radio.volume < 0.5 ? <Volume1 /> : <Volume2 />}
 							</Button>
-							<Slider
-								label="Громкость радио"
-								min={0}
-								max={1}
-								step={0.01}
-								value={radio.muted ? 0 : radio.volume}
-								onValueChange={radio.changeVolume}
-								className="mr-1 w-16 shrink-0 sm:w-20"
-							/>
+							{/* На iOS громкость <audio> только для чтения: слайдер скрыт, звук правят кнопки телефона */}
+							{!iosWebKit && (
+								<Slider
+									label="Громкость радио"
+									min={0}
+									max={1}
+									step={0.01}
+									value={radio.muted ? 0 : radio.volume}
+									onValueChange={radio.changeVolume}
+									className="mr-1 w-16 shrink-0 sm:w-20"
+								/>
+							)}
 
 							{/* Сплит-кнопка: сердечко добавляет станцию, шеврон открывает список избранного */}
 							<div className="ml-auto flex items-center">

@@ -8,6 +8,7 @@
 // кликом (unlockAudio при включении радио). До этого радио играет напрямую, а полоски — на CSS-анимации.
 // Потоки Рекорда отдают CORS, поэтому у <audio> стоит crossOrigin="anonymous" (см. useRadio)
 import { runningAudioContext } from '@/lib/audio';
+import { iosWebKit } from '@/lib/platform';
 
 import { bandLevels, createSilenceWatch, isSilentSpectrum } from './soundLevels';
 
@@ -44,6 +45,11 @@ function guardContext(context: AudioContext) {
 }
 
 function connect(audio: HTMLAudioElement) {
+	// На iOS через граф радио замолкает при блокировке экрана, поэтому там звук идёт напрямую
+	if (iosWebKit) {
+		broken.add(audio);
+		return null;
+	}
 	const existing = analysers.get(audio);
 	if (existing) return existing;
 	const context = runningAudioContext();

@@ -19,7 +19,7 @@ const startTimeoutMs = 10_000;
 // Iframe растягиваем как object-cover: 16:9, не меньше экрана по обеим сторонам, по центру
 const iframeClass = cn(
 	'[&_iframe]:absolute [&_iframe]:top-1/2 [&_iframe]:left-1/2 [&_iframe]:max-w-none [&_iframe]:-translate-1/2',
-	'[&_iframe]:h-[max(100vh,56.25vw)] [&_iframe]:w-[max(100vw,177.78vh)]'
+	'[&_iframe]:h-[max(100dvh,56.25vw)] [&_iframe]:w-[max(100vw,177.78dvh)]'
 );
 
 // Размер окна для масштаба iframe с потолком качества. Строка, чтобы useSyncExternalStore видел, что ничего не менялось

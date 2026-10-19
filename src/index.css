@@ -191,6 +191,10 @@
 }
 
 @layer base {
+	/* Убирает серую вспышку при касании на iOS Safari */
+	html {
+		-webkit-tap-highlight-color: transparent;
+	}
 	* {
 		@apply border-border outline-ring/50;
 	}

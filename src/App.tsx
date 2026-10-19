@@ -198,7 +198,7 @@ export default function App() {
 
 	return (
 		<TooltipProvider>
-			<main className="relative h-screen w-screen overflow-hidden bg-black text-white">
+			<main className="relative h-dvh w-full overflow-hidden bg-black text-white">
 				<WallpaperBackground />
 				{/* Затемнение только обоев: эффекты, часы и окна выше */}
 				<DimmerLayer />

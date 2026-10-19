@@ -31,7 +31,7 @@ import {
 } from './useRutube';
 
 // Размеры плеера. Фон: 16:9, не меньше экрана по обеим сторонам (как object-cover). Запуск: по центру поверх окон
-const backgroundSize = { width: 'max(100vw, 177.78vh)', height: 'max(100vh, 56.25vw)' };
+const backgroundSize = { width: 'max(100vw, 177.78dvh)', height: 'max(100dvh, 56.25vw)' };
 const launchSize = { width: 'var(--rw)', height: 'calc(var(--rw) * 9 / 16)' };
 
 type RutubeLayerProps = {

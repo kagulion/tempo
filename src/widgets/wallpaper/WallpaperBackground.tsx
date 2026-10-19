@@ -45,12 +45,19 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 			if (!video) return;
 			if (reducedMotion || document.hidden) video.pause();
 			// play() у muted-видео браузеры разрешают без клика, но промис может отклониться — тогда остаётся кадр
-			else video.play().catch(() => {});
+			else
+				video.play().catch(() => {
+					// iOS в режиме экономии заряда отклоняет play(), и loadeddata может не прийти.
+					// Если есть превью, считаем слой готовым: иначе смена обоев зависла бы
+					if (video.poster) onReady();
+				});
 		}
 
 		sync();
 		document.addEventListener('visibilitychange', sync);
 		return () => document.removeEventListener('visibilitychange', sync);
+		// onReady каждый раз новая функция, но делает одно и то же (setReadyId), поэтому в зависимости её не берём
+		// oxlint-disable-next-line react-hooks/exhaustive-deps
 	}, [reducedMotion, narrow]);
 
 	const media = wallpaper.kind === 'custom' ? wallpaper.media : wallpaper.kind;
@@ -103,6 +110,8 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 			preload="auto"
 			aria-label={wallpaper.title}
 			onLoadedData={onReady}
+			// Запасной сигнал: в iOS loadeddata может не прийти. Отклонённый play() разбирает sync выше
+			onCanPlay={onReady}
 			onAnimationEnd={onShown}
 			className={cn(layerClass, className)}
 		>
