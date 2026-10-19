@@ -3,6 +3,28 @@ import { cn } from 'cn';
 import { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 
+// Фокус попал на кнопку «по-настоящему», если перед этим нажали Tab или стрелку. Когда фокус ставит программа
+// (Base UI ведёт его на крестик только что открытого диалога после Enter), подсказка не нужна: она перехватывала
+// первый Esc, и диалог закрывался только со второго раза
+const navigationKeys = new Set([
+	'Tab',
+	'ArrowUp',
+	'ArrowDown',
+	'ArrowLeft',
+	'ArrowRight',
+	'Home',
+	'End'
+]);
+let focusByUser = false;
+if (typeof document !== 'undefined') {
+	document.addEventListener(
+		'keydown',
+		(event) => (focusByUser = navigationKeys.has(event.key)),
+		true
+	);
+	document.addEventListener('pointerdown', () => (focusByUser = false), true);
+}
+
 function TooltipProvider({
 	delay = 400,
 	closeDelay = 0,
@@ -38,6 +60,7 @@ function Tooltip({ onOpenChange, ...props }: TooltipPrimitive.Root.Props) {
 			data-slot="tooltip"
 			open={open}
 			onOpenChange={(next, details) => {
+				if (next && details.reason === 'trigger-focus' && !focusByUser) return;
 				setOpen(next);
 				onOpenChange?.(next, details);
 			}}

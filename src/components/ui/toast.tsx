@@ -30,6 +30,7 @@ function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
 	return (
 		<ToastPrimitive.Viewport
 			data-slot="toast-viewport"
+			aria-label="Уведомления"
 			className={cn(
 				'pointer-events-none fixed inset-x-4 bottom-[15.5rem] z-[60] mx-auto w-auto max-w-sm outline-none sm:inset-x-auto sm:right-4 sm:bottom-24 sm:mx-0 sm:w-80 lg:right-8 lg:bottom-28',
 				className
