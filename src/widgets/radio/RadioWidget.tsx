@@ -342,7 +342,7 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 									step={0.01}
 									value={radio.muted ? 0 : radio.volume}
 									onValueChange={radio.changeVolume}
-									className="mr-1 w-16 shrink-0 sm:w-20"
+									className="mr-1 w-16 min-w-8 sm:w-20"
 								/>
 							)}
 

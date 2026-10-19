@@ -44,19 +44,27 @@ import { keepVisitStatsRunning } from '@/widgets/stats/useVisitStats';
 import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 
 // На телефоне окно занимает ширину экрана над панелью, а если не влезает по высоте — прокручивается.
-// С sm окно стоит в своём столбце: не выше столбца, может сжаться (min-h-0) и прокручиваться внутри.
+// С sm окно стоит в своём столбце (до xl окно на экране одно, с xl окна трёх столбцов стоят рядом, см. columnClass): не выше столбца, может сжаться (min-h-0) и прокручиваться внутри.
 // Столбец не ловит клики, а окно — ловит
 const windowClass =
 	'absolute inset-x-4 bottom-[15rem] max-h-[calc(100dvh-20rem)] scrollbar-glass overflow-y-auto sm:pointer-events-auto sm:static sm:max-h-full sm:min-h-0';
 
-// Столбцы с компьютера: от верхнего края до панели. Окна с anchor: 'top' прижаты к верху (mb-auto),
-// остальные — к низу, к кнопкам панели, даже когда верхнее окно закрыто. Окна в столбце не наезжают друг на друга.
-// На телефоне столбцов нет (contents): окна встают по общему windowClass.
+// Столбцы с брейкпоинта sm. Окна с anchor: 'top' прижаты к верху (mb-auto), остальные — к низу, к кнопкам панели,
+// даже когда верхнее окно закрыто. На телефоне столбцов нет (contents): окна встают по общему windowClass.
+// sm–xl: до lg на экране одно окно, столбцы — три абсолютных блока по краям и в центре (центр сдвинут translate-x-1/2).
+// С xl: столбцы — три колонки сетки (gridClass): боковые и центр делят ширину пропорционально потолкам ширины окон,
+// а окно внутри — w-full с max-w из реестра, поэтому окна не наезжают друг на друга при любой ширине.
+// Верхний отступ задаёт каждый столбец (xl:pt-*): левый ниже логотипа, правый ниже кнопки полного экрана.
 // Сам столбец не ловит клики, иначе перекрыл бы фон между окнами.
 // У столбца свой z-10 (над крупными часами): transform у центрального столбца создаёт слой,
 // и без z-index окна внутри него оказывались бы под часами
 const columnClass =
-	'contents sm:pointer-events-none sm:absolute sm:z-10 sm:top-4 sm:bottom-24 sm:flex sm:flex-col sm:justify-end sm:gap-4 lg:top-8 lg:bottom-28';
+	'contents sm:pointer-events-none sm:absolute sm:z-10 sm:top-4 sm:bottom-24 sm:flex sm:flex-col sm:justify-end sm:gap-4 xl:static xl:inset-auto xl:min-h-0 xl:translate-x-0';
+
+// Сетка столбцов с xl: от верха до панели, поля по краям как у логотипа. Боковые колонки равны,
+// поэтому центр стоит по середине экрана
+const gridClass =
+	'contents xl:pointer-events-none xl:absolute xl:inset-x-8 xl:top-0 xl:bottom-28 xl:grid xl:grid-cols-[minmax(0,1fr)_28rem_minmax(0,1fr)] xl:grid-rows-[minmax(0,1fr)] xl:gap-x-8';
 
 // Панели внизу. На телефоне — столбик у левого края: панели стоят друг под другом, подписи групп слева.
 // С sm ряда нет (contents): каждая панель стоит в своём углу (className в dockPanels).
@@ -66,12 +74,12 @@ const dockRowClass =
 
 const columns: { id: WidgetColumn; className: string }[] = [
 	// Начинается ниже логотипа в левом верхнем углу
-	{ id: 'left', className: 'sm:top-16 sm:left-4 sm:items-start lg:top-24 lg:left-8' },
-	// С sm до lg начинается ниже ряда кнопок в правом верхнем углу: на узком экране таймер иначе уходит под них.
-	// С lg кнопки в углу короче окна и стоят правее, столбец снова от верха
-	{ id: 'center', className: 'sm:top-16 sm:left-1/2 sm:-translate-x-1/2 sm:items-center lg:top-8' },
+	{ id: 'left', className: 'sm:top-16 sm:left-4 sm:items-start xl:pt-24' },
+	// До xl начинается ниже ряда кнопок в правом верхнем углу: на узком экране окно иначе уходит под них.
+	// С xl кнопки в углу короче окна и стоят правее, столбец снова от верха
+	{ id: 'center', className: 'sm:top-16 sm:left-1/2 sm:-translate-x-1/2 sm:items-center xl:pt-8' },
 	// Начинается ниже кнопки полного экрана в правом верхнем углу
-	{ id: 'right', className: 'sm:top-16 sm:right-4 sm:items-end lg:top-20 lg:right-8' }
+	{ id: 'right', className: 'sm:top-16 sm:right-4 sm:items-end xl:pt-20' }
 ];
 
 // Окна столбца сверху вниз: сначала прижатые к верху, внутри — в порядке реестра
@@ -222,23 +230,25 @@ export default function App() {
 					<FullscreenButton />
 				</div>
 
-				{columns.map((column) => (
-					<div
-						key={column.id}
-						// В фокусе окна скрыты, а столбец остаётся ради свёрнутых часов: поднимаем его над
-						// слоем кликов (z-15), чтобы кнопка в строке станции нажималась
-						className={cn(columnClass, focus.mode !== 'off' && 'sm:z-[16]', column.className)}
-					>
-						{column.id === 'center' && (
-							<BigClock
-								visibility={visibility.bigClock}
-								variant="corner"
-								className={cornerClockClass}
-							/>
-						)}
-						{columnWidgets(column.id).map(renderWindow)}
-					</div>
-				))}
+				<div className={gridClass}>
+					{columns.map((column) => (
+						<div
+							key={column.id}
+							// В фокусе окна скрыты, а столбец остаётся ради свёрнутых часов: поднимаем его над
+							// слоем кликов (z-15), чтобы кнопка в строке станции нажималась
+							className={cn(columnClass, focus.mode !== 'off' && 'sm:z-[16]', column.className)}
+						>
+							{column.id === 'center' && (
+								<BigClock
+									visibility={visibility.bigClock}
+									variant="corner"
+									className={cornerClockClass}
+								/>
+							)}
+							{columnWidgets(column.id).map(renderWindow)}
+						</div>
+					))}
+				</div>
 				{BackgroundMusic && (
 					<Suspense>
 						<BackgroundMusic />

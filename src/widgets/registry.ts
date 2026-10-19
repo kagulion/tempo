@@ -46,7 +46,8 @@ function lazyWidget<Name extends string>(
 // Группы кнопок на панели. Какая группа в каком углу, задаёт dockPanels в src/widgets/dock/Dock.tsx
 export type DockGroupId = 'sound' | 'main' | 'view';
 
-// Столбец, в котором стоит окно с брейкпоинта sm. На телефоне столбцов нет: окна стоят одинаково (windowClass в App.tsx)
+// Столбец, в котором стоит окно с брейкпоинта sm (до xl окно на экране одно, с xl столбцы — сетка, см. App.tsx).
+// На телефоне столбцов нет: окна стоят одинаково (windowClass в App.tsx)
 export type WidgetColumn = 'left' | 'center' | 'right';
 
 type WidgetDefinition = {
@@ -67,7 +68,9 @@ type WidgetDefinition = {
 	// top — окно прижато к верху столбца, bottom — к низу, к панели. Окна столбца не перекрывают друг друга:
 	// если им не хватает высоты, окна без shrink-0 сжимаются и прокручиваются внутри
 	anchor: 'top' | 'bottom';
-	// Ширина и прочие классы окна с брейкпоинта sm. Место на экране задают column и anchor
+	// Ширина и прочие классы окна с брейкпоинта sm. Место на экране задают column и anchor.
+	// До xl окно одно на экране, ширина фиксированная (sm:w-[…]). С xl столбцы — сетка: у боковых окно тянется по столбцу
+	// и не шире потолка (xl:w-full xl:max-w-[…]): окна не перекрывают друг друга по построению
 	placement: string;
 	// Окна с одинаковым slot стоят на одном месте: открытие одного закрывает остальные
 	slot?: string;
@@ -88,7 +91,7 @@ const definitions = [
 		column: 'left',
 		anchor: 'bottom',
 		// Не сжимается: управление радио должно быть видно целиком, прокручиваются звуки над ним
-		placement: 'sm:w-[26rem] sm:shrink-0',
+		placement: 'sm:w-[26rem] xl:w-full xl:max-w-[26rem] sm:shrink-0',
 		enabled: !musicEnabled
 	},
 	{
@@ -101,7 +104,7 @@ const definitions = [
 		column: 'left',
 		anchor: 'top',
 		// Длинный список звуков сжимается до места над радио и прокручивается
-		placement: 'sm:w-[26rem]'
+		placement: 'sm:w-[26rem] xl:w-full xl:max-w-[26rem]'
 	},
 	{
 		id: 'stats',
@@ -113,7 +116,6 @@ const definitions = [
 		column: 'center',
 		anchor: 'top',
 		// Той же ширины, что таймер и задачи, поэтому при смене статистики и таймера окно не прыгает.
-		// Между звуками и окнами справа: на узких экранах может перекрыть соседей
 		placement: 'sm:w-[28rem]',
 		slot: 'center-top'
 	},
@@ -154,7 +156,7 @@ const definitions = [
 		column: 'right',
 		anchor: 'bottom',
 		// Галерея не выше 34rem, сетка превью прокручивается внутри
-		placement: 'max-h-[min(34rem,calc(100dvh-11rem))] sm:max-h-[34rem] sm:w-[30rem]',
+		placement: 'sm:max-h-[34rem] sm:w-[30rem] xl:w-full xl:max-w-[30rem]',
 		slot: 'view'
 	},
 	{
@@ -167,7 +169,7 @@ const definitions = [
 		column: 'right',
 		anchor: 'bottom',
 		// На месте галереи: открывается вместо неё. Подборки прокручиваются внутри
-		placement: 'max-h-[min(34rem,calc(100dvh-11rem))] sm:max-h-[34rem] sm:w-[30rem]',
+		placement: 'sm:max-h-[34rem] sm:w-[30rem] xl:w-full xl:max-w-[30rem]',
 		slot: 'view'
 	},
 	{
@@ -180,10 +182,10 @@ const definitions = [
 		column: 'right',
 		anchor: 'bottom',
 		// Окно-плеер, а не фон (Twitch не играет под интерфейсом, см. docs/twitch.md). Слот 'view' оставлен ради раскладки:
-		// окно открывается вместо галереи в той же колонке справа внизу и не наезжает на соседей. Плеер 16:9 держит
+		// окно открывается вместо галереи в той же колонке справа внизу. Плеер 16:9 держит
 		// высоту (shrink-0), при нехватке места прокручивается список каналов. На телефоне окно не выше, чем в windowClass
 		// (App.tsx), чтобы не залезать под верхние кнопки
-		placement: 'max-h-[calc(100dvh-20rem)] sm:max-h-[36rem] sm:w-[30rem]',
+		placement: 'sm:max-h-[36rem] sm:w-[30rem] xl:w-full xl:max-w-[30rem]',
 		slot: 'view'
 	},
 	{
@@ -196,7 +198,7 @@ const definitions = [
 		column: 'right',
 		anchor: 'bottom',
 		// На месте галереи: открывается вместо неё
-		placement: 'sm:w-[30rem]',
+		placement: 'sm:w-[30rem] xl:w-full xl:max-w-[30rem]',
 		slot: 'view'
 	},
 	{
@@ -209,7 +211,7 @@ const definitions = [
 		column: 'right',
 		anchor: 'bottom',
 		// На месте галереи и эффектов: открывается вместо них
-		placement: 'sm:w-[22rem]',
+		placement: 'sm:w-[22rem] xl:w-full xl:max-w-[22rem]',
 		slot: 'view'
 	}
 ] as const satisfies readonly WidgetDefinition[];

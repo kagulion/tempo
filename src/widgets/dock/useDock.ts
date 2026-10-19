@@ -10,7 +10,7 @@ function slotmates(id: WidgetId): WidgetId[] {
 	return slot ? widgets.filter((widget) => widget.slot === slot).map((widget) => widget.id) : [];
 }
 
-// Первый визит: всё как было до панели, звуки закрыты. На телефоне видно последнее — радио.
+// Первый визит: всё как было до панели, звуки закрыты. На узком экране видно последнее — радио.
 // Выключенные виджеты (enabled: false в реестре) отбрасываем
 const defaultOpen = (['wallpaper', 'timer', 'radio'] satisfies WidgetId[]).filter(isWidgetId);
 
@@ -24,25 +24,27 @@ export function parseOpen(saved: unknown): WidgetId[] | undefined {
 	);
 }
 
+// Список открытых окон после открытия окна id: на узком экране оно заменяет все, на широком — только соседей по месту
+export function openWindow(list: WidgetId[], id: WidgetId, single: boolean): WidgetId[] {
+	return single ? [id] : [...list.filter((item) => !slotmates(id).includes(item)), id];
+}
+
 // Какие окна виджетов открыты. Порядок — по времени открытия, последнее открытое в конце
 export function useDock() {
 	// Хранилище недоступно (приватный режим) — после перезагрузки откроем окна по умолчанию
 	const [open, setOpen] = usePersistentState(storageKeys.openWidgets, defaultOpen, parseOpen);
-	// На телефоне помещается только одно окно
-	const mobile = useMediaQuery(mediaQueries.mobile);
+	// Меньше xl помещается только одно окно
+	const single = useMediaQuery(mediaQueries.singleWindow);
 
-	// На телефоне видно только последнее открытое окно, на компьютере — все открытые
+	// На узком экране видно только последнее открытое окно, на широком — все открытые
 	function isOpen(id: WidgetId) {
-		return mobile ? open.at(-1) === id : open.includes(id);
+		return single ? open.at(-1) === id : open.includes(id);
 	}
 
 	function toggle(id: WidgetId) {
 		if (isOpen(id)) setOpen((list) => list.filter((item) => item !== id));
-		// На телефоне новое окно заменяет предыдущее, на компьютере — только соседа по месту
-		else
-			setOpen((list) =>
-				mobile ? [id] : [...list.filter((item) => !slotmates(id).includes(item)), id]
-			);
+		// На узком экране новое окно заменяет предыдущее, на широком — только соседа по месту
+		else setOpen((list) => openWindow(list, id, single));
 	}
 
 	return { isOpen, toggle };
