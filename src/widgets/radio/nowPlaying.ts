@@ -102,3 +102,9 @@ export function useNowPlaying() {
 export function useCanToggleNowPlaying() {
 	return useSyncExternalStore(subscribeNowPlaying, hasNowPlayingToggle);
 }
+
+// Фраза для скринридера при смене станции или старте. Нет станции — пустая строка (ничего не объявляем)
+export function stationAnnouncement(title: string | undefined) {
+	if (title === undefined) return '';
+	return `Играет: ${title.trim() || fallbackName}`;
+}

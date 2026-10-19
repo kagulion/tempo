@@ -20,7 +20,9 @@ export function StatsWidget({ className }: StatsWidgetProps) {
 
 	return (
 		<Widget aria-label="Статистика" className={cn('flex flex-col gap-2.5 p-4', className)}>
-			<WidgetTitle>Статистика</WidgetTitle>
+			<h2 className="m-0 text-xs font-medium">
+				<WidgetTitle>Статистика</WidgetTitle>
+			</h2>
 
 			{/* items-start: колонки не растягивают карточки друг до друга */}
 			<div className="flex flex-col gap-2.5 sm:grid sm:grid-cols-[12rem_minmax(0,1fr)] sm:items-start">

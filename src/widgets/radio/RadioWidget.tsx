@@ -164,6 +164,10 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 			{/* Радио без встроенных элементов управления — кнопки ниже. Один <audio> на оба вида,
 			    чтобы звук не прерывался при сворачивании */}
 			<audio {...radio.audio} />
+			{/* Скрытое объявление смены станции для скринридера */}
+			<div role="status" className="sr-only">
+				{radio.message}
+			</div>
 
 			<WidgetHeader title="Радио">
 				<Button
@@ -171,6 +175,7 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 					size="icon-sm"
 					onClick={toggleCompact}
 					hint={compact ? 'Развернуть' : 'Свернуть'}
+					aria-label="Свёрнутый вид"
 					aria-pressed={compact}
 				>
 					{compact ? <Maximize2 /> : <Minimize2 />}
@@ -189,7 +194,10 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 								{radio.track && <TrackLine track={radio.track} />}
 							</div>
 						) : (
-							<p className="min-w-0 flex-1 truncate text-sm text-white/80">
+							<p
+								role={status === 'error' ? 'alert' : 'status'}
+								className="min-w-0 flex-1 truncate text-sm text-white/80"
+							>
 								{statusText[status === 'idle' ? 'loading' : status]}
 							</p>
 						)}
@@ -198,6 +206,8 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 							size="icon"
 							onClick={radio.togglePlaying}
 							hint={radio.playing ? 'Выключить радио' : 'Включить радио'}
+							aria-label="Радио"
+							aria-pressed={radio.playing}
 						>
 							{radio.playing ? <Pause /> : <Play />}
 						</Button>
@@ -223,7 +233,7 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 										aria-pressed={source.kind === 'genre' && source.genre === genre.id}
 										className={chipClassName}
 									>
-										{genre.label}
+										<span lang="en">{genre.label}</span>
 									</button>
 								))}
 							</div>
@@ -243,7 +253,10 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 									className="min-w-0 flex-1"
 								/>
 							) : (
-								<p className="flex h-8 min-w-0 flex-1 items-center truncate px-1 text-sm text-white/80">
+								<p
+									role={status === 'error' ? 'alert' : 'status'}
+									className="flex h-8 min-w-0 flex-1 items-center truncate px-1 text-sm text-white/80"
+								>
 									{status === 'empty'
 										? emptyText
 										: statusText[status === 'idle' ? 'loading' : status]}
@@ -260,7 +273,7 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 										: 'Порядок: по порядку. Переключить на «Перемешать»'
 								}
 								aria-pressed={shuffled}
-								aria-label={shuffled ? 'Порядок: перемешать' : 'Порядок: по порядку'}
+								aria-label="Перемешать станции"
 							>
 								{shuffled ? <Shuffle /> : <ListOrdered />}
 							</Button>
@@ -295,6 +308,8 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 								size="icon"
 								onClick={radio.togglePlaying}
 								hint={radio.playing ? 'Выключить радио' : 'Включить радио'}
+								aria-label="Радио"
+								aria-pressed={radio.playing}
 							>
 								{radio.playing ? <Pause /> : <Play />}
 							</Button>
@@ -313,6 +328,8 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 								size="icon"
 								onClick={radio.toggleMuted}
 								hint={silent ? 'Включить звук' : 'Выключить звук'}
+								aria-label="Радио без звука"
+								aria-pressed={silent}
 							>
 								{silent ? <VolumeX /> : radio.volume < 0.5 ? <Volume1 /> : <Volume2 />}
 							</Button>
@@ -337,6 +354,7 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 									onClick={() => station && toggleFavorite(station)}
 									disabled={!station || status !== 'idle'}
 									hint={favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+									aria-label="В избранном"
 									aria-pressed={favorite}
 									className="rounded-r-none"
 								>

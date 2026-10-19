@@ -28,7 +28,7 @@ export function OnlineCard({ count }: OnlineCardProps) {
 							)}
 						/>
 					</span>
-					<span aria-live="polite">{count ?? '—'}</span>
+					<span>{count ?? '—'}</span>
 				</StatValue>
 			</div>
 		</StatCard>

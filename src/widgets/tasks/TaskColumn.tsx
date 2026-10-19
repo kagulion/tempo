@@ -68,22 +68,25 @@ export function TaskColumn({
 					items={cards.map((card) => card.id)}
 					strategy={verticalListSortingStrategy}
 				>
-					<div role="list" className="flex flex-col gap-1.5 px-1 pt-1 pb-1.5">
-						{cards.map((card) => (
-							<TaskCard
-								key={card.id}
-								card={card}
-								column={column}
-								onMove={onMove}
-								onRemove={onRemove}
-							/>
-						))}
-						{cards.length === 0 && (
+					{cards.length > 0 ? (
+						<div role="list" className="flex flex-col gap-1.5 px-1 pt-1 pb-1.5">
+							{cards.map((card) => (
+								<TaskCard
+									key={card.id}
+									card={card}
+									column={column}
+									onMove={onMove}
+									onRemove={onRemove}
+								/>
+							))}
+						</div>
+					) : (
+						<div className="px-1 pt-1 pb-1.5">
 							<p className="rounded-lg border border-dashed border-white/15 py-3 text-center text-xs text-white/80">
 								Нет задач
 							</p>
-						)}
-					</div>
+						</div>
+					)}
 				</SortableContext>
 			)}
 		</section>

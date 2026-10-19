@@ -40,7 +40,7 @@ export function FocusButton({ mode, onToggle, onHideAll, className }: FocusButto
 					type="button"
 					onClick={onToggle}
 					aria-pressed={active}
-					aria-label={label}
+					aria-label="Фокус"
 					className={cn(
 						partClass,
 						'gap-1.5 pl-3 text-sm',

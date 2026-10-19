@@ -40,7 +40,7 @@ export function StatsHighlights({ className }: StatsHighlightsProps) {
 				className
 			)}
 		>
-			<span className="flex items-center gap-1.5" title={onlineLabel}>
+			<span className="flex items-center gap-1.5">
 				<span
 					aria-hidden
 					className={cn(
@@ -52,13 +52,13 @@ export function StatsHighlights({ className }: StatsHighlightsProps) {
 				<span className="sr-only">{onlineLabel}</span>
 			</span>
 			<Divider />
-			<span className="flex items-center gap-1" title={streakLabel}>
+			<span className="flex items-center gap-1">
 				<Flame className="size-3.5 text-orange-400" aria-hidden />
 				<span aria-hidden>{stats.streak}</span>
 				<span className="sr-only">{streakLabel}</span>
 			</span>
 			<Divider />
-			<span className="flex items-center" title={moodLabel}>
+			<span className="flex items-center">
 				<span aria-hidden>{moodLevel ? moodLevel.emoji : '—'}</span>
 				<span className="sr-only">{moodLabel}</span>
 			</span>

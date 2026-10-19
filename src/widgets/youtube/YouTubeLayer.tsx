@@ -221,6 +221,9 @@ export function YouTubeLayer({
 						onReady: () => {
 							if (disposed) return;
 							playerReady = true;
+							// Слой скрыт от скринридера (aria-hidden), поэтому iframe не должен ловить Tab
+							const frame = host.querySelector('iframe');
+							if (frame) frame.tabIndex = -1;
 							sync();
 						},
 						onStateChange: ({ data }) => {

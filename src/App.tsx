@@ -199,6 +199,7 @@ export default function App() {
 	return (
 		<TooltipProvider>
 			<main className="relative h-dvh w-full overflow-hidden bg-black text-white">
+				<h1 className="sr-only">Tempo</h1>
 				<WallpaperBackground />
 				{/* Затемнение только обоев: эффекты, часы и окна выше */}
 				<DimmerLayer />

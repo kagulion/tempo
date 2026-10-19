@@ -6,6 +6,7 @@ import {
 	nowPlayingName,
 	registerNowPlayingToggle,
 	setNowPlaying,
+	stationAnnouncement,
 	subscribeNowPlaying,
 	toggleNowPlaying,
 	trackLabel
@@ -134,5 +135,19 @@ describe('трек в nowPlaying', () => {
 	it('trackLabel: «Исполнитель — Песня», без исполнителя только песня', () => {
 		expect(trackLabel(track)).toBe('Artist — Song');
 		expect(trackLabel({ artist: ' ', song: 'Song' })).toBe('Song');
+	});
+});
+
+describe('stationAnnouncement', () => {
+	it('называет станцию', () => {
+		expect(stationAnnouncement(' Record Lo-Fi ')).toBe('Играет: Record Lo-Fi');
+	});
+
+	it('пустое название заменяет запасным', () => {
+		expect(stationAnnouncement('  ')).toBe('Играет: Без названия');
+	});
+
+	it('без станции ничего не объявляет', () => {
+		expect(stationAnnouncement(undefined)).toBe('');
 	});
 });

@@ -21,7 +21,7 @@ export function DockClock({ className }: DockClockProps) {
 				type="button"
 				onClick={bigClock.toggle}
 				aria-pressed={bigClock.shown}
-				aria-label={label}
+				aria-label="Крупные часы"
 				className={cn(className, 'hidden sm:flex', bigClock.shown && 'bg-white/20 text-white')}
 			>
 				<Clock className="size-4" />

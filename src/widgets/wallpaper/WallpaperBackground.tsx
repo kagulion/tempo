@@ -69,7 +69,9 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 				// Без вариантов (свои обои, новые обои без запуска скрипта) остаётся один файл
 				srcSet={image?.srcSet}
 				sizes={image?.srcSet ? image.sizes : undefined}
-				alt={wallpaper.title}
+				// Обои — декор: скринридеру они не нужны
+				alt=""
+				aria-hidden="true"
 				// Фон — главная картинка страницы: качаем с высоким приоритетом, а раскодирует браузер вне основного потока
 				fetchPriority="high"
 				decoding="async"
@@ -108,7 +110,7 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 			loop
 			playsInline
 			preload="auto"
-			aria-label={wallpaper.title}
+			aria-hidden="true"
 			onLoadedData={onReady}
 			// Запасной сигнал: в iOS loadeddata может не прийти. Отклонённый play() разбирает sync выше
 			onCanPlay={onReady}
@@ -116,8 +118,8 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 			className={cn(layerClass, className)}
 		>
 			{/* AV1 первым, H.264 запасным: браузер берёт первый тип, который умеет декодировать */}
-			{sources.map((source) => (
-				<source key={source.src} src={source.src} type={source.type} />
+			{sources.map((source, index) => (
+				<source key={`${index}-${source.src}`} src={source.src} type={source.type} />
 			))}
 		</video>
 	);

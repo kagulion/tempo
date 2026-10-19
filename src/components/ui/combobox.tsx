@@ -189,12 +189,16 @@ export function ComboboxButton<T>({
 		>
 			{hint ? (
 				<Hint label={hint}>
-					<ComboboxPrimitive.Trigger aria-label={ariaLabel ?? hint} className={className}>
+					<ComboboxPrimitive.Trigger
+						role="button"
+						aria-label={ariaLabel ?? hint}
+						className={className}
+					>
 						{children}
 					</ComboboxPrimitive.Trigger>
 				</Hint>
 			) : (
-				<ComboboxPrimitive.Trigger aria-label={ariaLabel} className={className}>
+				<ComboboxPrimitive.Trigger role="button" aria-label={ariaLabel} className={className}>
 					{children}
 				</ComboboxPrimitive.Trigger>
 			)}

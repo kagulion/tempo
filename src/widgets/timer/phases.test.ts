@@ -5,6 +5,7 @@ import {
 	elapsedOf,
 	minute,
 	nextPhase,
+	phaseAnnouncement,
 	pomodoroTotal,
 	replaceRun,
 	settle,
@@ -158,5 +159,34 @@ describe('announcement', () => {
 	it('о конце помидоро и обратного отсчёта', () => {
 		expect(announcement(null, 'pomodoro', settings).title).toBe('Помидоро завершён');
 		expect(announcement(null, 'countdown', settings).title).toBe('Время вышло');
+	});
+});
+
+describe('phaseAnnouncement', () => {
+	it('после работы объявляет перерыв', () => {
+		const next = run({ phase: 'shortBreak', duration: 5 * minute });
+		expect(phaseAnnouncement(run(), next, settings)).toBe('Работа закончена, перерыв 5 мин');
+	});
+
+	it('различает длинный перерыв', () => {
+		const next = run({ phase: 'longBreak', round: 4, duration: 15 * minute });
+		expect(phaseAnnouncement(run({ round: 4 }), next, settings)).toBe(
+			'Работа закончена, длинный перерыв 15 мин'
+		);
+	});
+
+	it('после перерыва объявляет новый раунд', () => {
+		const prev = run({ phase: 'shortBreak', duration: 5 * minute });
+		const next = run({ round: 2 });
+		expect(phaseAnnouncement(prev, next, settings)).toBe(
+			'Перерыв закончен, работа: раунд 2, 25 мин'
+		);
+	});
+
+	it('в конце помидоро и отсчёта объявляет завершение', () => {
+		expect(phaseAnnouncement(run({ round: 4 }), null, settings)).toBe(
+			'Помидоро завершён, все раунды пройдены: 4'
+		);
+		expect(phaseAnnouncement(run({ mode: 'countdown' }), null, settings)).toBe('Время вышло');
 	});
 });

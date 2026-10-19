@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+	dayLabel,
 	maxNoteLength,
 	monthAverage,
 	monthGrid,
@@ -149,5 +150,21 @@ describe('monthAverage', () => {
 
 	it('без оценок — null', () => {
 		expect(monthAverage(entries, 2026, 0)).toBeNull();
+	});
+});
+
+describe('dayLabel', () => {
+	it('называет дату и оценку', () => {
+		expect(dayLabel('2026-10-19', { level: 4 })).toBe('19 октября 2026, настроение: хорошо');
+	});
+
+	it('день без оценки', () => {
+		expect(dayLabel('2026-10-05', undefined)).toBe('5 октября 2026, без оценки');
+	});
+
+	it('добавляет заметку', () => {
+		expect(dayLabel('2026-01-02', { level: 1, note: 'ужас' })).toBe(
+			'2 января 2026, настроение: ужасно, заметка: ужас'
+		);
 	});
 });

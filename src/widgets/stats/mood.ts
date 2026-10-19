@@ -133,3 +133,27 @@ export function monthAverage(entries: MoodEntries, year: number, month: number):
 	if (levels.length === 0) return null;
 	return levels.reduce((sum, level) => sum + level, 0) / levels.length;
 }
+
+// Ключ дня 2026-10-15 → дата по местному времени
+export function parseDay(day: string) {
+	const [year, month, date] = day.split('-').map(Number);
+	return new Date(year, month - 1, date);
+}
+
+const fullDateFormat = new Intl.DateTimeFormat('ru', {
+	day: 'numeric',
+	month: 'long',
+	year: 'numeric'
+});
+
+// Подпись клетки календаря для скринридера: «19 октября 2026, настроение: хорошо» или «…, без оценки».
+// Заметка дня, если она есть, добавляется в конце
+export function dayLabel(day: string, entry: MoodEntry | undefined) {
+	const parts = fullDateFormat.formatToParts(parseDay(day));
+	const part = (type: string) => parts.find((item) => item.type === type)?.value ?? '';
+	// Без «г.» после года, которое добавляет Intl
+	const date = `${part('day')} ${part('month')} ${part('year')}`;
+	if (!entry) return `${date}, без оценки`;
+	const level = moodLevels[entry.level - 1].label.toLowerCase();
+	return `${date}, настроение: ${level}${entry.note ? `, заметка: ${entry.note}` : ''}`;
+}

@@ -18,7 +18,15 @@ export function DimmerWidget({ className }: DimmerWidgetProps) {
 	const { value, setValue } = useDimmer();
 
 	return (
-		<Widget aria-label="Затемнение" className={cn('flex flex-col gap-3 p-4', className)}>
+		// tabIndex: окно прокручивается при малой высоте экрана, и с клавиатуры его должно быть можно прокрутить
+		<Widget
+			aria-label="Затемнение"
+			tabIndex={0}
+			className={cn(
+				'flex flex-col gap-3 p-4 outline-none focus-visible:ring-3 focus-visible:ring-white/20',
+				className
+			)}
+		>
 			<WidgetHeader title="Затемнение">
 				<Button
 					variant="glass"

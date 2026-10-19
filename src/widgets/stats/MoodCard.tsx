@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Hint } from '@/components/Hint';
 import { cn } from '@/lib/utils';
 
-import { maxNoteLength, monthAverage, monthGrid, moodLevels } from './mood';
+import { dayLabel, maxNoteLength, monthAverage, monthGrid, moodLevels, parseDay } from './mood';
 import { StatCard, StatLabel, StatValue } from './StatCard';
 import { useMood } from './useMood';
 
@@ -17,12 +17,6 @@ const dayFormat = new Intl.DateTimeFormat('ru', { day: 'numeric', month: 'long' 
 
 function capitalize(text: string) {
 	return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-// Ключ дня 2026-10-15 → дата по местному времени
-function parseDay(day: string) {
-	const [year, month, date] = day.split('-').map(Number);
-	return new Date(year, month - 1, date);
 }
 
 // Трекер настроения: оценка дня смайликом, короткая заметка и календарь месяца
@@ -140,6 +134,8 @@ export function MoodCard({ today: todayKey }: MoodCardProps) {
 									key={cell}
 									type="button"
 									title={title}
+									aria-label={dayLabel(cell, entry)}
+									aria-current={cell === today ? 'date' : undefined}
 									disabled={future}
 									aria-pressed={cell === day}
 									onClick={() => mood.selectDay(cell)}

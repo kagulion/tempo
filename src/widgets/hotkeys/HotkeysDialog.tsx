@@ -27,7 +27,10 @@ export function HotkeysDialog({ open, onClose }: HotkeysDialogProps) {
 				className="flex max-h-full w-full max-w-md scrollbar-glass flex-col gap-4 overflow-y-auto p-4"
 				initialFocus={closeRef}
 			>
-				<WidgetHeader title={<DialogTitle render={<span />}>Горячие клавиши</DialogTitle>}>
+				<WidgetHeader
+					heading={false}
+					title={<DialogTitle render={<h2 />}>Горячие клавиши</DialogTitle>}
+				>
 					<Button
 						ref={closeRef}
 						variant="glass"

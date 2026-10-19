@@ -143,124 +143,131 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 	);
 
 	return (
-		<Widget aria-label="Таймер" className={cn('flex flex-col gap-3 p-4', className)}>
-			<WidgetHeader title="Таймер">
-				<Button
-					variant="glass"
-					size="icon-sm"
-					onClick={() => timer.changeSetting('sound', !settings.sound)}
-					hint={settings.sound ? 'Выключить сигнал' : 'Включить сигнал'}
-					aria-pressed={settings.sound}
-				>
-					{settings.sound ? <Bell /> : <BellOff />}
-				</Button>
-			</WidgetHeader>
+		<>
+			<Widget aria-label="Таймер" className={cn('flex flex-col gap-3 p-4', className)}>
+				<WidgetHeader title="Таймер">
+					<Button
+						variant="glass"
+						size="icon-sm"
+						onClick={() => timer.changeSetting('sound', !settings.sound)}
+						hint={settings.sound ? 'Выключить сигнал' : 'Включить сигнал'}
+						aria-label="Сигнал"
+						aria-pressed={settings.sound}
+					>
+						{settings.sound ? <Bell /> : <BellOff />}
+					</Button>
+				</WidgetHeader>
 
-			<Tabs value={mode} onValueChange={(value: TimerMode) => timer.changeSetting('mode', value)}>
-				{/* Пока таймер идёт, другие режимы недоступны. На паузе можно уйти и вернуться к нему */}
-				<TabsList>
-					{modes.map((item) => (
-						<TabsTrigger
-							key={item.value}
-							value={item.value}
-							disabled={status === 'running' && item.value !== mode}
-						>
-							{item.label}
-							{item.value !== mode && pausedModes.has(item.value) && (
-								<span
-									title="Таймер на паузе"
-									aria-label="таймер на паузе"
-									className="size-1.5 rounded-full bg-white/70"
+				<Tabs value={mode} onValueChange={(value: TimerMode) => timer.changeSetting('mode', value)}>
+					{/* Пока таймер идёт, другие режимы недоступны. На паузе можно уйти и вернуться к нему */}
+					<TabsList>
+						{modes.map((item) => (
+							<TabsTrigger
+								key={item.value}
+								value={item.value}
+								disabled={status === 'running' && item.value !== mode}
+							>
+								{item.label}
+								{item.value !== mode && pausedModes.has(item.value) && (
+									<span
+										title="Таймер на паузе"
+										aria-label="таймер на паузе"
+										className="size-1.5 rounded-full bg-white/70"
+									/>
+								)}
+							</TabsTrigger>
+						))}
+					</TabsList>
+
+					<TabsContent value="pomodoro">
+						{active ? (
+							activeView
+						) : (
+							<div className="flex flex-col gap-2">
+								<SettingSlider
+									icon={BrainCircuit}
+									label="Работа"
+									value={settings.work}
+									min={5}
+									max={90}
+									step={5}
+									format={formatMinutes}
+									onValueChange={(value) => timer.changeSetting('work', value)}
 								/>
-							)}
-						</TabsTrigger>
-					))}
-				</TabsList>
+								<SettingSlider
+									icon={Coffee}
+									label="Короткий перерыв"
+									value={settings.shortBreak}
+									min={1}
+									max={30}
+									format={formatMinutes}
+									onValueChange={(value) => timer.changeSetting('shortBreak', value)}
+								/>
+								<SettingSlider
+									icon={Sofa}
+									label="Длинный перерыв"
+									value={settings.longBreak}
+									min={5}
+									max={60}
+									step={5}
+									format={formatMinutes}
+									onValueChange={(value) => timer.changeSetting('longBreak', value)}
+								/>
+								<SettingSlider
+									icon={Repeat}
+									label="Раунды"
+									value={settings.rounds}
+									min={1}
+									max={12}
+									format={String}
+									onValueChange={(value) => timer.changeSetting('rounds', value)}
+								/>
+								<p className="py-1 text-center text-xs text-white/80">
+									Всего {formatMinutes(pomodoroTotal(settings) / 60_000)} · длинный перерыв раз в{' '}
+									{longBreakEvery} раунда
+								</p>
+								{startButton}
+							</div>
+						)}
+					</TabsContent>
 
-				<TabsContent value="pomodoro">
-					{active ? (
-						activeView
-					) : (
-						<div className="flex flex-col gap-2">
-							<SettingSlider
-								icon={BrainCircuit}
-								label="Работа"
-								value={settings.work}
-								min={5}
-								max={90}
-								step={5}
-								format={formatMinutes}
-								onValueChange={(value) => timer.changeSetting('work', value)}
-							/>
-							<SettingSlider
-								icon={Coffee}
-								label="Короткий перерыв"
-								value={settings.shortBreak}
-								min={1}
-								max={30}
-								format={formatMinutes}
-								onValueChange={(value) => timer.changeSetting('shortBreak', value)}
-							/>
-							<SettingSlider
-								icon={Sofa}
-								label="Длинный перерыв"
-								value={settings.longBreak}
-								min={5}
-								max={60}
-								step={5}
-								format={formatMinutes}
-								onValueChange={(value) => timer.changeSetting('longBreak', value)}
-							/>
-							<SettingSlider
-								icon={Repeat}
-								label="Раунды"
-								value={settings.rounds}
-								min={1}
-								max={12}
-								format={String}
-								onValueChange={(value) => timer.changeSetting('rounds', value)}
-							/>
-							<p className="py-1 text-center text-xs text-white/80">
-								Всего {formatMinutes(pomodoroTotal(settings) / 60_000)} · длинный перерыв раз в{' '}
-								{longBreakEvery} раунда
-							</p>
-							{startButton}
-						</div>
-					)}
-				</TabsContent>
+					<TabsContent value="countdown">
+						{active ? (
+							activeView
+						) : (
+							<div className="flex flex-col gap-2">
+								<SettingSlider
+									icon={Hourglass}
+									label="Длительность"
+									value={settings.countdown}
+									min={1}
+									max={180}
+									format={formatMinutes}
+									onValueChange={(value) => timer.changeSetting('countdown', value)}
+								/>
+								{startButton}
+							</div>
+						)}
+					</TabsContent>
 
-				<TabsContent value="countdown">
-					{active ? (
-						activeView
-					) : (
-						<div className="flex flex-col gap-2">
-							<SettingSlider
-								icon={Hourglass}
-								label="Длительность"
-								value={settings.countdown}
-								min={1}
-								max={180}
-								format={formatMinutes}
-								onValueChange={(value) => timer.changeSetting('countdown', value)}
-							/>
-							{startButton}
-						</div>
-					)}
-				</TabsContent>
-
-				<TabsContent value="stopwatch">
-					{active ? (
-						activeView
-					) : (
-						<div className="flex flex-col gap-3">
-							<span className="pt-1 text-center text-5xl font-semibold tracking-tight text-white/60 tabular-nums">
-								00:00
-							</span>
-							{startButton}
-						</div>
-					)}
-				</TabsContent>
-			</Tabs>
-		</Widget>
+					<TabsContent value="stopwatch">
+						{active ? (
+							activeView
+						) : (
+							<div className="flex flex-col gap-3">
+								<span className="pt-1 text-center text-5xl font-semibold tracking-tight text-white/60 tabular-nums">
+									00:00
+								</span>
+								{startButton}
+							</div>
+						)}
+					</TabsContent>
+				</Tabs>
+			</Widget>
+			{/* Вне окна, чтобы объявление звучало и при закрытом окне (оно просто hidden). Только смена фазы, не каждая секунда */}
+			<div role="status" className="sr-only">
+				{timer.message}
+			</div>
+		</>
 	);
 }

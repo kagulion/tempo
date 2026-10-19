@@ -9,7 +9,7 @@ import { loadStored, saveStored, storageKeys } from '@/lib/storage';
 
 import { setLevelSource } from './audioAnalyser';
 import { applyMediaInfo, mediaInfo } from './mediaSession';
-import { registerNowPlayingToggle, setNowPlaying } from './nowPlaying';
+import { registerNowPlayingToggle, setNowPlaying, stationAnnouncement } from './nowPlaying';
 import type { RecordStation } from './record';
 import { fetchRecordStations } from './recordApi';
 import { parseSort, parseSource, parseStation } from './saved';
@@ -45,6 +45,8 @@ export function useRadio(open = true) {
 		return last ? [last] : [];
 	});
 	const [currentStation, setCurrentStation] = useState(0);
+	// Фраза для скринридера («Играет: …»): только при смене станции кнопкой и при старте, не на каждый трек
+	const [message, setMessage] = useState('');
 	// Звук реально идёт: playing — лишь намерение пользователя, а поток может буферизоваться,
 	// ждать первого клика (автозапуск заблокирован) или упасть с ошибкой
 	const [sounding, setSounding] = useState(false);
@@ -148,6 +150,7 @@ export function useRadio(open = true) {
 		let index = currentStation;
 		while (index === currentStation) index = Math.floor(Math.random() * stations.length);
 		setCurrentStation(index);
+		setMessage(stationAnnouncement(stations[index]?.title));
 	}
 
 	// Включает станцию: из текущей очереди сразу, иначе (избранное из другого пресета) —
@@ -176,12 +179,24 @@ export function useRadio(open = true) {
 		});
 	}
 
-	function nextStation() {
+	// Переход к следующей станции без объявления: по концу потока и при ошибке
+	function advanceStation() {
 		setCurrentStation((index) => (index + 1) % stations.length);
 	}
 
+	// Кнопки «Следующая» и «Предыдущая» объявляют новую станцию
+	function nextStation() {
+		if (stations.length === 0) return;
+		const index = (currentStation + 1) % stations.length;
+		setCurrentStation(index);
+		setMessage(stationAnnouncement(stations[index].title));
+	}
+
 	function prevStation() {
-		setCurrentStation((index) => (index - 1 + stations.length) % stations.length);
+		if (stations.length === 0) return;
+		const index = (currentStation - 1 + stations.length) % stations.length;
+		setCurrentStation(index);
+		setMessage(stationAnnouncement(stations[index].title));
 	}
 
 	function handleAudioError() {
@@ -191,7 +206,7 @@ export function useRadio(open = true) {
 			setStatus('error');
 			return;
 		}
-		nextStation();
+		advanceStation();
 	}
 
 	function togglePlaying() {
@@ -201,6 +216,8 @@ export function useRadio(open = true) {
 		// Прямой эфир после паузы отстаёт — перезагружаем поток, чтобы вернуться к живому звуку
 		if (!playing) audioRef.current?.load();
 		setPlaying((on) => !on);
+		// Включили — называем станцию; выключили — сбрасываем фразу, чтобы то же название прозвучало при следующем включении
+		setMessage(playing ? '' : stationAnnouncement(station?.title));
 	}
 
 	function changeVolume(value: number) {
@@ -292,7 +309,7 @@ export function useRadio(open = true) {
 			// Потоки Рекорда отдают CORS, без crossOrigin анализатор выдавал бы тишину. Ставится до src
 			crossOrigin: 'anonymous' as const,
 			src: station?.stream,
-			onEnded: nextStation,
+			onEnded: advanceStation,
 			// Пока радио выключено, поток не качаем
 			preload: 'none',
 			onPlaying: () => {
@@ -309,6 +326,7 @@ export function useRadio(open = true) {
 			}
 		},
 		sounding,
+		message,
 		track,
 		status,
 		source,

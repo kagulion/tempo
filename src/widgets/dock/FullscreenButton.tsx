@@ -42,7 +42,7 @@ export function FullscreenButton({ className }: FullscreenButtonProps) {
 				type="button"
 				onClick={toggleFullscreen}
 				aria-pressed={fullscreen}
-				aria-label={label}
+				aria-label="Полный экран"
 				className={cn(
 					'flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/65 text-white/70 shadow-2xl backdrop-blur-md transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20',
 					className

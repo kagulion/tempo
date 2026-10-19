@@ -22,16 +22,24 @@ export function WidgetTitle({ className, ...props }: ComponentProps<'span'>) {
 
 type WidgetHeaderProps = {
 	title: ReactNode;
+	// false — заголовок уже оформлен снаружи (в диалоге это DialogTitle), своя обёртка h2 не нужна
+	heading?: boolean;
 	// Маленькие кнопки справа: Button variant="glass" size="icon-sm"
 	children?: ReactNode;
 };
 
 // Шапка окна: подпись слева, кнопки справа. Отрицательный отступ съедает лишнюю высоту кнопок,
 // чтобы шапка не раздвигала окно
-export function WidgetHeader({ title, children }: WidgetHeaderProps) {
+export function WidgetHeader({ title, heading = true, children }: WidgetHeaderProps) {
 	return (
 		<div className="-my-1 flex items-center gap-1">
-			<WidgetTitle>{title}</WidgetTitle>
+			{heading ? (
+				<h2 className="m-0 text-xs font-medium">
+					<WidgetTitle>{title}</WidgetTitle>
+				</h2>
+			) : (
+				<WidgetTitle>{title}</WidgetTitle>
+			)}
 			{children && <div className="ml-auto flex items-center gap-1">{children}</div>}
 		</div>
 	);

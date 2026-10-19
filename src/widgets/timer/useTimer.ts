@@ -10,6 +10,7 @@ import {
 	elapsedOf,
 	minute,
 	nextPhase,
+	phaseAnnouncement,
 	phaseDuration,
 	replaceRun,
 	settle,
@@ -18,6 +19,7 @@ import {
 	type TimerSettings,
 	type TimerStatus
 } from './phases';
+import { setTimerMessage, useTimerMessage } from './message';
 import { chimeLength, notify, playChime, requestNotifications } from './signal';
 
 const defaultSettings: TimerSettings = {
@@ -48,6 +50,7 @@ export function useTimer() {
 	);
 	const [runs, setRuns] = usePersistentState<TimerRuns>(storageKeys.timerRuns, {}, parseRuns);
 	const [now, setNow] = useState(Date.now);
+	const message = useTimerMessage();
 
 	// Идущий таймер главнее выбранной вкладки: уйти с неё, пока он идёт, нельзя
 	const mode = Object.values(runs).find((item) => item.startedAt !== null)?.mode ?? settings.mode;
@@ -89,6 +92,7 @@ export function useTimer() {
 		}
 		const { title, body } = announcement(next, run.mode, settings);
 		notify(title, body);
+		setTimerMessage(phaseAnnouncement(run, next, settings));
 	}, [run, now, settings, setRuns]);
 
 	function start() {
@@ -139,6 +143,13 @@ export function useTimer() {
 		const next = nextPhase(run, settings);
 		const at = Date.now();
 		setNow(at);
+		setTimerMessage(
+			phaseAnnouncement(
+				run,
+				next && { ...run, ...next, duration: phaseDuration(next.phase, settings) },
+				settings
+			)
+		);
 		setRun(
 			next && {
 				...run,
@@ -159,6 +170,7 @@ export function useTimer() {
 
 	return {
 		settings,
+		message,
 		changeSetting,
 		mode,
 		status,

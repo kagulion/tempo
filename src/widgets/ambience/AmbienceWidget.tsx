@@ -91,6 +91,7 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 									onClick={() => ambience.toggleSound(sound.id)}
 									disabled={!sound.available}
 									aria-pressed={active}
+									aria-busy={sound.status === 'loading'}
 									className="-mx-1.5 flex h-8 min-w-0 flex-1 items-center gap-2 rounded-lg px-1.5 text-left text-sm font-medium transition-colors outline-none hover:bg-white/10 focus-visible:ring-3 focus-visible:ring-white/20 disabled:pointer-events-none"
 								>
 									{sound.status === 'loading' ? (
@@ -101,6 +102,10 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 										<Icon className="size-4 shrink-0" />
 									)}
 									<span className="truncate">{sound.label}</span>
+									{sound.status === 'loading' && <span className="sr-only">, загружается</span>}
+									{sound.status === 'error' && (
+										<span className="sr-only">, не удалось загрузить</span>
+									)}
 								</button>
 								<Slider
 									label={`Громкость: ${sound.label}`}

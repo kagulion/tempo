@@ -21,7 +21,7 @@ export function ClickSoundsButton({ className }: ClickSoundsButtonProps) {
 				type="button"
 				onClick={clickSounds.toggle}
 				aria-pressed={clickSounds.enabled}
-				aria-label={label}
+				aria-label="Звуки нажатий"
 				className={cn(className, clickSounds.enabled && 'bg-white/20 text-white')}
 			>
 				<MousePointerClick className="size-4" />

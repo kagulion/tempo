@@ -116,3 +116,20 @@ export function announcement(run: TimerRun | null, mode: TimerMode, settings: Ti
 		? { title: `${phaseText.work}: раунд ${run.round}`, body: `${minutes} мин — за дело` }
 		: { title: phaseText[run.phase], body: `${minutes} мин отдыха` };
 }
+
+// Фраза для скринридера (скрытый status) о смене фазы: что закончилось и что началось.
+// prev — фаза, что только что шла; next — следующая или null, если таймер закончился.
+// Звучит только при событиях (конец фазы, пропуск), а не каждую секунду
+export function phaseAnnouncement(prev: TimerRun, next: TimerRun | null, settings: TimerSettings) {
+	if (!next) {
+		return prev.mode === 'pomodoro'
+			? `Помидоро завершён, все раунды пройдены: ${settings.rounds}`
+			: 'Время вышло';
+	}
+	const minutes = Math.round((next.duration ?? 0) / minute);
+	if (prev.phase === 'work') {
+		const kind = next.phase === 'longBreak' ? 'длинный перерыв' : 'перерыв';
+		return `Работа закончена, ${kind} ${minutes} мин`;
+	}
+	return `Перерыв закончен, работа: раунд ${next.round}, ${minutes} мин`;
+}

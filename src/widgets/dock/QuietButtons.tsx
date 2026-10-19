@@ -37,7 +37,7 @@ export function QuietButtons({ className }: QuietButtonsProps) {
 					size="icon-sm"
 					onClick={toggleSoundMuted}
 					aria-pressed={muted}
-					aria-label={soundLabel}
+					aria-label="Без звука"
 					className={cn(partClass, 'pl-1')}
 				>
 					{muted ? <VolumeOff /> : <Volume2 />}
@@ -49,7 +49,7 @@ export function QuietButtons({ className }: QuietButtonsProps) {
 					size="icon-sm"
 					onClick={toggleEffectsOff}
 					aria-pressed={effectsOff}
-					aria-label={effectsLabel}
+					aria-label="Без эффектов"
 					className={cn(partClass, 'relative pr-1')}
 				>
 					<Sparkles />

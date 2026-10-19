@@ -185,6 +185,9 @@ export function useTwitchPlayer(login: string | null, attempt: number) {
 					height: '100%'
 				});
 				player = created;
+				// Плеер сам делает iframe без подписи: задаём, чтобы скринридер называл его
+				const frame = host.querySelector('iframe');
+				if (frame && !frame.title) frame.title = `Twitch: ${login}`;
 
 				function track(event: Parameters<typeof trackStart>[1]) {
 					if (disposed) return;
