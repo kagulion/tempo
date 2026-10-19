@@ -1,0 +1,116 @@
+<!doctype html>
+<!-- Страница «не найдено». Отдельный файл без сборки: хостинг отдаёт его на любой несуществующий адрес,
+     поэтому все пути абсолютные (от корня), а стили внутри. Оформление повторяет стеклянные окна виджетов -->
+<html lang="ru">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex" />
+		<meta name="theme-color" content="#000000" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>Страница не найдена — Tempo</title>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			html {
+				-webkit-tap-highlight-color: transparent;
+			}
+			body {
+				margin: 0;
+				min-height: 100vh;
+				min-height: 100dvh;
+				display: grid;
+				place-items: center;
+				padding: 1rem;
+				background-color: #000;
+				/* Тёплый отсвет камина снизу, как в таверне на обоях */
+				background-image:
+					radial-gradient(ellipse 80% 50% at 50% 110%, rgb(250 141 147 / 0.28), transparent 70%),
+					radial-gradient(ellipse 60% 40% at 50% 100%, rgb(249 168 142 / 0.22), transparent 70%);
+				color: #fff;
+				font-family:
+					'Geist Variable',
+					system-ui,
+					-apple-system,
+					'Segoe UI',
+					Roboto,
+					sans-serif;
+				-webkit-font-smoothing: antialiased;
+			}
+			main {
+				width: 100%;
+				max-width: 24rem;
+				padding: 2rem 1.5rem;
+				border: 1px solid rgb(255 255 255 / 0.1);
+				border-radius: 1rem;
+				background: rgb(0 0 0 / 0.65);
+				box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+				-webkit-backdrop-filter: blur(12px);
+				backdrop-filter: blur(12px);
+				text-align: center;
+			}
+			.logo {
+				display: block;
+				height: 1.5rem;
+				width: auto;
+				margin: 0 auto 1.75rem;
+			}
+			.code {
+				margin: 0;
+				font-size: 4.5rem;
+				font-weight: 600;
+				line-height: 1;
+				letter-spacing: -0.04em;
+				background: linear-gradient(#f9a88e, #fa8d93);
+				-webkit-background-clip: text;
+				background-clip: text;
+				color: transparent;
+			}
+			h1 {
+				margin: 1rem 0 0.5rem;
+				font-size: 1.125rem;
+				font-weight: 500;
+			}
+			p {
+				margin: 0;
+				font-size: 0.875rem;
+				line-height: 1.5;
+				color: rgb(255 255 255 / 0.7);
+			}
+			a {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 2.5rem;
+				margin-top: 1.5rem;
+				padding: 0 1.25rem;
+				border-radius: 0.625rem;
+				background: rgb(255 255 255 / 0.1);
+				color: #fff;
+				font-size: 0.875rem;
+				font-weight: 500;
+				text-decoration: none;
+				transition: background-color 150ms;
+			}
+			@media (hover: hover) {
+				a:hover {
+					background: rgb(255 255 255 / 0.2);
+				}
+			}
+			a:focus-visible {
+				outline: 3px solid rgb(255 255 255 / 0.3);
+				outline-offset: 2px;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<img class="logo" src="/logotype.svg" alt="Tempo" width="293" height="88" />
+			<p class="code" aria-hidden="true">404</p>
+			<h1>Такой страницы нет</h1>
+			<p>Похоже, вы свернули не в тот коридор таверны. Возвращайтесь к камину, там тепло и играет радио.</p>
+			<a href="/">На главную</a>
+		</main>
+	</body>
+</html>
