@@ -8,7 +8,9 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { installClickSounds, clickSoundsStore } from '@/lib/clickSound';
 import { toggleSoundMuted } from '@/lib/soundMute';
 import { mediaQueries } from '@/lib/media';
+import { whenIdle } from '@/lib/idle';
 import { cn } from '@/lib/utils';
+import { Widget } from '@/widgets/Widget';
 import { useBigClock } from '@/widgets/clock/useBigClock';
 import { BigClock } from '@/widgets/clock/BigClock';
 import { DimmerLayer } from '@/widgets/dimmer/DimmerLayer';
@@ -16,6 +18,7 @@ import { Dock, dockPanels } from '@/widgets/dock/Dock';
 import { FullscreenButton, toggleFullscreen } from '@/widgets/dock/FullscreenButton';
 import { QuietButtons } from '@/widgets/dock/QuietButtons';
 import { onOpenWidgetRequest } from '@/widgets/dock/openRequests';
+import { mountWidget, useMountedWidgets } from '@/widgets/dock/mountedWidgets';
 import { useDock } from '@/widgets/dock/useDock';
 import { EffectLayers } from '@/widgets/effects/EffectLayers';
 import { toggleEffectsOff } from '@/widgets/effects/effectsOff';
@@ -26,6 +29,7 @@ import { hotkeyBindings } from '@/widgets/hotkeys/bindings';
 import { HotkeysButton, HotkeysDialog } from '@/widgets/hotkeys/HotkeysDialog';
 import {
 	BackgroundMusic,
+	preloadWidget,
 	widgets,
 	type WidgetColumn,
 	type WidgetEntry,
@@ -35,6 +39,8 @@ import { ScenesDialog } from '@/widgets/onboarding/ScenesDialog';
 import { openScenes } from '@/widgets/onboarding/scenesReopen';
 import { useOnboarding } from '@/widgets/onboarding/useOnboarding';
 import { StatsHighlights } from '@/widgets/stats/StatsHighlights';
+import { keepOnlineRunning } from '@/widgets/stats/useOnline';
+import { keepVisitStatsRunning } from '@/widgets/stats/useVisitStats';
 import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 
 // На телефоне окно занимает ширину экрана над панелью, а если не влезает по высоте — прокручивается.
@@ -103,6 +109,39 @@ export default function App() {
 		[]
 	);
 
+	// Окно монтируется при первом открытии и остаётся в странице (см. mountedWidgets.ts)
+	const mounted = useMountedWidgets();
+	const openIds = widgets.filter((widget) => dock.isOpen(widget.id)).map((widget) => widget.id);
+	const openKey = openIds.join();
+	useEffect(() => {
+		openIds.forEach(mountWidget);
+		// oxlint-disable-next-line react-hooks/exhaustive-deps
+	}, [openKey]);
+
+	// Чанки остальных окон подгружаем заранее, по одному в простое и не сразу после загрузки: первой отрисовке они не мешают,
+	// а окно потом открывается без паузы
+	useEffect(() => {
+		let cancelCurrent = () => {};
+		let cancelled = false;
+		const queue = widgets.map((widget) => widget.id);
+		function next(delay: number) {
+			const id = queue.shift();
+			if (id === undefined || cancelled) return;
+			cancelCurrent = whenIdle(() => {
+				preloadWidget(id)?.then(() => next(500));
+			}, delay);
+		}
+		next(4000);
+		return () => {
+			cancelled = true;
+			cancelCurrent();
+		};
+	}, []);
+
+	// Учёт времени, серии дней и присутствия в онлайне идёт всегда, а не только пока показано окно статистики
+	useEffect(() => keepVisitStatsRunning(), []);
+	useEffect(() => keepOnlineRunning(), []);
+
 	// Тихие тики при нажатии кнопок, слушатель один на весь документ
 	useEffect(() => installClickSounds(), []);
 
@@ -132,21 +171,28 @@ export default function App() {
 		? undefined
 		: 'sm:mb-auto';
 
-	// Закрытые окна не размонтируем, а прячем: радио, звуки и таймер продолжают работать
+	// Закрытые окна не размонтируем, а прячем: радио, звуки и таймер продолжают работать.
+	// Окно, которое ещё ни разу не открывали, не монтируем вовсе: его чанк не грузится
 	function renderWindow(widget: WidgetEntry) {
+		const open = dock.isOpen(widget.id);
+		if (!open && !mounted.has(widget.id)) return null;
 		const Component = widget.component;
+		const className = cn(
+			windowClass,
+			// Анимация появления — в src/index.css
+			'widget-window',
+			widget.anchor === 'top' && 'sm:mb-auto',
+			widget.placement,
+			(!open || !visibility.windows) && 'hidden'
+		);
 		return (
-			<Component
+			// Пока грузится чанк, на месте окна стоит пустая стеклянная заготовка того же размера и положения
+			<Suspense
 				key={widget.id}
-				className={cn(
-					windowClass,
-					// Анимация появления — в src/index.css
-					'widget-window',
-					widget.anchor === 'top' && 'sm:mb-auto',
-					widget.placement,
-					(!dock.isOpen(widget.id) || !visibility.windows) && 'hidden'
-				)}
-			/>
+				fallback={<Widget aria-busy="true" className={cn(className, 'min-h-24')} />}
+			>
+				<Component className={className} open={open} />
+			</Suspense>
 		);
 	}
 
@@ -204,7 +250,7 @@ export default function App() {
 					))}
 				</div>
 				<HotkeysDialog open={helpOpen} onClose={closeHelp} />
-				{onboarding.visible && <ScenesDialog onFinish={onboarding.finish} />}
+				<ScenesDialog open={onboarding.visible} onFinish={onboarding.finish} />
 			</main>
 			{/* Уведомления (src/components/ui/toast.tsx): один раз на всю страницу */}
 			<Toaster />

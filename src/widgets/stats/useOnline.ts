@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
+import { afterFirstScreenMs, whenIdle } from '@/lib/idle';
 import { createLiveStore } from '@/lib/liveStore';
 import { storageKeys } from '@/lib/storage';
 
@@ -34,29 +35,33 @@ const onlineStore = createLiveStore<number | null>(
 		let cancelled = false;
 		let cleanup = () => {};
 
-		// Клиент грузится отдельным чанком, только если сервис настроен
-		import('@supabase/supabase-js').then(({ createClient }) => {
-			if (cancelled) return;
-			const supabase = createClient(supabaseUrl, supabaseKey);
-			const channel = supabase.channel(channelName, {
-				config: { presence: { key: visitorId() } }
-			});
-
-			channel
-				.on('presence', { event: 'sync' }, () => {
-					// Ключи состояния — id посетителей, вкладки одного браузера сгруппированы под одним ключом
-					set(Object.keys(channel.presenceState()).length);
-				})
-				.subscribe((status) => {
-					if (status === 'SUBSCRIBED') channel.track({ since: Date.now() });
+		// Клиент грузится отдельным чанком, только если сервис настроен, и не раньше простоя после загрузки страницы:
+		// счётчик не нужен для первой отрисовки, а чанк и соединение отнимают у неё канал и процессор
+		const cancelIdle = whenIdle(() => {
+			import('@supabase/supabase-js').then(({ createClient }) => {
+				if (cancelled) return;
+				const supabase = createClient(supabaseUrl, supabaseKey);
+				const channel = supabase.channel(channelName, {
+					config: { presence: { key: visitorId() } }
 				});
 
-			cleanup = () => {
-				supabase.removeChannel(channel);
-			};
-		});
+				channel
+					.on('presence', { event: 'sync' }, () => {
+						// Ключи состояния — id посетителей, вкладки одного браузера сгруппированы под одним ключом
+						set(Object.keys(channel.presenceState()).length);
+					})
+					.subscribe((status) => {
+						if (status === 'SUBSCRIBED') channel.track({ since: Date.now() });
+					});
+
+				cleanup = () => {
+					supabase.removeChannel(channel);
+				};
+			});
+		}, afterFirstScreenMs);
 
 		return () => {
+			cancelIdle();
 			cancelled = true;
 			cleanup();
 		};
@@ -66,4 +71,10 @@ const onlineStore = createLiveStore<number | null>(
 // Сколько пользователей сейчас на сайте. null — ещё подключаемся
 export function useOnline() {
 	return useSyncExternalStore(onlineStore.subscribe, onlineStore.get);
+}
+
+// Держит присутствие на сайте включённым без React: посетитель виден другим, даже если счётчик нигде не показан.
+// Вызывать один раз в App; возвращает отписку
+export function keepOnlineRunning() {
+	return onlineStore.subscribe(() => {});
 }

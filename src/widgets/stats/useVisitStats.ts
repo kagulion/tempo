@@ -47,3 +47,9 @@ const visitStore = createLiveStore<VisitStats>(
 export function useVisitStats() {
 	return useSyncExternalStore(visitStore.subscribe, visitStore.get);
 }
+
+// Держит учёт включённым без React: время и серия идут, даже если окно статистики и хайлайты не показаны
+// (закрытое окно, экран меньше xl, режим фокуса). Вызывать один раз в App; возвращает отписку
+export function keepVisitStatsRunning() {
+	return visitStore.subscribe(() => {});
+}

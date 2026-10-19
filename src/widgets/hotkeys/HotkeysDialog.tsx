@@ -1,11 +1,12 @@
 import { Keyboard, X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import { Hint, Kbd } from '@/components/Hint';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { bindingName, hotkeyGroupLabels, type HotkeyGroup } from '@/lib/hotkeys';
 import { cn } from '@/lib/utils';
-import { Widget, WidgetHeader } from '@/widgets/Widget';
+import { WidgetHeader } from '@/widgets/Widget';
 
 import { hotkeyBindings } from './bindings';
 
@@ -17,43 +18,16 @@ type HotkeysDialogProps = {
 const groups: HotkeyGroup[] = ['windows', 'view', 'other'];
 
 // Окно со списком горячих клавиш. Закрывается по Esc, по клику мимо и по крестику.
-// Закрытое не рисуется вовсе
+// Фокус, Esc и возврат фокуса на кнопку, что открыла окно, ведёт Base UI
 export function HotkeysDialog({ open, onClose }: HotkeysDialogProps) {
 	const closeRef = useRef<HTMLButtonElement>(null);
-
-	// Обработчик меняется при каждой отрисовке: чтобы не ставить слушатель заново, держим его в ref
-	const onCloseRef = useRef(onClose);
-	useEffect(() => {
-		onCloseRef.current = onClose;
-	});
-
-	useEffect(() => {
-		if (!open) return;
-		closeRef.current?.focus();
-		function onKeyDown(event: KeyboardEvent) {
-			if (event.key !== 'Escape') return;
-			event.preventDefault();
-			onCloseRef.current();
-		}
-		document.addEventListener('keydown', onKeyDown);
-		return () => document.removeEventListener('keydown', onKeyDown);
-	}, [open]);
-
-	if (!open) return null;
-
 	return (
-		<div
-			className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 p-4"
-			onClick={onClose}
-		>
-			<Widget
-				role="dialog"
-				aria-modal="true"
-				aria-label="Горячие клавиши"
-				onClick={(event) => event.stopPropagation()}
-				className="widget-window flex max-h-full w-full max-w-md scrollbar-glass flex-col gap-4 overflow-y-auto p-4"
+		<Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+			<DialogContent
+				className="flex max-h-full w-full max-w-md scrollbar-glass flex-col gap-4 overflow-y-auto p-4"
+				initialFocus={closeRef}
 			>
-				<WidgetHeader title="Горячие клавиши">
+				<WidgetHeader title={<DialogTitle render={<span />}>Горячие клавиши</DialogTitle>}>
 					<Button
 						ref={closeRef}
 						variant="glass"
@@ -86,8 +60,8 @@ export function HotkeysDialog({ open, onClose }: HotkeysDialogProps) {
 						</section>
 					);
 				})}
-			</Widget>
-		</div>
+			</DialogContent>
+		</Dialog>
 	);
 }
 

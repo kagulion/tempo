@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { Hint } from '@/components/Hint';
 import { cn } from '@/lib/utils';
 import { hotkeyLabel } from '@/widgets/hotkeys/bindings';
-import { type DockGroupId, widgets, type WidgetId } from '@/widgets/registry';
+import { type DockGroupId, preloadWidget, widgets, type WidgetId } from '@/widgets/registry';
 
 import { ClickSoundsButton } from './ClickSoundsButton';
 import { DockClock } from './DockClock';
@@ -84,6 +84,9 @@ export function Dock({ panel, isOpen, onToggle }: DockProps) {
 										<button
 											type="button"
 											onClick={() => onToggle(widget.id)}
+											// Чанк окна подгружается заранее: к клику он обычно уже готов
+											onPointerEnter={() => preloadWidget(widget.id)}
+											onFocus={() => preloadWidget(widget.id)}
 											aria-pressed={open}
 											aria-label={widget.label}
 											className={cn(buttonClass, open && 'bg-white/20 text-white')}

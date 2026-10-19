@@ -1,5 +1,7 @@
 import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
 import { cn } from 'cn';
+import { useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 function TooltipProvider({
 	delay = 400,
@@ -16,8 +18,32 @@ function TooltipProvider({
 	);
 }
 
-function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
-	return <TooltipPrimitive.Root data-slot="tooltip" {...props} />;
+// Открытая подсказка гасит Esc: Base UI останавливает событие и не даёт закрыться окну, внутри которого
+// стоит кнопка (диалогу), а режиму фокуса приходится ждать второго Esc. Поэтому на Esc закрываем подсказку
+// ещё до остальных слушателей (capture), сами событие не трогаем: окно или режим фокуса закроются с первого раза
+function Tooltip({ onOpenChange, ...props }: TooltipPrimitive.Root.Props) {
+	const [open, setOpen] = useState(false);
+
+	useEffect(() => {
+		if (!open) return;
+		function onKeyDown(event: KeyboardEvent) {
+			if (event.key === 'Escape') flushSync(() => setOpen(false));
+		}
+		document.addEventListener('keydown', onKeyDown, true);
+		return () => document.removeEventListener('keydown', onKeyDown, true);
+	}, [open]);
+
+	return (
+		<TooltipPrimitive.Root
+			data-slot="tooltip"
+			open={open}
+			onOpenChange={(next, details) => {
+				setOpen(next);
+				onOpenChange?.(next, details);
+			}}
+			{...props}
+		/>
+	);
 }
 
 function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {

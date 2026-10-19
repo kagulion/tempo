@@ -77,10 +77,12 @@ function TrackLine({ track, className }: { track: RecordTrack; className?: strin
 
 type RadioWidgetProps = {
 	className?: string;
+	// Окно открыто: пока оно закрыто и радио не играет, список станций не запрашиваем
+	open?: boolean;
 };
 
-export function RadioWidget({ className }: RadioWidgetProps) {
-	const radio = useRadio();
+export function RadioWidget({ className, open = true }: RadioWidgetProps) {
+	const radio = useRadio(open);
 	// Свёрнутое окно: только звук, название станции и Play/Pause
 	const [compact, setCompact] = usePersistentState(storageKeys.radioCompact, false, parseCompact);
 	const { favorites, isFavorite, toggleFavorite } = useFavoriteStations();

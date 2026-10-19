@@ -13,7 +13,13 @@ type ScenesButtonProps = {
 export function ScenesButton({ className }: ScenesButtonProps) {
 	return (
 		<Hint label="Сменить сцену" hotkey={hotkeyLabel('scenes')}>
-			<button type="button" onClick={openScenes} aria-label="Сменить сцену" className={className}>
+			<button
+				type="button"
+				onClick={openScenes}
+				aria-label="Сменить сцену"
+				data-scenes-button
+				className={className}
+			>
 				<Clapperboard className="size-4" />
 			</button>
 		</Hint>

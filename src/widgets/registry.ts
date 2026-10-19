@@ -11,18 +11,9 @@ import {
 	Tv,
 	type LucideIcon
 } from 'lucide-react';
-import { lazy, type ComponentType } from 'react';
+import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
 
-import { AmbienceWidget } from './ambience/AmbienceWidget';
-import { DimmerWidget } from './dimmer/DimmerWidget';
-import { EffectsWidget } from './effects/EffectsWidget';
-import { RadioWidget } from './radio/RadioWidget';
-import { StatsWidget } from './stats/StatsWidget';
-import { TasksWidget } from './tasks/TasksWidget';
-import { TimerWidget } from './timer/TimerWidget';
-import { TwitchWidget } from './twitch/TwitchWidget';
-import { WallpaperGallery } from './wallpaper/WallpaperGallery';
-import { YouTubeWidget } from './youtube/YouTubeWidget';
+import { hasRunningTimer } from './timer/running';
 
 // Загруженная музыка временно скрыта: вместо неё играет радио. Код оставлен, чтобы вернуть её флагом
 export const musicEnabled = false;
@@ -34,6 +25,23 @@ export const BackgroundMusic = musicEnabled
 			import('./music/BackgroundMusic').then((module) => ({ default: module.BackgroundMusic }))
 		)
 	: null;
+
+// Свойства окна виджета. Положение на экране приходит в className
+export type WidgetProps = {
+	className?: string;
+	// Окно сейчас открыто на панели. Нужно тем, кто не должен работать зря, пока окно закрыто (радио: список станций)
+	open?: boolean;
+};
+
+// Окно виджета отдельным чанком: грузится, когда его впервые открывают (или заранее, см. preloadWidget).
+// После загрузки остаётся смонтированным, как и раньше, — см. App.tsx
+function lazyWidget<Name extends string>(
+	load: () => Promise<Record<Name, ComponentType<WidgetProps>>>,
+	name: Name
+) {
+	const loadDefault = () => load().then((module) => ({ default: module[name] }));
+	return { component: lazy(loadDefault), load: loadDefault };
+}
 
 // Группы кнопок на панели. Какая группа в каком углу, задаёт dockPanels в src/widgets/dock/Dock.tsx
 export type DockGroupId = 'sound' | 'main' | 'view';
@@ -49,8 +57,12 @@ type WidgetDefinition = {
 	hotkey?: string;
 	icon: LucideIcon;
 	dockGroup: DockGroupId;
-	// Окно виджета. Положение на экране приходит в className
-	component: ComponentType<{ className?: string }>;
+	// Окно виджета (React.lazy) и функция, которая подгружает его чанк заранее
+	component: LazyExoticComponent<ComponentType<WidgetProps>>;
+	load: () => Promise<unknown>;
+	// true — окно монтируется сразу при загрузке страницы, даже закрытым: оно что-то делает и без открытия
+	// (радио: строка станции под часами и кнопка play у часов; идущий таймер). По умолчанию — при первом открытии
+	mountAtStart?: () => boolean;
 	column: WidgetColumn;
 	// top — окно прижато к верху столбца, bottom — к низу, к панели. Окна столбца не перекрывают друг друга:
 	// если им не хватает высоты, окна без shrink-0 сжимаются и прокручиваются внутри
@@ -71,7 +83,8 @@ const definitions = [
 		label: 'Радио',
 		icon: Radio,
 		dockGroup: 'sound',
-		component: RadioWidget,
+		...lazyWidget(() => import('./radio/RadioWidget'), 'RadioWidget'),
+		mountAtStart: () => true,
 		column: 'left',
 		anchor: 'bottom',
 		// Не сжимается: управление радио должно быть видно целиком, прокручиваются звуки над ним
@@ -84,7 +97,7 @@ const definitions = [
 		label: 'Звуки',
 		icon: Headphones,
 		dockGroup: 'sound',
-		component: AmbienceWidget,
+		...lazyWidget(() => import('./ambience/AmbienceWidget'), 'AmbienceWidget'),
 		column: 'left',
 		anchor: 'top',
 		// Длинный список звуков сжимается до места над радио и прокручивается
@@ -96,7 +109,7 @@ const definitions = [
 		label: 'Статистика',
 		icon: ChartNoAxesColumn,
 		dockGroup: 'main',
-		component: StatsWidget,
+		...lazyWidget(() => import('./stats/StatsWidget'), 'StatsWidget'),
 		column: 'center',
 		anchor: 'top',
 		// Той же ширины, что таймер и задачи, поэтому при смене статистики и таймера окно не прыгает.
@@ -110,7 +123,9 @@ const definitions = [
 		label: 'Таймер',
 		icon: Timer,
 		dockGroup: 'main',
-		component: TimerWidget,
+		...lazyWidget(() => import('./timer/TimerWidget'), 'TimerWidget'),
+		// Идущий таймер переживает перезагрузку: сигнал и затихание музыки зависят от окна, даже закрытого
+		mountAtStart: hasRunningTimer,
 		column: 'center',
 		anchor: 'top',
 		// На месте статистики: открывается вместо неё. Не сжимается: при нехватке высоты сжимаются задачи под ним
@@ -123,7 +138,7 @@ const definitions = [
 		label: 'Задачи',
 		icon: SquareKanban,
 		dockGroup: 'main',
-		component: TasksWidget,
+		...lazyWidget(() => import('./tasks/TasksWidget'), 'TasksWidget'),
 		column: 'center',
 		anchor: 'bottom',
 		// Под статистикой, у панели. Не shrink-0: при нехватке высоты сжимается и список секций прокручивается внутри
@@ -135,7 +150,7 @@ const definitions = [
 		label: 'Обои',
 		icon: Image,
 		dockGroup: 'view',
-		component: WallpaperGallery,
+		...lazyWidget(() => import('./wallpaper/WallpaperGallery'), 'WallpaperGallery'),
 		column: 'right',
 		anchor: 'bottom',
 		// Галерея не выше 34rem, сетка превью прокручивается внутри
@@ -148,7 +163,7 @@ const definitions = [
 		label: 'YouTube',
 		icon: MonitorPlay,
 		dockGroup: 'view',
-		component: YouTubeWidget,
+		...lazyWidget(() => import('./youtube/YouTubeWidget'), 'YouTubeWidget'),
 		column: 'right',
 		anchor: 'bottom',
 		// На месте галереи: открывается вместо неё. Подборки прокручиваются внутри
@@ -161,7 +176,7 @@ const definitions = [
 		label: 'Twitch',
 		icon: Tv,
 		dockGroup: 'view',
-		component: TwitchWidget,
+		...lazyWidget(() => import('./twitch/TwitchWidget'), 'TwitchWidget'),
 		column: 'right',
 		anchor: 'bottom',
 		// Окно-плеер, а не фон (Twitch не играет под интерфейсом, см. docs/twitch.md). Слот 'view' оставлен ради раскладки:
@@ -177,7 +192,7 @@ const definitions = [
 		label: 'Эффекты',
 		icon: Sparkles,
 		dockGroup: 'view',
-		component: EffectsWidget,
+		...lazyWidget(() => import('./effects/EffectsWidget'), 'EffectsWidget'),
 		column: 'right',
 		anchor: 'bottom',
 		// На месте галереи: открывается вместо неё
@@ -190,7 +205,7 @@ const definitions = [
 		label: 'Затемнение',
 		icon: Contrast,
 		dockGroup: 'view',
-		component: DimmerWidget,
+		...lazyWidget(() => import('./dimmer/DimmerWidget'), 'DimmerWidget'),
 		column: 'right',
 		anchor: 'bottom',
 		// На месте галереи и эффектов: открывается вместо них
@@ -209,4 +224,12 @@ export const widgets = allWidgets.filter((widget) => widget.enabled !== false);
 
 export function isWidgetId(value: unknown): value is WidgetId {
 	return widgets.some((widget) => widget.id === value);
+}
+
+// Подгружает чанк окна заранее (наведение на кнопку панели, простой браузера), чтобы окно открывалось без паузы
+export function preloadWidget(id: WidgetId) {
+	return widgets
+		.find((widget) => widget.id === id)
+		?.load()
+		.catch(() => {});
 }

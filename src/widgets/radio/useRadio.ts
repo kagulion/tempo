@@ -4,6 +4,7 @@ import { useAutoplay } from '@/hooks/useAutoplay';
 import { useDuckLevel } from '@/hooks/useDuckLevel';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { unlockAudio } from '@/lib/audio';
+import { afterFirstScreenMs, whenIdle } from '@/lib/idle';
 import { loadStored, saveStored, storageKeys } from '@/lib/storage';
 
 import { setLevelSource } from './audioAnalyser';
@@ -29,22 +30,25 @@ function loadLastStation() {
 	return loadStored<RecordStation | undefined>(storageKeys.lastStation, undefined, parseStation);
 }
 
-// Вся логика радио: источники станций, воспроизведение и громкость. Разметка — в RadioWidget
-export function useRadio() {
+// Вся логика радио: источники станций, воспроизведение и громкость. Разметка — в RadioWidget.
+// open — окно открыто. Полный список станций (~630 КБ) запрашиваем, только когда он нужен: окно открыто
+// или радио включили. Пока закрыто и не играет, держим одну последнюю станцию — для строки под часами и кнопки play
+export function useRadio(open = true) {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	// Радио всегда стартует выключенным — включает пользователь
 	const [playing, setPlaying] = useState(false);
 	const [volume, setVolume] = useState(0.8);
 	const [muted, setMuted] = useState(false);
-	// Все станции Рекорда (с прокси или из снимка в репозитории)
-	const [catalog, setCatalog] = useState<RecordStation[]>([]);
 	// Очередь воспроизведения: «Следующая станция» идёт по ней
-	const [stations, setStations] = useState<RecordStation[]>([]);
+	const [stations, setStations] = useState<RecordStation[]>(() => {
+		const last = loadLastStation();
+		return last ? [last] : [];
+	});
 	const [currentStation, setCurrentStation] = useState(0);
 	// Звук реально идёт: playing — лишь намерение пользователя, а поток может буферизоваться,
 	// ждать первого клика (автозапуск заблокирован) или упасть с ошибкой
 	const [sounding, setSounding] = useState(false);
-	const [status, setStatus] = useState<RadioStatus>('loading');
+	const [status, setStatus] = useState<RadioStatus>(() => (loadLastStation() ? 'idle' : 'loading'));
 	// Последний источник запоминаем: все станции или пресет
 	const [source, setSource] = usePersistentState<StationSource>(
 		storageKeys.radioSource,
@@ -81,28 +85,61 @@ export function useRadio() {
 		setStatus('idle');
 	}
 
+	// Выбор пресета или станции из избранного нужен список целиком: если он ещё не пришёл, ждём его
 	function loadStations(next: StationSource, first?: RecordStation) {
-		applySource(catalog, next, first);
+		getCatalog().then((all) => {
+			if (!unmounted.current) applySource(all, next, first);
+		});
 	}
 
-	// Один раз при открытии страницы: загружаем станции и ставим последнюю (без звука).
-	// Дальше очередь меняется только по действию пользователя
+	// Список станций запрашиваем один раз: при первом открытии окна или первом включении, что бы ни случилось раньше.
+	// Потом ставим в очередь последнюю станцию (без звука). Дальше очередь меняется только по действию пользователя
+	const catalogRequested = useRef(false);
+	const unmounted = useRef(false);
 	useEffect(() => {
-		let cancelled = false;
-		fetchRecordStations().then((all) => {
-			if (cancelled) return;
-			setCatalog(all);
+		unmounted.current = false;
+		return () => {
+			unmounted.current = true;
+		};
+	}, []);
+
+	// Один запрос на всю жизнь окна; все, кому нужен список, ждут один и тот же результат
+	const catalogPromise = useRef<Promise<RecordStation[]> | null>(null);
+	function getCatalog() {
+		catalogPromise.current ??= fetchRecordStations();
+		return catalogPromise.current;
+	}
+
+	// Список нужен впервые: загружаем и ставим в очередь последнюю станцию
+	function ensureCatalog() {
+		if (catalogRequested.current) return;
+		catalogRequested.current = true;
+		getCatalog().then((all) => {
+			if (unmounted.current) return;
 			if (all.length === 0) {
 				setStatus('error');
 				return;
 			}
 			applySource(all, source, loadLastStation());
 		});
-		return () => {
-			cancelled = true;
-		};
-		// oxlint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}
+
+	// Окно открыто: список нужен. Если оно открыто с самой загрузки страницы, запрос ждёт простоя после загрузки,
+	// чтобы не делить канал с картинками и скриптами первого экрана. Если окно открыли позже — запрос сразу.
+	// Включение радио (togglePlaying) тоже запрашивает список сразу
+	const mountedOpen = useRef(open);
+	const ensureCatalogRef = useRef(ensureCatalog);
+	useEffect(() => {
+		ensureCatalogRef.current = ensureCatalog;
+	});
+	useEffect(() => {
+		if (!open) return;
+		if (!mountedOpen.current) {
+			ensureCatalogRef.current();
+			return;
+		}
+		return whenIdle(() => ensureCatalogRef.current(), afterFirstScreenMs);
+	}, [open]);
 
 	// Случайная станция из текущей очереди, кроме играющей
 	function randomStation() {
@@ -128,11 +165,15 @@ export function useRadio() {
 	// Переключает порядок очереди, не прерывая текущую станцию
 	function changeSort(next: RadioSort) {
 		setSort(next);
-		const sorted = sortStations(stationsForSource(catalog, source), next);
-		// Играющая станция могла быть вне источника (избранное) — оставляем её первой
-		const placed = station ? placeStation(sorted, station) : { list: sorted, index: 0 };
-		setStations(placed.list);
-		setCurrentStation(placed.index);
+		const current = station;
+		getCatalog().then((all) => {
+			if (unmounted.current) return;
+			const sorted = sortStations(stationsForSource(all, source), next);
+			// Играющая станция могла быть вне источника (избранное) — оставляем её первой
+			const placed = current ? placeStation(sorted, current) : { list: sorted, index: 0 };
+			setStations(placed.list);
+			setCurrentStation(placed.index);
+		});
 	}
 
 	function nextStation() {
@@ -156,6 +197,7 @@ export function useRadio() {
 	function togglePlaying() {
 		// Клик разблокирует AudioContext, через который идёт анализатор эквалайзера
 		unlockAudio();
+		ensureCatalog();
 		// Прямой эфир после паузы отстаёт — перезагружаем поток, чтобы вернуться к живому звуку
 		if (!playing) audioRef.current?.load();
 		setPlaying((on) => !on);
