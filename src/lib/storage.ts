@@ -12,6 +12,8 @@ export const storageKeys = {
 	// Кнопка «Без эффектов» в правом верхнем углу: true — эффекты и затемнение скрыты
 	effectsOff: 'tempo:effects-off',
 	favoriteStations: 'tempo:favorite-stations',
+	// Живые обои: true — видео играет, false — на паузе; нет значения — решает «уменьшить движение», см. src/widgets/wallpaper/liveWallpaper.ts
+	liveWallpaper: 'tempo:live-wallpaper',
 	lastStation: 'tempo:last-station',
 	mood: 'tempo:mood',
 	// Первый экран со сценами: 'pending' — ещё не выбрали, 'done' — закрыт навсегда

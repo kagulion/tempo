@@ -13,6 +13,11 @@ export type Scene = {
 	effects: EffectId[];
 };
 
+// Эффекты сцены при её применении: с «уменьшить движение» сцена их не включает
+export function sceneEffects(scene: Scene, reducedMotion: boolean): EffectId[] {
+	return reducedMotion ? [] : scene.effects;
+}
+
 export const scenes: Scene[] = [
 	{
 		id: 'tavern',

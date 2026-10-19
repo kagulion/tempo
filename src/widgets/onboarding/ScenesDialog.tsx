@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { matchesMedia, mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { mountWidget } from '@/widgets/dock/mountedWidgets';
@@ -9,7 +10,7 @@ import { setActiveEffects } from '@/widgets/effects/useActiveEffects';
 import { selectWallpaper } from '@/widgets/wallpaper/useWallpaper';
 import { wallpapers } from '@/widgets/wallpaper/wallpapers';
 
-import { scenes, type Scene } from './scenes';
+import { sceneEffects, scenes, type Scene } from './scenes';
 
 type ScenesDialogProps = {
 	open: boolean;
@@ -23,7 +24,7 @@ function applyScene(scene: Scene) {
 	// Звуки сцены играет окно звуков, даже закрытое: заказываем его загрузку
 	mountWidget('ambience');
 	applyAmbienceScene(scene.sounds);
-	setActiveEffects(scene.effects);
+	setActiveEffects(sceneEffects(scene, matchesMedia(mediaQueries.reducedMotion)));
 }
 
 // Куда вернуть фокус после закрытия: кнопка «Сменить сцену» в доке. При первом запуске окно открыто без кнопки,

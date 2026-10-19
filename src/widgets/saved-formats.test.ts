@@ -6,10 +6,11 @@ import { parsePosition } from './clock/useBigClock';
 import { parseDimmer } from './dimmer/dimmer';
 import { parseOpen } from './dock/useDock';
 import { parseSort, parseSource, parseStation, parseStationMap } from './radio/saved';
-import { parseState } from './effects/useActiveEffects';
+import { initialState, parseState } from './effects/useActiveEffects';
 import { parseEffectsOff } from './effects/effectsOff';
 import { parseSoundMuted } from '@/lib/soundMute';
 import { parseMood } from './stats/mood';
+import { parseLiveWallpaper, resolveLive } from './wallpaper/liveWallpaper';
 import { parseSaved } from './wallpaper/useWallpaper';
 import { parseSavedChannel } from './twitch/twitch';
 import { parseSoundOn } from './youtube/playback';
@@ -264,5 +265,28 @@ describe('Twitch', () => {
 		expect(parseSoundOn(false)).toBe(false);
 		expect(parseSoundOn('true')).toBeUndefined();
 		expect(parseSoundOn(1)).toBeUndefined();
+	});
+});
+
+describe('живые обои', () => {
+	it('читает только boolean', () => {
+		expect(parseLiveWallpaper(true)).toBe(true);
+		expect(parseLiveWallpaper(false)).toBe(false);
+		expect(parseLiveWallpaper('false')).toBeUndefined();
+		expect(parseLiveWallpaper(0)).toBeUndefined();
+	});
+
+	it('без выбора решает «уменьшить движение», явный выбор главнее', () => {
+		expect(resolveLive(null, false)).toBe(true);
+		expect(resolveLive(null, true)).toBe(false);
+		expect(resolveLive(true, true)).toBe(true);
+		expect(resolveLive(false, false)).toBe(false);
+	});
+});
+
+describe('эффекты по умолчанию', () => {
+	it('с «уменьшить движение» эффектов нет', () => {
+		expect(initialState(false).active).toEqual(['embers']);
+		expect(initialState(true).active).toEqual([]);
 	});
 });

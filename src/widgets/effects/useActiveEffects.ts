@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
+import { matchesMedia, mediaQueries } from '@/lib/media';
 import { createPersistentStore, isRecord, storageKeys } from '@/lib/storage';
 
 import { type EffectId, effects } from './effects';
@@ -10,8 +11,15 @@ type EffectsState = {
 	paused: boolean;
 };
 
-// Первый визит: как было до окна эффектов, только огоньки
-const defaultState: EffectsState = { active: ['embers'], paused: false };
+// Первый визит: как было до окна эффектов, только огоньки. С «уменьшить движение» эффектов нет:
+// включить их можно кнопкой, это явный выбор
+export function initialState(reducedMotion: boolean): EffectsState {
+	return { active: reducedMotion ? [] : ['embers'], paused: false };
+}
+
+const defaultState = initialState(
+	typeof window !== 'undefined' && matchesMedia(mediaQueries.reducedMotion)
+);
 
 // Эффект могли убрать из списка — неизвестные id отбрасываем
 function knownIds(list: unknown): EffectId[] {

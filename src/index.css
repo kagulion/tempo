@@ -212,3 +212,28 @@
 		@apply font-sans;
 	}
 }
+
+/* «Уменьшить движение» (WCAG 2.2.2, 2.3.3): бесконечных анимаций нет, входные укорочены до мгновенных.
+   Вращение загрузки (animate-spin) остаётся: это признак работы, а не декор, но идёт медленнее.
+   Правило для .widget-window выше сохранено */
+@media (prefers-reduced-motion: reduce) {
+	.animate-pulse,
+	.animate-ping,
+	.animate-bounce {
+		animation: none;
+	}
+
+	.animate-spin {
+		animation-duration: 3s;
+	}
+
+	[class*='animate-in'],
+	[class*='animate-out'],
+	[data-open],
+	[data-closed],
+	[data-starting-style],
+	[data-ending-style] {
+		animation-duration: 1ms !important;
+		transition-duration: 1ms !important;
+	}
+}

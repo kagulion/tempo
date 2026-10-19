@@ -4,7 +4,7 @@ import { ambientSounds } from '@/widgets/ambience/sounds';
 import { effects } from '@/widgets/effects/effects';
 import { wallpapers } from '@/widgets/wallpaper/wallpapers';
 
-import { scenes } from './scenes';
+import { sceneEffects, scenes } from './scenes';
 
 describe('scenes', () => {
 	it('сцен три или четыре, id не повторяются', () => {
@@ -27,6 +27,15 @@ describe('scenes', () => {
 		expect(new Set(scene.sounds.map((sound) => sound.id)).size).toBe(scene.sounds.length);
 		for (const id of scene.effects) {
 			expect(effects.some((item) => item.id === id)).toBe(true);
+		}
+	});
+});
+
+describe('sceneEffects', () => {
+	it('с «уменьшить движение» эффекты сцены не включаются', () => {
+		for (const scene of scenes) {
+			expect(sceneEffects(scene, false)).toEqual(scene.effects);
+			expect(sceneEffects(scene, true)).toEqual([]);
 		}
 	});
 });

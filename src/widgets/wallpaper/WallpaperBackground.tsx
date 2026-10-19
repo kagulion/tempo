@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
 import { RutubeLayer } from '@/widgets/rutube/RutubeLayer';
 import { setYouTubeTitle } from '@/widgets/youtube/useYouTubeHistory';
 import { YouTubeLayer } from '@/widgets/youtube/YouTubeLayer';
 
+import { useLiveWallpaper } from './liveWallpaper';
 import { defaultWallpaperId, useWallpaper } from './useWallpaper';
 import { videoPortraitMedia } from './variants';
 import type { CustomWallpaper, FileWallpaper, Wallpaper } from './wallpapers';
@@ -24,7 +24,7 @@ type LayerProps = {
 
 function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 	const videoRef = useRef<HTMLVideoElement>(null);
-	const reducedMotion = useMediaQuery(mediaQueries.reducedMotion);
+	const { live } = useLiveWallpaper();
 	// Узкий портретный экран получает кроп видео 540×960 (если он есть). Выбираем здесь, а не атрибутом media у <source>:
 	// браузер без его поддержки взял бы первый же источник, то есть кроп и на десктопе
 	const narrow = useMediaQuery(videoPortraitMedia);
@@ -36,14 +36,14 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 		: [];
 
 	// Видео играет, только пока вкладка видна: в фоне оно зря грузит процессор.
-	// При «уменьшить движение» в системе видео стоит на первом кадре
+	// Если «Живые обои» выключены (в том числе по умолчанию при «уменьшить движение» в системе), видео стоит на кадре
 	useEffect(() => {
 		const video = videoRef.current;
 		if (!video) return;
 
 		function sync() {
 			if (!video) return;
-			if (reducedMotion || document.hidden) video.pause();
+			if (!live || document.hidden) video.pause();
 			// play() у muted-видео браузеры разрешают без клика, но промис может отклониться — тогда остаётся кадр
 			else
 				video.play().catch(() => {
@@ -58,7 +58,7 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 		return () => document.removeEventListener('visibilitychange', sync);
 		// onReady каждый раз новая функция, но делает одно и то же (setReadyId), поэтому в зависимости её не берём
 		// oxlint-disable-next-line react-hooks/exhaustive-deps
-	}, [reducedMotion, narrow]);
+	}, [live, narrow]);
 
 	const media = wallpaper.kind === 'custom' ? wallpaper.media : wallpaper.kind;
 	if (media === 'image') {
