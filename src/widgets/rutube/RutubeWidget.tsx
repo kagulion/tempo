@@ -155,7 +155,7 @@ function StreamCard({
 			onClick={onSelect}
 			aria-pressed={active}
 			title={stream.author ? `${stream.title} — ${stream.author}` : stream.title}
-			className="flex min-w-0 flex-col gap-1 text-left outline-none"
+			className="group flex min-w-0 flex-col gap-1 text-left outline-none"
 		>
 			<span className={cn(tileClass, 'block w-full', active && tileActiveClass)}>
 				{stream.thumbnail && !thumbFailed && (

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 // Общее для окон-галерей (обои, YouTube, ТВ): плитки, кнопки-переходы по секциям и прокрутка к секции
 
 export const tileClass =
-	'relative aspect-video overflow-hidden rounded-lg border border-white/15 bg-white/10 outline-none ring-white/20 transition hover:border-white/50 focus-visible:ring-3';
+	'relative aspect-video overflow-hidden rounded-lg border border-white/15 bg-white/10 outline-none ring-white/20 transition hover:border-white/50 focus-visible:ring-3 group-focus-visible:ring-3 group-focus-visible:ring-white';
 
 export const tileActiveClass = 'border-white hover:border-white';
 

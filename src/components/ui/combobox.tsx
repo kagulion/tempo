@@ -106,7 +106,7 @@ export function Combobox<T>({
 		>
 			<div
 				className={cn(
-					'relative flex h-8 items-center rounded-lg border border-white/10 bg-white/10 text-sm text-white transition-colors hover:bg-white/20 has-focus-visible:ring-3 has-focus-visible:ring-white/20 has-disabled:opacity-50',
+					'relative flex h-8 items-center rounded-lg border border-white/10 bg-white/10 text-sm text-white transition-colors hover:bg-white/20 has-focus-visible:ring-3 has-focus-visible:ring-white/70 has-disabled:opacity-50',
 					className
 				)}
 			>
@@ -202,7 +202,7 @@ export function ComboboxButton<T>({
 			<ComboboxPrimitive.Portal>
 				<ComboboxPrimitive.Positioner side="top" sideOffset={8} align="end" className="z-50">
 					<ComboboxPrimitive.Popup className={cn(popupClassName, 'w-72')}>
-						<div className="flex items-center gap-2 border-b border-white/10 px-2.5">
+						<div className="flex items-center gap-2 border-b border-white/10 px-2.5 has-focus-visible:ring-2 has-focus-visible:ring-white/70 has-focus-visible:ring-inset">
 							<SearchIcon className="size-4 shrink-0 text-white/50" />
 							<ComboboxPrimitive.Input
 								placeholder={searchPlaceholder}

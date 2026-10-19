@@ -46,7 +46,7 @@ export function SettingSlider({
 				<SliderPrimitive.Thumb
 					getAriaLabel={() => label}
 					getAriaValueText={() => format(value)}
-					className="h-6 w-0.5 rounded-full outline-none focus-visible:bg-white"
+					className="h-6 w-0.5 rounded-full outline-none has-[:focus-visible]:bg-white"
 				/>
 				{/* Подписи поверх заливки не перехватывают перетаскивание */}
 				<div className="pointer-events-none absolute inset-0 flex items-center gap-2 px-3 text-sm">

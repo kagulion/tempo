@@ -44,7 +44,7 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 			<div className="flex items-center gap-3">
 				<span className="flex-1 text-sm font-medium">Громкость</span>
 				<Slider
-					aria-label="Общая громкость звуков"
+					label="Общая громкость звуков"
 					min={0}
 					max={1}
 					step={0.01}
@@ -102,7 +102,7 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 									<span className="truncate">{sound.label}</span>
 								</button>
 								<Slider
-									aria-label={`Громкость: ${sound.label}`}
+									label={`Громкость: ${sound.label}`}
 									min={0}
 									max={1}
 									step={0.01}

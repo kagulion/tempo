@@ -190,7 +190,7 @@ function ChannelCard({
 			onClick={onSelect}
 			aria-pressed={active}
 			title={`${channel.title} — ${channel.author}`}
-			className="flex min-w-0 flex-col gap-1 text-left outline-none"
+			className="group flex min-w-0 flex-col gap-1 text-left outline-none"
 		>
 			<span className={cn(tileClass, 'block w-full', active && tileActiveClass)}>
 				{!thumbFailed && (

@@ -316,7 +316,7 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 								{silent ? <VolumeX /> : radio.volume < 0.5 ? <Volume1 /> : <Volume2 />}
 							</Button>
 							<Slider
-								aria-label="Громкость"
+								label="Громкость радио"
 								min={0}
 								max={1}
 								step={0.01}
