@@ -135,3 +135,44 @@ export function buildThumbSrcSet(base: string, thumb: string, urls: Record<strin
 	const small = urls[variantFile(base, thumbSmallWidth, 'webp')];
 	return small ? `${small} ${thumbSmallWidth}w, ${thumb} ${thumbWidth}w` : undefined;
 }
+
+// Видеообои. Оригинал `<имя>.mp4` (H.264 1080p) в сборку не попадает: приложение берёт только варианты рядом с ним,
+// их делает тот же скрипт. Имена: `<имя>.av1.mp4`, `<имя>.h264.mp4` и портретные `<имя>.p.av1.mp4`, `<имя>.p.h264.mp4`
+export type VideoCodec = 'av1' | 'h264';
+
+// Точные строки кодеков для type у <source>: браузер без AV1 пропускает источник и берёт следующий.
+// AV1 — Main, уровень 4.0, 10 бит (так кодирует скрипт: `ffprobe` показывает level=8), H.264 — High 4.0
+export const videoTypes: Record<VideoCodec, string> = {
+	av1: 'video/mp4; codecs="av01.0.08M.10"',
+	h264: 'video/mp4; codecs="avc1.640028"'
+};
+
+export const videoCodecs: VideoCodec[] = ['av1', 'h264'];
+
+// Портретный вариант для узких экранов: кроп 9:16 по центру кадра (как делает object-cover) и 540×960.
+// Условие то же, что у узкого кропа картинок
+export const videoPortraitMedia = '(max-aspect-ratio: 9/16)';
+
+export function videoFile(base: string, codec: VideoCodec, portrait = false) {
+	return `${base}${portrait ? '.p' : ''}.${codec}.mp4`;
+}
+
+export type VideoSource = { src: string; type: string };
+
+// Источники для <video> по порядку: AV1, затем H.264. Портретные идут первыми, если экран узкий.
+// Выбираем в коде, а не атрибутом media у <source>: браузер без поддержки media взял бы первый же источник,
+// то есть портретный кроп на десктопе. Каких-то вариантов нет — берём те, что есть
+export function buildVideoSources(
+	base: string,
+	urls: Record<string, string>,
+	portrait: boolean
+): VideoSource[] {
+	const sources: VideoSource[] = [];
+	for (const wantPortrait of portrait ? [true, false] : [false]) {
+		for (const codec of videoCodecs) {
+			const src = urls[videoFile(base, codec, wantPortrait)];
+			if (src) sources.push({ src, type: videoTypes[codec] });
+		}
+	}
+	return sources;
+}

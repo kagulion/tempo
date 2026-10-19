@@ -4,9 +4,6 @@ import elfsTavern from '@/assets/wallpapers/alliance/elfs-tavern.webp';
 import bloodElfsTavern from '@/assets/wallpapers/horde/bloody-elfs-tavern.webp';
 import orcsTavern from '@/assets/wallpapers/horde/orcs-tavern.webp';
 import taurenTavern from '@/assets/wallpapers/horde/tauren-tavern.webp';
-import cafe from '@/assets/wallpapers/japan/cafe.mp4';
-import sakura from '@/assets/wallpapers/japan/sakura.mp4';
-import village from '@/assets/wallpapers/japan/village.mp4';
 import allianceTavernThumb from '@/assets/wallpapers/thumbs/alliance/alliance-tavern.webp';
 import dwarfsTavernThumb from '@/assets/wallpapers/thumbs/alliance/dwarfs-tavern.webp';
 import elfsTavernThumb from '@/assets/wallpapers/thumbs/alliance/elfs-tavern.webp';
@@ -21,13 +18,15 @@ import bootyBayThumb from '@/assets/wallpapers/thumbs/warcraft/booty-bay.webp';
 import dragonflightThumb from '@/assets/wallpapers/thumbs/warcraft/dragonflight.webp';
 import pandariaThumb from '@/assets/wallpapers/thumbs/warcraft/mists-of-pandaria.webp';
 import nightElfThumb from '@/assets/wallpapers/thumbs/warcraft/night-elf.webp';
-import ashenvale from '@/assets/wallpapers/warcraft/ashenvale.mp4';
-import bootyBay from '@/assets/wallpapers/warcraft/booty-bay.mp4';
-import dragonflight from '@/assets/wallpapers/warcraft/dragonflight.mp4';
-import pandaria from '@/assets/wallpapers/warcraft/mists-of-pandaria.mp4';
-import nightElf from '@/assets/wallpapers/warcraft/night-elf.mp4';
 
-import { buildImageSources, buildThumbSrcSet, type ImageSources } from './variants';
+import {
+	buildImageSources,
+	buildThumbSrcSet,
+	buildVideoSources,
+	videoFile,
+	type ImageSources,
+	type VideoSource
+} from './variants';
 import { rutubeWallpaperId } from '@/widgets/rutube/rutube';
 import {
 	type YouTubeHistoryItem,
@@ -49,6 +48,9 @@ export type FileWallpaper = {
 	thumb: string;
 	// srcset превью 240w/480w для галереи и окна сцен. Нет маленького файла — undefined
 	thumbSrcSet?: string;
+	// Видео: источники для <video> по порядку (AV1, H.264) — обычные и портретные для узких экранов (см. variants.ts).
+	// Оригинал .mp4 в сборку не попадает, только варианты, которые делает scripts/wallpaper-variants.ts
+	video?: { sources: VideoSource[]; portraitSources: VideoSource[] };
 	// Картинка: <picture> с вариантами по ширине, портретными кропами и AVIF (см. variants.ts). У видео нет
 	image?: ImageSources;
 };
@@ -130,6 +132,17 @@ const variantUrls = Object.fromEntries(
 	).map(([path, url]) => [path.replace('/src/assets/wallpapers/', ''), url])
 );
 
+// Варианты видео (`japan/cafe.av1.mp4`...): имя с лишней точкой, поэтому оригиналы шаблон не берёт и в сборку они не идут
+const videoUrls = Object.fromEntries(
+	Object.entries(
+		import.meta.glob<string>('/src/assets/wallpapers/*/*.*.mp4', {
+			eager: true,
+			query: '?url',
+			import: 'default'
+		})
+	).map(([path, url]) => [path.replace('/src/assets/wallpapers/', ''), url])
+);
+
 const thumbUrls = Object.fromEntries(
 	Object.entries(variantUrls)
 		.filter(([path]) => path.startsWith('thumbs/'))
@@ -140,6 +153,15 @@ function withVariants(item: FileWallpaper): FileWallpaper {
 	return {
 		...item,
 		thumbSrcSet: buildThumbSrcSet(item.id, item.thumb, thumbUrls),
+		// Запасной адрес (H.264 1080p) для тех, кому нужен один файл. Нет вариантов — пусто, скрипт не запускали
+		url: item.kind === 'video' ? (videoUrls[videoFile(item.id, 'h264')] ?? '') : item.url,
+		video:
+			item.kind === 'video'
+				? {
+						sources: buildVideoSources(item.id, videoUrls, false),
+						portraitSources: buildVideoSources(item.id, videoUrls, true)
+					}
+				: undefined,
 		image: item.kind === 'image' ? buildImageSources(item.id, item.url, variantUrls) : undefined
 	};
 }
@@ -198,7 +220,7 @@ const files: FileWallpaper[] = [
 		title: 'Ясеневый лес',
 		category: 'warcraft',
 		kind: 'video',
-		url: ashenvale,
+		url: '',
 		thumb: ashenvaleThumb
 	},
 	{
@@ -206,7 +228,7 @@ const files: FileWallpaper[] = [
 		title: 'Пиратская Бухта',
 		category: 'warcraft',
 		kind: 'video',
-		url: bootyBay,
+		url: '',
 		thumb: bootyBayThumb
 	},
 	{
@@ -214,7 +236,7 @@ const files: FileWallpaper[] = [
 		title: 'Драконьи острова',
 		category: 'warcraft',
 		kind: 'video',
-		url: dragonflight,
+		url: '',
 		thumb: dragonflightThumb
 	},
 	{
@@ -222,7 +244,7 @@ const files: FileWallpaper[] = [
 		title: 'Пандария',
 		category: 'warcraft',
 		kind: 'video',
-		url: pandaria,
+		url: '',
 		thumb: pandariaThumb
 	},
 	{
@@ -230,7 +252,7 @@ const files: FileWallpaper[] = [
 		title: 'Ночная эльфийка',
 		category: 'warcraft',
 		kind: 'video',
-		url: nightElf,
+		url: '',
 		thumb: nightElfThumb
 	},
 	{
@@ -238,7 +260,7 @@ const files: FileWallpaper[] = [
 		title: 'Кофейня',
 		category: 'japan',
 		kind: 'video',
-		url: cafe,
+		url: '',
 		thumb: cafeThumb
 	},
 	{
@@ -246,7 +268,7 @@ const files: FileWallpaper[] = [
 		title: 'Сакура',
 		category: 'japan',
 		kind: 'video',
-		url: sakura,
+		url: '',
 		thumb: sakuraThumb
 	},
 	{
@@ -254,7 +276,7 @@ const files: FileWallpaper[] = [
 		title: 'Деревня',
 		category: 'japan',
 		kind: 'video',
-		url: village,
+		url: '',
 		thumb: villageThumb
 	}
 ];

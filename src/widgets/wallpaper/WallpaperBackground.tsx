@@ -9,6 +9,7 @@ import { setYouTubeTitle } from '@/widgets/youtube/useYouTubeHistory';
 import { YouTubeLayer } from '@/widgets/youtube/YouTubeLayer';
 
 import { defaultWallpaperId, useWallpaper } from './useWallpaper';
+import { videoPortraitMedia } from './variants';
 import type { CustomWallpaper, FileWallpaper, Wallpaper } from './wallpapers';
 
 const layerClass = 'absolute inset-0 h-full w-full object-cover';
@@ -24,6 +25,15 @@ type LayerProps = {
 function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const reducedMotion = useMediaQuery(mediaQueries.reducedMotion);
+	// Узкий портретный экран получает кроп видео 540×960 (если он есть). Выбираем здесь, а не атрибутом media у <source>:
+	// браузер без его поддержки взял бы первый же источник, то есть кроп и на десктопе
+	const narrow = useMediaQuery(videoPortraitMedia);
+	const video = wallpaper.kind === 'custom' ? undefined : wallpaper.video;
+	const sources = video
+		? narrow
+			? [...video.portraitSources, ...video.sources]
+			: video.sources
+		: [];
 
 	// Видео играет, только пока вкладка видна: в фоне оно зря грузит процессор.
 	// При «уменьшить движение» в системе видео стоит на первом кадре
@@ -41,7 +51,7 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 		sync();
 		document.addEventListener('visibilitychange', sync);
 		return () => document.removeEventListener('visibilitychange', sync);
-	}, [reducedMotion]);
+	}, [reducedMotion, narrow]);
 
 	const media = wallpaper.kind === 'custom' ? wallpaper.media : wallpaper.kind;
 	if (media === 'image') {
@@ -83,7 +93,9 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 	return (
 		<video
 			ref={videoRef}
-			src={wallpaper.url}
+			// Смена набора источников (повернули телефон) пересоздаёт видео: у <source> без этого src не перечитывается
+			key={narrow ? 'portrait' : 'landscape'}
+			src={sources.length === 0 ? wallpaper.url : undefined}
 			poster={wallpaper.kind === 'custom' ? undefined : wallpaper.thumb}
 			muted
 			loop
@@ -93,7 +105,12 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 			onLoadedData={onReady}
 			onAnimationEnd={onShown}
 			className={cn(layerClass, className)}
-		/>
+		>
+			{/* AV1 первым, H.264 запасным: браузер берёт первый тип, который умеет декодировать */}
+			{sources.map((source) => (
+				<source key={source.src} src={source.src} type={source.type} />
+			))}
+		</video>
 	);
 }
 

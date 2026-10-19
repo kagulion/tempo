@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest';
 import {
 	buildImageSources,
 	buildThumbSrcSet,
+	buildVideoSources,
 	isVariantFile,
 	landscapeSizes,
-	variantFile
+	variantFile,
+	videoFile
 } from './variants';
 
 describe('имена вариантов', () => {
@@ -67,5 +69,35 @@ describe('buildThumbSrcSet', () => {
 			'/t240.webp 240w, /t480.webp 480w'
 		);
 		expect(buildThumbSrcSet('h/a', '/t480.webp', {})).toBeUndefined();
+	});
+});
+
+describe('buildVideoSources', () => {
+	const urls = {
+		'w/a.av1.mp4': '/av1',
+		'w/a.h264.mp4': '/h264',
+		'w/a.p.av1.mp4': '/p-av1',
+		'w/a.p.h264.mp4': '/p-h264'
+	};
+
+	it('AV1 раньше H.264, а портретные идут первыми только для узких экранов', () => {
+		expect(buildVideoSources('w/a', urls, false).map((s) => s.src)).toEqual(['/av1', '/h264']);
+		expect(buildVideoSources('w/a', urls, true).map((s) => s.src)).toEqual([
+			'/p-av1',
+			'/p-h264',
+			'/av1',
+			'/h264'
+		]);
+	});
+
+	it('точные строки кодеков в type', () => {
+		const [av1, h264] = buildVideoSources('w/a', urls, false);
+		expect(av1.type).toBe('video/mp4; codecs="av01.0.08M.10"');
+		expect(h264.type).toBe('video/mp4; codecs="avc1.640028"');
+	});
+
+	it('без вариантов источников нет', () => {
+		expect(buildVideoSources('w/a', {}, true)).toEqual([]);
+		expect(videoFile('w/a', 'av1', true)).toBe('w/a.p.av1.mp4');
 	});
 });
