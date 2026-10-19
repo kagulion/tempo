@@ -52,7 +52,7 @@ export function EffectsWidget({ className }: EffectsWidgetProps) {
 							onClick={() => toggle(effect.id)}
 							aria-pressed={active}
 							className={cn(
-								'flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-1 py-3 text-xs font-medium text-white/60 transition-colors outline-none',
+								'flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-1 py-3 text-xs font-medium text-white/80 transition-colors outline-none',
 								'hover:border-white/25 hover:bg-white/10 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20',
 								active &&
 									'border-white/30 bg-white/20 text-white hover:border-white/30 hover:bg-white/20'

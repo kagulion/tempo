@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 export function StatLabel({ children, className }: { children: ReactNode; className?: string }) {
 	return (
 		<span
-			className={cn('text-[0.65rem] font-medium tracking-wide text-white/50 uppercase', className)}
+			className={cn('text-[0.65rem] font-medium tracking-wide text-white/80 uppercase', className)}
 		>
 			{children}
 		</span>

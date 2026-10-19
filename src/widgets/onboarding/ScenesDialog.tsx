@@ -53,7 +53,7 @@ export function ScenesDialog({ open, onFinish }: ScenesDialogProps) {
 					<DialogTitle render={<h2 />} className="text-lg font-medium">
 						Добро пожаловать в Tempo
 					</DialogTitle>
-					<DialogDescription render={<p />} className="text-sm text-white/60">
+					<DialogDescription render={<p />} className="text-sm text-white/80">
 						Уютная комната для фокуса: обои, фоновые звуки, радио и таймер. Выберите готовую сцену
 						или настройте сами.
 					</DialogDescription>
@@ -81,14 +81,14 @@ export function ScenesDialog({ open, onFinish }: ScenesDialogProps) {
 										className="aspect-video w-full rounded-lg object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
 									/>
 									<span className="px-0.5 text-sm font-medium">{scene.title}</span>
-									<span className="px-0.5 text-xs text-white/60">{scene.description}</span>
+									<span className="px-0.5 text-xs text-white/80">{scene.description}</span>
 								</button>
 							</li>
 						);
 					})}
 				</ul>
 
-				<Button variant="glass" size="sm" onClick={onFinish} className="self-center text-white/60">
+				<Button variant="glass" size="sm" onClick={onFinish} className="self-center text-white/80">
 					Пропустить, настрою сам
 				</Button>
 			</DialogContent>

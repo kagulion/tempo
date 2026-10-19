@@ -19,7 +19,7 @@ type ComboboxItemsProps<T> = {
 function ComboboxItems<T>({ emptyText, getLabel, getKey, getHint }: ComboboxItemsProps<T>) {
 	return (
 		<>
-			<ComboboxPrimitive.Empty className="px-3 py-2 text-white/50 empty:hidden">
+			<ComboboxPrimitive.Empty className="px-3 py-2 text-white/80 empty:hidden">
 				{emptyText}
 			</ComboboxPrimitive.Empty>
 			<ComboboxPrimitive.List className="max-h-[min(18rem,var(--available-height))] scroll-py-1 overflow-y-auto overscroll-contain p-1 empty:p-0">
@@ -31,7 +31,7 @@ function ComboboxItems<T>({ emptyText, getLabel, getKey, getHint }: ComboboxItem
 					>
 						<span className="truncate">{getLabel(item)}</span>
 						{getHint && (
-							<span className="ml-auto max-w-[55%] truncate text-xs text-white/50">
+							<span className="ml-auto max-w-[55%] truncate text-xs text-white/80">
 								{getHint(item)}
 							</span>
 						)}
@@ -114,11 +114,11 @@ export function Combobox<T>({
 					ref={inputRef}
 					aria-label={ariaLabel}
 					placeholder={placeholder}
-					className="h-full w-full min-w-0 truncate bg-transparent pr-8 pl-2.5 outline-none placeholder:text-white/50"
+					className="h-full w-full min-w-0 truncate bg-transparent pr-8 pl-2.5 outline-none placeholder:text-white/90"
 				/>
 				<ComboboxPrimitive.Trigger
 					aria-label="Открыть список"
-					className="absolute top-1/2 right-1 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-white/70 hover:text-white"
+					className="absolute top-1/2 right-1 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-white/80 hover:text-white"
 				>
 					<ChevronDownIcon className="size-4" />
 				</ComboboxPrimitive.Trigger>
@@ -203,10 +203,10 @@ export function ComboboxButton<T>({
 				<ComboboxPrimitive.Positioner side="top" sideOffset={8} align="end" className="z-50">
 					<ComboboxPrimitive.Popup className={cn(popupClassName, 'w-72')}>
 						<div className="flex items-center gap-2 border-b border-white/10 px-2.5 has-focus-visible:ring-2 has-focus-visible:ring-white/70 has-focus-visible:ring-inset">
-							<SearchIcon className="size-4 shrink-0 text-white/50" />
+							<SearchIcon className="size-4 shrink-0 text-white/80" />
 							<ComboboxPrimitive.Input
 								placeholder={searchPlaceholder}
-								className="h-9 w-full min-w-0 bg-transparent outline-none placeholder:text-white/50"
+								className="h-9 w-full min-w-0 bg-transparent outline-none placeholder:text-white/90"
 							/>
 						</div>
 						<ComboboxItems

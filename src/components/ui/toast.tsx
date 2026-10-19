@@ -93,7 +93,7 @@ function ToastDescription({ className, ...props }: ToastPrimitive.Description.Pr
 	return (
 		<ToastPrimitive.Description
 			data-slot="toast-description"
-			className={cn('text-sm text-white/60', className)}
+			className={cn('text-sm text-white/80', className)}
 			{...props}
 		/>
 	);

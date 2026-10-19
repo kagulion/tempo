@@ -79,7 +79,7 @@ export function HotkeysButton({ onClick, className }: HotkeysButtonProps) {
 				onClick={onClick}
 				aria-label="Горячие клавиши"
 				className={cn(
-					'flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white/70 shadow-2xl backdrop-blur-md transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20',
+					'flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/65 text-white/70 shadow-2xl backdrop-blur-md transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20',
 					className
 				)}
 			>

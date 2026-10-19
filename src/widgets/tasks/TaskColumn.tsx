@@ -52,10 +52,10 @@ export function TaskColumn({
 			>
 				<Icon className="size-4 shrink-0" />
 				<span className="min-w-0 truncate">{columnTitles[column]}</span>
-				<span className="text-xs text-white/50 tabular-nums">{cards.length}</span>
+				<span className="text-xs text-white/80 tabular-nums">{cards.length}</span>
 				<ChevronDown
 					className={cn(
-						'ml-auto size-4 shrink-0 text-white/50 transition-transform',
+						'ml-auto size-4 shrink-0 text-white/80 transition-transform',
 						collapsed && '-rotate-90'
 					)}
 				/>
@@ -79,7 +79,7 @@ export function TaskColumn({
 							/>
 						))}
 						{cards.length === 0 && (
-							<p className="rounded-lg border border-dashed border-white/15 py-3 text-center text-xs text-white/50">
+							<p className="rounded-lg border border-dashed border-white/15 py-3 text-center text-xs text-white/80">
 								Нет задач
 							</p>
 						)}

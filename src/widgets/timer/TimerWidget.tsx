@@ -74,12 +74,12 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 	const activeView = (
 		<div className="flex flex-col gap-3">
 			<div className="flex flex-col items-center gap-1 pt-1">
-				<span className="text-sm text-white/70">{caption}</span>
+				<span className="text-sm text-white/80">{caption}</span>
 				<span
 					role="timer"
 					className={cn(
 						'text-5xl font-semibold tracking-tight tabular-nums',
-						status === 'paused' && 'animate-pulse text-white/70'
+						status === 'paused' && 'animate-pulse text-white/80'
 					)}
 				>
 					{clock}
@@ -220,7 +220,7 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 								format={String}
 								onValueChange={(value) => timer.changeSetting('rounds', value)}
 							/>
-							<p className="py-1 text-center text-xs text-white/50">
+							<p className="py-1 text-center text-xs text-white/80">
 								Всего {formatMinutes(pomodoroTotal(settings) / 60_000)} · длинный перерыв раз в{' '}
 								{longBreakEvery} раунда
 							</p>
@@ -253,7 +253,7 @@ export function TimerWidget({ className }: TimerWidgetProps) {
 						activeView
 					) : (
 						<div className="flex flex-col gap-3">
-							<span className="pt-1 text-center text-5xl font-semibold tracking-tight text-white/40 tabular-nums">
+							<span className="pt-1 text-center text-5xl font-semibold tracking-tight text-white/60 tabular-nums">
 								00:00
 							</span>
 							{startButton}

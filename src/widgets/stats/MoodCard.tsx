@@ -44,7 +44,7 @@ export function MoodCard({ today: todayKey }: MoodCardProps) {
 			<div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
 				<div className="flex flex-col gap-0.5">
 					<StatLabel>Настроение</StatLabel>
-					<span className="text-xs text-white/40">
+					<span className="text-xs text-white/80">
 						{day === today ? 'Сегодня' : dayFormat.format(parseDay(day))}
 					</span>
 				</div>

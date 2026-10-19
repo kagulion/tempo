@@ -172,7 +172,7 @@ function StreamCard({
 			</span>
 			<span className="line-clamp-2 text-[0.7rem] leading-tight font-medium">{stream.title}</span>
 			{stream.author && (
-				<span className="truncate text-[0.65rem] text-white/50">{stream.author}</span>
+				<span className="truncate text-[0.65rem] text-white/80">{stream.author}</span>
 			)}
 		</button>
 	);

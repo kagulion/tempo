@@ -12,7 +12,7 @@ const inputVariants = cva(
 					'border-input bg-transparent placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 disabled:bg-input/50 dark:bg-input/30 dark:disabled:bg-input/80',
 				// Поле в стеклянных окнах виджетов, под стать Button variant="glass" и комбобоксу
 				glass:
-					'border-white/10 bg-white/10 text-white placeholder:text-white/50 hover:bg-white/20 focus-visible:border-white/20 focus-visible:ring-white/20'
+					'border-white/10 bg-white/10 text-white placeholder:text-white/90 hover:bg-white/20 focus-visible:border-white/20 focus-visible:ring-white/20'
 			}
 		},
 		defaultVariants: {

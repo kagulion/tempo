@@ -31,7 +31,7 @@ export function FocusButton({ mode, onToggle, onHideAll, className }: FocusButto
 	return (
 		<div
 			className={cn(
-				'flex h-9 items-center overflow-hidden rounded-full border border-white/10 bg-black/50 shadow-2xl backdrop-blur-md',
+				'flex h-9 items-center overflow-hidden rounded-full border border-white/10 bg-black/65 shadow-2xl backdrop-blur-md',
 				className
 			)}
 		>

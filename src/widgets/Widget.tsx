@@ -7,7 +7,7 @@ export function Widget({ className, ...props }: ComponentProps<'section'>) {
 	return (
 		<section
 			className={cn(
-				'z-10 rounded-2xl border border-white/10 bg-black/50 text-white shadow-2xl backdrop-blur-md',
+				'z-10 rounded-2xl border border-white/10 bg-black/65 text-white shadow-2xl backdrop-blur-md',
 				className
 			)}
 			{...props}
@@ -17,7 +17,7 @@ export function Widget({ className, ...props }: ComponentProps<'section'>) {
 
 // Мелкая подпись окна: «Звуки», «Таймер»
 export function WidgetTitle({ className, ...props }: ComponentProps<'span'>) {
-	return <span className={cn('text-xs font-medium text-white/60', className)} {...props} />;
+	return <span className={cn('text-xs font-medium text-white/80', className)} {...props} />;
 }
 
 type WidgetHeaderProps = {

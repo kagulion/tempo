@@ -206,7 +206,7 @@ function ChannelCard({
 				)}
 			</span>
 			<span className="line-clamp-2 text-[0.7rem] leading-tight font-medium">{channel.title}</span>
-			<span className="truncate text-[0.65rem] text-white/50">{channel.author}</span>
+			<span className="truncate text-[0.65rem] text-white/80">{channel.author}</span>
 		</button>
 	);
 }

@@ -14,11 +14,11 @@ type StatsHighlightsProps = {
 };
 
 function Divider() {
-	return <span aria-hidden className="h-4 w-px bg-white/25" />;
+	return <span aria-hidden className="h-4 w-px bg-white/30" />;
 }
 
 // Ключевые цифры статистики в углу экрана: онлайн, серия дней и настроение за месяц (только смайлик).
-// Без фона и обводки, не нажимается — просто подпись поверх обоев, тень держит читаемость.
+// Не нажимается — просто подпись поверх обоев на тёмной стеклянной подложке, чтобы читалась на светлых обоях.
 // Данные берутся из тех же общих хранилищ, что и окно статистики, так что цифры всегда совпадают.
 // Видимое скрыто от скринридера, вместо него — полные подписи в sr-only
 export function StatsHighlights({ className }: StatsHighlightsProps) {
@@ -36,7 +36,7 @@ export function StatsHighlights({ className }: StatsHighlightsProps) {
 			role="group"
 			aria-label="Статистика"
 			className={cn(
-				'flex h-9 items-center gap-3 px-1 text-sm font-medium text-white/90 tabular-nums drop-shadow-[0_1px_4px_rgb(0_0_0/0.8)] select-none',
+				'flex h-9 items-center gap-3 rounded-full bg-black/65 px-3 text-sm font-medium text-white/90 tabular-nums backdrop-blur-md select-none',
 				className
 			)}
 		>

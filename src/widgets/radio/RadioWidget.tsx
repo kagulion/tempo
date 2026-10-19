@@ -40,7 +40,7 @@ const statusText: Record<Exclude<RadioStatus, 'idle'>, string> = {
 };
 
 const chipClassName =
-	'h-7 shrink-0 rounded-lg border border-white/10 bg-white/10 px-2.5 text-xs text-white/80 transition-colors outline-none hover:bg-white/20 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20 aria-pressed:bg-white/30 aria-pressed:text-white disabled:opacity-50';
+	'h-7 shrink-0 rounded-lg border border-white/10 bg-white/10 px-2.5 text-xs text-white/90 transition-colors outline-none hover:bg-white/20 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20 aria-pressed:bg-white/30 aria-pressed:text-white disabled:opacity-50';
 
 function parseCompact(saved: unknown) {
 	return typeof saved === 'boolean' ? saved : undefined;
@@ -54,7 +54,7 @@ function stationName(station: RecordStation) {
 function TrackLine({ track, className }: { track: RecordTrack; className?: string }) {
 	const label = trackLabel(track);
 	return (
-		<div className={cn('flex min-w-0 items-center gap-2 text-xs text-white/70', className)}>
+		<div className={cn('flex min-w-0 items-center gap-2 text-xs text-white/80', className)}>
 			{track.cover && (
 				<img
 					// Новая обложка — новый элемент: скрытая по ошибке не мешает следующей
@@ -189,7 +189,7 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 								{radio.track && <TrackLine track={radio.track} />}
 							</div>
 						) : (
-							<p className="min-w-0 flex-1 truncate text-sm text-white/70">
+							<p className="min-w-0 flex-1 truncate text-sm text-white/80">
 								{statusText[status === 'idle' ? 'loading' : status]}
 							</p>
 						)}
@@ -243,7 +243,7 @@ export function RadioWidget({ className, open = true }: RadioWidgetProps) {
 									className="min-w-0 flex-1"
 								/>
 							) : (
-								<p className="flex h-8 min-w-0 flex-1 items-center truncate px-1 text-sm text-white/70">
+								<p className="flex h-8 min-w-0 flex-1 items-center truncate px-1 text-sm text-white/80">
 									{status === 'empty'
 										? emptyText
 										: statusText[status === 'idle' ? 'loading' : status]}

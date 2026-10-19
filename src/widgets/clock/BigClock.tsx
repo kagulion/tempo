@@ -208,7 +208,7 @@ function StationRow({ corner = false }: { corner?: boolean }) {
 	return (
 		<div
 			className={cn(
-				'flex max-w-full min-w-0 items-center gap-2 text-sm text-white/70',
+				'flex max-w-full min-w-0 items-center gap-2 text-sm text-white/80',
 				!corner && 'lg:text-base'
 			)}
 		>

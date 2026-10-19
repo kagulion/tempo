@@ -68,8 +68,10 @@ export function Dock({ panel, isOpen, onToggle }: DockProps) {
 		>
 			{panel.groups.map((group) => (
 				<div key={group.id} className="flex flex-col items-start gap-1 sm:items-center">
-					<span className="px-2 text-xs font-medium text-white/80 drop-shadow">{group.label}</span>
-					<div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/50 p-1 shadow-2xl backdrop-blur-md">
+					<span className="rounded-full bg-black/65 px-2.5 py-0.5 text-xs font-medium text-white/90 backdrop-blur-md">
+						{group.label}
+					</span>
+					<div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/65 p-1 shadow-2xl backdrop-blur-md">
 						{widgets
 							.filter((widget) => widget.dockGroup === group.id)
 							.map((widget) => {

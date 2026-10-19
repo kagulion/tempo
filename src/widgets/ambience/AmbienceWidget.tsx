@@ -52,7 +52,7 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 					onValueChange={ambience.changeVolume}
 					className="w-24 shrink-0"
 				/>
-				<span className="w-9 shrink-0 text-right text-xs text-white/60 tabular-nums">
+				<span className="w-9 shrink-0 text-right text-xs text-white/80 tabular-nums">
 					{percent(ambience.volume)}
 				</span>
 			</div>
@@ -64,7 +64,7 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 					aria-label={group.label}
 					className="flex flex-col gap-0.5"
 				>
-					<span className="pb-1 text-[0.7rem] font-medium tracking-wider text-white/40 uppercase">
+					<span className="pb-1 text-[0.7rem] font-medium tracking-wider text-white/80 uppercase">
 						{group.label}
 					</span>
 
@@ -81,7 +81,8 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 								title={hint}
 								className={cn(
 									'flex items-center gap-3 transition-opacity',
-									!active && 'opacity-50',
+									// Выключенный звук — всё ещё кнопка: приглушаем не ниже 4.5:1 на светлых обоях
+									!active && 'opacity-75',
 									!sound.available && 'opacity-30'
 								)}
 							>
@@ -111,7 +112,7 @@ export function AmbienceWidget({ className }: AmbienceWidgetProps) {
 									disabled={!sound.available}
 									className="w-24 shrink-0"
 								/>
-								<span className="w-9 shrink-0 text-right text-xs text-white/60 tabular-nums">
+								<span className="w-9 shrink-0 text-right text-xs text-white/80 tabular-nums">
 									{percent(sound.volume)}
 								</span>
 							</div>

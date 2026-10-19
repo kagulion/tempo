@@ -102,7 +102,7 @@ export function WallpaperGallery({ className }: WallpaperGalleryProps) {
 							title="Картинка или видео с вашего устройства. Файл остаётся в браузере и никуда не отправляется"
 							className={cn(
 								tileClass,
-								'flex flex-col items-center justify-center gap-1 border-dashed text-xs text-white/70 hover:text-white disabled:opacity-50'
+								'flex flex-col items-center justify-center gap-1 border-dashed text-xs text-white/80 hover:text-white disabled:opacity-50'
 							)}
 						>
 							<Plus className="size-5" />
@@ -160,7 +160,7 @@ export function WallpaperGallery({ className }: WallpaperGalleryProps) {
 							);
 						})}
 					</div>
-					<p className="pt-2 text-[0.7rem] text-white/50">
+					<p className="pt-2 text-[0.7rem] text-white/80">
 						Файл можно перетащить сюда. Он хранится только в вашем браузере.
 					</p>
 					{message && (

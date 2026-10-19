@@ -52,7 +52,7 @@ export function SettingSlider({
 				<div className="pointer-events-none absolute inset-0 flex items-center gap-2 px-3 text-sm">
 					<Icon className="size-4 shrink-0 text-white/80" />
 					<span className="font-medium">{label}</span>
-					<span className="ml-auto text-white/70 tabular-nums">{format(value)}</span>
+					<span className="ml-auto text-white/80 tabular-nums">{format(value)}</span>
 				</div>
 			</SliderPrimitive.Control>
 		</SliderPrimitive.Root>

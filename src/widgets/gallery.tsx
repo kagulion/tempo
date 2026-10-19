@@ -13,7 +13,7 @@ export const tileActiveClass = 'border-white hover:border-white';
 export const tileCaptionClass =
 	'absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/80 to-transparent px-2 pt-4 pb-1 text-left text-[0.7rem] font-medium';
 
-export const sectionTitleClass = 'pt-3 pb-2 text-xs font-medium text-white/60';
+export const sectionTitleClass = 'pt-3 pb-2 text-xs font-medium text-white/80';
 
 // Прокручиваем только список: scrollIntoView сдвинул бы и страницу с overflow-hidden
 export function useSectionScroll() {

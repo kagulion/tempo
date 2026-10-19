@@ -61,7 +61,7 @@ function DropdownMenuLabel({
 		<MenuPrimitive.GroupLabel
 			data-slot="dropdown-menu-label"
 			data-inset={inset}
-			className={cn('px-2.5 py-1.5 text-xs font-medium text-white/50 data-inset:pl-7', className)}
+			className={cn('px-2.5 py-1.5 text-xs font-medium text-white/80 data-inset:pl-7', className)}
 			{...props}
 		/>
 	);
@@ -225,7 +225,7 @@ function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<'spa
 		<span
 			data-slot="dropdown-menu-shortcut"
 			className={cn(
-				'ml-auto text-xs tracking-widest text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground',
+				'ml-auto text-xs tracking-widest text-white/80 group-focus/dropdown-menu-item:text-accent-foreground',
 				className
 			)}
 			{...props}
