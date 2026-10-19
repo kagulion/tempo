@@ -26,6 +26,8 @@ export const storageKeys = {
 	rutubeSound: 'tempo:rutube-sound',
 	// Кнопка «Без звука» в правом верхнем углу: true — весь звук сайта заглушён
 	soundMuted: 'tempo:sound-muted',
+	// Клавиши сайта (WCAG 2.1.4): true (по умолчанию) — одиночные символьные клавиши работают, см. src/lib/siteHotkeys.ts
+	siteHotkeys: 'tempo:site-hotkeys',
 	stats: 'tempo:stats',
 	tasks: 'tempo:tasks',
 	timerRuns: 'tempo:timer-runs',

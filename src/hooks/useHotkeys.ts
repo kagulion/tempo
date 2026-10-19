@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { siteHotkeysStore } from '@/lib/siteHotkeys';
 import { matchHotkey, type HotkeyBinding } from '@/lib/hotkeys';
 
 // Один слушатель keydown на странице: находит действие по клавише и вызывает onAction.
@@ -12,7 +13,7 @@ export function useHotkeys(bindings: readonly HotkeyBinding[], onAction: (action
 
 	useEffect(() => {
 		function onKeyDown(event: KeyboardEvent) {
-			const action = matchHotkey(event, bindings);
+			const action = matchHotkey(event, bindings, siteHotkeysStore.get());
 			if (action === undefined) return;
 			event.preventDefault();
 			handler.current(action);

@@ -63,6 +63,24 @@ describe('сопоставление клавиш', () => {
 	});
 });
 
+describe('клавиши сайта выключены', () => {
+	it('ни одна привязка не срабатывает, включая «?»', () => {
+		for (const binding of bindings) {
+			const event = {
+				code: binding.code,
+				shiftKey: Boolean(binding.shift),
+				ctrlKey: false,
+				altKey: false,
+				metaKey: false,
+				repeat: false,
+				target: null
+			};
+			expect(matchHotkey(event, bindings, false)).toBeUndefined();
+			expect(matchHotkey(event, bindings, true)).toBe(binding.action);
+		}
+	});
+});
+
 describe('поля ввода', () => {
 	// Тесты идут в Node без DOM: подделываем элемент с closest
 	class FakeElement {
@@ -75,6 +93,24 @@ describe('поля ввода', () => {
 	it('без DOM поле ввода не определяется, и цель null не мешает', () => {
 		expect(isTypingTarget(null)).toBe(false);
 		expect(isTypingTarget({} as EventTarget)).toBe(false);
+	});
+
+	it('role=textbox и role=combobox — тоже поле ввода', () => {
+		const globalWithElement = globalThis as unknown as { Element?: unknown };
+		const original = globalWithElement.Element;
+		class RoleElement {
+			closest(selector: string) {
+				return selector.includes('[role="textbox"]') && selector.includes('[role="combobox"]')
+					? this
+					: null;
+			}
+		}
+		globalWithElement.Element = RoleElement;
+		try {
+			expect(isTypingTarget(new RoleElement() as unknown as EventTarget)).toBe(true);
+		} finally {
+			globalWithElement.Element = original;
+		}
 	});
 
 	it('в поле ввода клавиши не срабатывают', () => {

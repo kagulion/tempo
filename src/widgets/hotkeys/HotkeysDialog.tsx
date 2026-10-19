@@ -3,8 +3,10 @@ import { useRef } from 'react';
 
 import { Hint, Kbd } from '@/components/Hint';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { bindingName, hotkeyGroupLabels, type HotkeyGroup } from '@/lib/hotkeys';
+import { useSiteHotkeys } from '@/lib/siteHotkeys';
 import { cn } from '@/lib/utils';
 import { WidgetHeader } from '@/widgets/Widget';
 
@@ -21,6 +23,7 @@ const groups: HotkeyGroup[] = ['windows', 'view', 'other'];
 // Фокус, Esc и возврат фокуса на кнопку, что открыла окно, ведёт Base UI
 export function HotkeysDialog({ open, onClose }: HotkeysDialogProps) {
 	const closeRef = useRef<HTMLButtonElement>(null);
+	const siteHotkeys = useSiteHotkeys();
 	return (
 		<Dialog open={open} onOpenChange={(next) => !next && onClose()}>
 			<DialogContent
@@ -43,20 +46,43 @@ export function HotkeysDialog({ open, onClose }: HotkeysDialogProps) {
 					</Button>
 				</WidgetHeader>
 
+				{/* WCAG 2.1.4: одиночные символьные клавиши можно отключить */}
+				<Switch
+					checked={siteHotkeys.enabled}
+					onCheckedChange={siteHotkeys.setEnabled}
+					label="Клавиши сайта"
+					description="Одиночные клавиши из списка ниже. Выключите, если они мешают диктовке или экранному диктору"
+				/>
+
 				{groups.map((group) => {
 					const items = hotkeyBindings.filter((binding) => binding.group === group);
 					if (items.length === 0) return null;
 					return (
-						<section key={group} className="flex flex-col gap-1.5">
-							<h3 className="text-xs font-medium text-white/50">{hotkeyGroupLabels[group]}</h3>
-							<ul className="flex flex-col gap-1">
+						<section
+							key={group}
+							className="flex flex-col gap-1.5"
+							data-disabled={!siteHotkeys.enabled || undefined}
+						>
+							<h3 className="text-xs font-medium text-white/80">{hotkeyGroupLabels[group]}</h3>
+							<ul
+								className="flex flex-col gap-1"
+								aria-label={
+									siteHotkeys.enabled ? undefined : `${hotkeyGroupLabels[group]}: клавиши выключены`
+								}
+							>
 								{items.map((binding) => (
 									<li
 										key={binding.action}
 										className="flex items-center justify-between gap-3 text-sm"
 									>
-										<span>{binding.label}</span>
-										<Kbd>{bindingName(binding)}</Kbd>
+										<span className={cn(!siteHotkeys.enabled && 'text-white/80')}>
+											{binding.label}
+										</span>
+										<span
+											className={cn(!siteHotkeys.enabled && 'line-through decoration-white/60')}
+										>
+											<Kbd>{bindingName(binding)}</Kbd>
+										</span>
 									</li>
 								))}
 							</ul>

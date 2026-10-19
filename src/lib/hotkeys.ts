@@ -73,10 +73,11 @@ export function bindingName(binding: Pick<HotkeyBinding, 'code' | 'shift'>): str
 // Фокус в поле ввода: буквы тогда печатаются, а не вызывают действия
 export function isTypingTarget(target: EventTarget | null): boolean {
 	if (typeof Element === 'undefined' || !(target instanceof Element)) return false;
-	if (target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
-		return true;
-	}
-	return false;
+	return Boolean(
+		target.closest(
+			'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="combobox"]'
+		)
+	);
 }
 
 type KeyEventLike = Pick<
@@ -84,15 +85,26 @@ type KeyEventLike = Pick<
 	'code' | 'shiftKey' | 'ctrlKey' | 'altKey' | 'metaKey' | 'repeat' | 'target'
 >;
 
-// Какое действие вызывает нажатие. undefined — никакое: поле ввода, Ctrl/Alt/Meta, автоповтор или клавиши нет в списке
+// Срабатывает ли привязка вообще. Все привязки сайта — одиночные символьные клавиши, поэтому когда
+// «Клавиши сайта» выключены (WCAG 2.1.4), не срабатывает ни одна. Проверка здесь одна, новые привязки подчиняются сами
+export function isHotkeyActive(_binding: HotkeyBinding, siteHotkeysEnabled: boolean): boolean {
+	return siteHotkeysEnabled;
+}
+
+// Какое действие вызывает нажатие. undefined — никакое: клавиши сайта выключены, поле ввода, Ctrl/Alt/Meta,
+// автоповтор или клавиши нет в списке
 export function matchHotkey(
 	event: KeyEventLike,
-	bindings: readonly HotkeyBinding[]
+	bindings: readonly HotkeyBinding[],
+	siteHotkeysEnabled = true
 ): string | undefined {
 	if (event.ctrlKey || event.altKey || event.metaKey || event.repeat) return undefined;
 	if (isTypingTarget(event.target)) return undefined;
 	return bindings.find(
-		(binding) => binding.code === event.code && Boolean(binding.shift) === event.shiftKey
+		(binding) =>
+			isHotkeyActive(binding, siteHotkeysEnabled) &&
+			binding.code === event.code &&
+			Boolean(binding.shift) === event.shiftKey
 	)?.action;
 }
 

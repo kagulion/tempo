@@ -8,6 +8,7 @@ import { parseOpen } from './dock/useDock';
 import { parseSort, parseSource, parseStation, parseStationMap } from './radio/saved';
 import { initialState, parseState } from './effects/useActiveEffects';
 import { parseEffectsOff } from './effects/effectsOff';
+import { parseSiteHotkeys } from '@/lib/siteHotkeys';
 import { parseSoundMuted } from '@/lib/soundMute';
 import { parseMood } from './stats/mood';
 import { parseLiveWallpaper, resolveLive } from './wallpaper/liveWallpaper';
@@ -241,6 +242,15 @@ describe('кнопки «Без звука» и «Без эффектов»', ()
 		expect(parseSoundMuted(null)).toBeUndefined();
 		expect(parseEffectsOff(1)).toBeUndefined();
 		expect(parseEffectsOff({})).toBeUndefined();
+	});
+});
+
+describe('клавиши сайта', () => {
+	it('читает флаг, мусор отбрасывает', () => {
+		expect(parseSiteHotkeys(true)).toBe(true);
+		expect(parseSiteHotkeys(false)).toBe(false);
+		expect(parseSiteHotkeys('false')).toBeUndefined();
+		expect(parseSiteHotkeys(null)).toBeUndefined();
 	});
 });
 
