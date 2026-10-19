@@ -61,7 +61,7 @@ export function ScenesDialog({ open, onFinish }: ScenesDialogProps) {
 
 				<ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 					{scenes.map((scene) => {
-						const thumb = wallpapers.find((item) => item.id === scene.wallpaperId)?.thumb;
+						const wallpaper = wallpapers.find((item) => item.id === scene.wallpaperId);
 						return (
 							<li key={scene.id} className="flex">
 								<button
@@ -73,7 +73,10 @@ export function ScenesDialog({ open, onFinish }: ScenesDialogProps) {
 									className="group flex w-full flex-col gap-2 rounded-xl border border-white/10 bg-white/5 p-2 text-left transition-colors outline-none hover:bg-white/15 focus-visible:ring-3 focus-visible:ring-white/30"
 								>
 									<img
-										src={thumb}
+										src={wallpaper?.thumb}
+										srcSet={wallpaper?.thumbSrcSet}
+										// Плитка ~8rem с sm, на телефоне две колонки
+										sizes="(min-width: 40rem) 8rem, 44vw"
 										alt=""
 										className="aspect-video w-full rounded-lg object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
 									/>

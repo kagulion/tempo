@@ -45,14 +45,38 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 
 	const media = wallpaper.kind === 'custom' ? wallpaper.media : wallpaper.kind;
 	if (media === 'image') {
-		return (
+		const image = wallpaper.kind === 'custom' ? undefined : wallpaper.image;
+		const img = (
 			<img
 				src={wallpaper.url}
+				// Без вариантов (свои обои, новые обои без запуска скрипта) остаётся один файл
+				srcSet={image?.srcSet}
+				sizes={image?.srcSet ? image.sizes : undefined}
 				alt={wallpaper.title}
+				// Фон — главная картинка страницы: качаем с высоким приоритетом, а раскодирует браузер вне основного потока
+				fetchPriority="high"
+				decoding="async"
 				onLoad={onReady}
 				onAnimationEnd={onShown}
 				className={cn(layerClass, className)}
 			/>
+		);
+		if (!image || image.sources.length === 0) return img;
+		// Источники по порядку: портретные кропы (AVIF, затем webp), горизонтальный AVIF; запасной webp — сам <img>.
+		// <picture> не рисуется сам, поэтому слой остаётся <img> с теми же классами
+		return (
+			<picture>
+				{image.sources.map((source) => (
+					<source
+						key={`${source.media ?? 'landscape'}-${source.type}`}
+						type={source.type}
+						media={source.media}
+						srcSet={source.srcSet}
+						sizes={source.sizes}
+					/>
+				))}
+				{img}
+			</picture>
 		);
 	}
 

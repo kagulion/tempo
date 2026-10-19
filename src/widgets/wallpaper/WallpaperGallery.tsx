@@ -204,6 +204,9 @@ export function WallpaperGallery({ className }: WallpaperGalleryProps) {
 											{/* lazy: пока окно скрыто, превью не грузятся */}
 											<img
 												src={item.thumb}
+												srcSet={item.thumbSrcSet}
+												// Плитка ~9rem с sm, на телефоне две колонки на всю ширину окна
+												sizes="(min-width: 40rem) 9rem, calc((100vw - 4rem) / 2)"
 												alt=""
 												loading="lazy"
 												decoding="async"

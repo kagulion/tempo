@@ -27,6 +27,7 @@ import dragonflight from '@/assets/wallpapers/warcraft/dragonflight.mp4';
 import pandaria from '@/assets/wallpapers/warcraft/mists-of-pandaria.mp4';
 import nightElf from '@/assets/wallpapers/warcraft/night-elf.mp4';
 
+import { buildImageSources, buildThumbSrcSet, type ImageSources } from './variants';
 import { rutubeWallpaperId } from '@/widgets/rutube/rutube';
 import {
 	type YouTubeHistoryItem,
@@ -46,6 +47,10 @@ export type FileWallpaper = {
 	url: string;
 	// Маленькое превью для галереи (webp ~480px). Оригиналы весят мегабайты, сетка из них грузилась бы долго
 	thumb: string;
+	// srcset превью 240w/480w для галереи и окна сцен. Нет маленького файла — undefined
+	thumbSrcSet?: string;
+	// Картинка: <picture> с вариантами по ширине, портретными кропами и AVIF (см. variants.ts). У видео нет
+	image?: ImageSources;
 };
 
 // Видео с YouTube, которое вставил посетитель. Живёт не в списке обоев, а в истории ссылок
@@ -113,7 +118,33 @@ export const categories: { value: Category; label: string }[] = [
 	{ value: 'japan', label: 'Япония' }
 ];
 
-export const wallpapers: FileWallpaper[] = [
+// Варианты и превью, которые сделал scripts/wallpaper-variants.ts. Ключ — путь от src/assets/wallpapers/
+// (`horde/orcs-tavern.1280.avif`, `thumbs/horde/orcs-tavern.240.webp`). Как и оригиналы, файлы скачиваются, только когда их показывают
+const variantUrls = Object.fromEntries(
+	Object.entries(
+		import.meta.glob<string>('/src/assets/wallpapers/**/*.{avif,webp}', {
+			eager: true,
+			query: '?url',
+			import: 'default'
+		})
+	).map(([path, url]) => [path.replace('/src/assets/wallpapers/', ''), url])
+);
+
+const thumbUrls = Object.fromEntries(
+	Object.entries(variantUrls)
+		.filter(([path]) => path.startsWith('thumbs/'))
+		.map(([path, url]) => [path.slice('thumbs/'.length), url])
+);
+
+function withVariants(item: FileWallpaper): FileWallpaper {
+	return {
+		...item,
+		thumbSrcSet: buildThumbSrcSet(item.id, item.thumb, thumbUrls),
+		image: item.kind === 'image' ? buildImageSources(item.id, item.url, variantUrls) : undefined
+	};
+}
+
+const files: FileWallpaper[] = [
 	{
 		id: 'alliance/alliance-tavern',
 		title: 'Таверна Альянса',
@@ -227,3 +258,5 @@ export const wallpapers: FileWallpaper[] = [
 		thumb: villageThumb
 	}
 ];
+
+export const wallpapers: FileWallpaper[] = files.map(withVariants);
