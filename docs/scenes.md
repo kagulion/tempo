@@ -4,14 +4,7 @@
 
 ## Где код
 
-| Файл                                                                                    | Что внутри                                                                                   |
-| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [`src/widgets/onboarding/scenes.ts`](../src/widgets/onboarding/scenes.ts)               | Список сцен и `sceneEffects` (учёт «уменьшить движение»). Тесты — `scenes.test.ts`           |
-| [`src/widgets/onboarding/ScenesDialog.tsx`](../src/widgets/onboarding/ScenesDialog.tsx) | Диалог с карточками сцен и `applyScene`, который всё включает                                |
-| [`src/widgets/onboarding/onboarding.ts`](../src/widgets/onboarding/onboarding.ts)       | Когда показывать экран: `parseOnboarding`, `initialOnboarding`. Тесты — `onboarding.test.ts` |
-| [`src/widgets/onboarding/useOnboarding.ts`](../src/widgets/onboarding/useOnboarding.ts) | Хук: `visible`, `open`, `finish`; хранение флага                                             |
-| [`src/widgets/onboarding/scenesReopen.ts`](../src/widgets/onboarding/scenesReopen.ts)   | Повторное открытие по просьбе посетителя: `openScenes`, `closeScenes`, `useScenesReopened`   |
-| [`src/widgets/dock/ScenesButton.tsx`](../src/widgets/dock/ScenesButton.tsx)             | Кнопка «Сменить сцену» на панели                                                             |
+Код в [`src/widgets/onboarding/`](../src/widgets/onboarding/): сцены и их применение (`scenes.ts`, `ScenesDialog.tsx`), когда показывать экран (`onboarding.ts`), повторное открытие по просьбе посетителя (`scenesReopen.ts`). Кнопка «Сменить сцену» — `ScenesButton.tsx` в [`src/widgets/dock/`](../src/widgets/dock/).
 
 ## Список сцен
 
@@ -46,8 +39,3 @@
 - **Пока экран открыт**, остальные [клавиши сайта](hotkeys.md) молчат.
 - После закрытия фокус возвращается на кнопку «Сменить сцену» (`data-scenes-button`). Если её нет (например, при первом визите), фокус возвращает сам диалог Base UI.
 - Когда окно открыто с самой загрузки страницы, оно появляется сразу, без проявления: пока оно прозрачно, браузер не засчитывает его текст как отрисованный (LCP).
-
-## Тесты
-
-- [`scenes.test.ts`](../src/widgets/onboarding/scenes.test.ts): состав сцен и `sceneEffects` с «уменьшить движение».
-- [`onboarding.test.ts`](../src/widgets/onboarding/onboarding.test.ts): `parseOnboarding` принимает только `pending` и `done`; `initialOnboarding` по ключам хранилища.

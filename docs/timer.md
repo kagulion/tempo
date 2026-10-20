@@ -1,20 +1,10 @@
 # Таймер
 
-Виджет в правом верхнем углу (на телефоне — над панелью во всю ширину). Окно открывается кнопкой «Таймер» на [панели](widgets.md#панель). Три режима на вкладках: **Помидоро**, **Отсчёт** и **Секундомер**. Положение задаёт реестр [`src/widgets/registry.ts`](../src/widgets/registry.ts), всё остальное лежит в `src/widgets/timer/`.
+Окно открывается кнопкой «Таймер» на [панели](widgets.md#панель). Три режима на вкладках: **Помидоро**, **Отсчёт** и **Секундомер**. Где окно стоит на экране, см. [раскладку](widgets.md#раскладка-на-разных-экранах).
 
 ## Где код
 
-| Файл                                                                            | Что внутри                                                                                                              |
-| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| [`src/widgets/timer/TimerWidget.tsx`](../src/widgets/timer/TimerWidget.tsx)     | Разметка: вкладки, настройки, циферблат и кнопки. Логики нет, только вызов `useTimer`                                   |
-| [`src/widgets/timer/useTimer.ts`](../src/widgets/timer/useTimer.ts)             | Состояние таймера: настройки, запуск, пауза, сигнал, `localStorage`                                                     |
-| [`src/widgets/timer/phases.ts`](../src/widgets/timer/phases.ts)                 | Логика без React: смена фаз помидоро, догон после перезагрузки (`settle`), тексты уведомлений. Тесты — `phases.test.ts` |
-| [`src/widgets/timer/SettingSlider.tsx`](../src/widgets/timer/SettingSlider.tsx) | Строка настройки во всю ширину на Base UI Slider: заливка фона показывает значение                                      |
-| [`src/widgets/timer/signal.ts`](../src/widgets/timer/signal.ts)                 | Сигнал о конце фазы: колокольчик через Web Audio и системное уведомление                                                |
-| [`src/lib/ducking.ts`](../src/lib/ducking.ts)                                   | Приглушение музыки вокруг сигнала: таймер сообщает момент сигнала, радио и звуки берут множитель громкости              |
-| [`src/hooks/useDuckLevel.ts`](../src/hooks/useDuckLevel.ts)                     | Хук для звуковых виджетов: текущий множитель громкости, тикает только во время приглушения. В режиме «без звука» — 0    |
-| [`src/components/ui/tabs.tsx`](../src/components/ui/tabs.tsx)                   | Вкладки base-nova на Base UI в стиле стеклянной панели                                                                  |
-| [`src/components/ui/progress.tsx`](../src/components/ui/progress.tsx)           | Полоса прогресса base-nova на Base UI в стиле стеклянной панели                                                         |
+Код в [`src/widgets/timer/`](../src/widgets/timer/). `TimerWidget.tsx` — только разметка, состояние в `useTimer.ts`, логика без React (смена фаз, догон после перезагрузки `settle`, тексты уведомлений) — в `phases.ts`. Приглушение музыки вокруг сигнала — [`src/lib/ducking.ts`](../src/lib/ducking.ts) и [`src/hooks/useDuckLevel.ts`](../src/hooks/useDuckLevel.ts), подробно [ниже](#приглушение-музыки). `SettingSlider.tsx` используется и в [затемнении](dimmer.md).
 
 ## Режимы
 

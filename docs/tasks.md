@@ -6,15 +6,7 @@
 
 ## Где код
 
-| Файл                                                                        | Что внутри                                                                                                                                      |
-| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`src/widgets/tasks/TasksWidget.tsx`](../src/widgets/tasks/TasksWidget.tsx) | Окно: поле ввода, `DndContext` из dnd-kit, датчики, обработчики перетаскивания, объявления для скринридера                                      |
-| [`src/widgets/tasks/TaskColumn.tsx`](../src/widgets/tasks/TaskColumn.tsx)   | Секция: заголовок со счётчиком (клик сворачивает), список карточек, место для броска                                                            |
-| [`src/widgets/tasks/TaskCard.tsx`](../src/widgets/tasks/TaskCard.tsx)       | Карточка (`useSortable`) с меню «Действия» и её копия `TaskCardOverlay`, которая летит за курсором                                              |
-| [`src/widgets/tasks/columnIcons.ts`](../src/widgets/tasks/columnIcons.ts)   | Иконки секций                                                                                                                                   |
-| [`src/widgets/tasks/board.ts`](../src/widgets/tasks/board.ts)               | Логика без React: `addCard`, `removeCard`, `moveCard`, `toggleCollapsed`, `findCard`, разбор сохранённого `parseBoard`. Тесты — `board.test.ts` |
-| [`src/widgets/tasks/dnd.ts`](../src/widgets/tasks/dnd.ts)                   | Мелочи перетаскивания: `columnDropId` и `columnOfDropId`, выбор цели `collisionDetection`                                                       |
-| [`src/widgets/tasks/useBoard.ts`](../src/widgets/tasks/useBoard.ts)         | Состояние доски и сохранение в `localStorage`. Действия `add`, `remove`, `move`, `toggleCollapsed`                                              |
+Код в [`src/widgets/tasks/`](../src/widgets/tasks/). Логика доски без React — `board.ts`, мелочи перетаскивания (id мест для броска и выбор цели) — `dnd.ts`. Датчики, обработчики перетаскивания и объявления для скринридера — в `TasksWidget.tsx`.
 
 ## Как это работает
 
@@ -40,7 +32,3 @@
 Доска целиком хранится в `localStorage` под ключом `tempo:tasks` (`storageKeys.tasks` в [`src/lib/storage.ts`](../src/lib/storage.ts)) через `usePersistentState` с разбором `parseBoard`.
 
 `parseBoard` разбирает данные по частям: испорченные карточки отбрасываются по одной, а не вся доска. Остаются карточки с непустым строковым `id` и названием (оно чистится и обрезается до лимита). Карточка с уже встречавшимся `id` (в этой или другой секции) остаётся один раз, в первой. Лишние поля и секции игнорируются. Если списка `collapsed` нет, сворачивается «Готово». Не объект — `undefined`, то есть берётся пустая доска.
-
-## Тесты
-
-[`src/widgets/tasks/board.test.ts`](../src/widgets/tasks/board.test.ts) проверяет `emptyBoard`, `addCard` (конец «Сделать», пробелы, пустое название, лимит длины, занятый `id`, неизменность исходной доски), `removeCard`, `moveCard` (пустая секция, начало, середина, конец, слишком большой и отрицательный индекс, перестановка внутри секции, то же место, карточки не теряются и не размножаются), `toggleCollapsed` и `parseBoard`.
