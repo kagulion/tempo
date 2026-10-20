@@ -71,7 +71,7 @@ describe('история видео YouTube', () => {
 	});
 });
 
-describe('звук видео-обоев (YouTube и ТВ)', () => {
+describe('звук видео (YouTube и Twitch)', () => {
 	it('читает сохранённый выбор', () => {
 		expect(parseSoundOn(true)).toBe(true);
 		expect(parseSoundOn(false)).toBe(false);

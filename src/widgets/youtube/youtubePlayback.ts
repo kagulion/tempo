@@ -5,7 +5,7 @@ import { createPersistentStore, storageKeys } from '@/lib/storage';
 import { parseSoundOn } from './playback';
 import { defaultVideoQuality, parseVideoQuality, type VideoQuality } from './quality';
 
-// Управление видео-фоном с YouTube, общее для фона и окна YouTube. Пауза общая и для ТВ-фона: фон один
+// Управление видео-фоном с YouTube, общее для фона и окна YouTube
 
 // Пауза от кнопки. undefined — посетитель не выбирал. Не сохраняется: после перезагрузки видео снова играет
 let paused: boolean | undefined;

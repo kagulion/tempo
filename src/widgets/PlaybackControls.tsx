@@ -10,7 +10,7 @@ type PlaybackControlsProps = {
 	onToggleSound: () => void;
 };
 
-// Кнопки в шапке окна, когда фон — видео (YouTube, ТВ): пауза и звук
+// Кнопки паузы и звука в шапке окон с видео: YouTube и Twitch
 export function PlaybackControls({
 	stopped,
 	onTogglePause,
