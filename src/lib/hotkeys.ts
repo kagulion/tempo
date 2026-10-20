@@ -32,8 +32,6 @@ export const staticHotkeys = [
 	{ action: 'clickSounds', code: 'KeyK', label: 'Звуки нажатий', group: 'other' }
 ] as const satisfies readonly HotkeyBinding[];
 
-export type StaticHotkeyAction = (typeof staticHotkeys)[number]['action'];
-
 type WidgetHotkeySource = { id: string; label: string; hotkey?: string };
 
 // Клавиши окон виджетов: 'widget:<id>'

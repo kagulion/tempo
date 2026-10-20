@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { genres } from './genres';
 import type { RecordStation } from './record';
 import { snapshotStations as all } from './saved';
-import { filterStations, placeStation, sortStations, stationsForSource } from './stations';
+import { placeStation, sortStations, stationsForSource } from './stations';
 
 function station(id: number, patch: Partial<RecordStation> = {}): RecordStation {
 	return {
@@ -77,18 +77,5 @@ describe('placeStation', () => {
 		const placed = placeStation(list, station(9));
 		expect(ids(placed.list)).toEqual([9, 1, 2, 3]);
 		expect(placed.index).toBe(0);
-	});
-});
-
-describe('filterStations', () => {
-	const list = [station(1, { title: 'Lo-Fi' }), station(2, { title: 'Chill House' })];
-
-	it('ищет по названию без учёта регистра и пробелов', () => {
-		expect(ids(filterStations(list, '  HOUSE '))).toEqual([2]);
-	});
-
-	it('пустой запрос возвращает все станции, ненайденное — пустой список', () => {
-		expect(filterStations(list, '  ')).toBe(list);
-		expect(filterStations(list, 'jazz')).toEqual([]);
 	});
 });

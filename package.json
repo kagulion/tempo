@@ -14,7 +14,6 @@
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"record:snapshot": "node scripts/record-snapshot.ts",
-		"rutube:snapshot": "node scripts/rutube-snapshot.ts",
 		"wallpaper:variants": "node scripts/wallpaper-variants.ts"
 	},
 	"dependencies": {

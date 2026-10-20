@@ -15,17 +15,6 @@ import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
 
 import { hasRunningTimer } from './timer/running';
 
-// Загруженная музыка временно скрыта: вместо неё играет радио. Код оставлен, чтобы вернуть её флагом
-export const musicEnabled = false;
-
-// Плеер загруженной музыки, отдельным чанком. Пока музыка выключена, импорта нет вовсе —
-// иначе сборщик положил бы mp3 (~14 МБ) в dist, даже если плеер нигде не показан
-export const BackgroundMusic = musicEnabled
-	? lazy(() =>
-			import('./music/BackgroundMusic').then((module) => ({ default: module.BackgroundMusic }))
-		)
-	: null;
-
 // Свойства окна виджета. Положение на экране приходит в className
 export type WidgetProps = {
 	className?: string;
@@ -91,8 +80,7 @@ const definitions = [
 		column: 'left',
 		anchor: 'bottom',
 		// Не сжимается: управление радио должно быть видно целиком, прокручиваются звуки над ним
-		placement: 'sm:w-[26rem] xl:w-full xl:max-w-[26rem] sm:shrink-0',
-		enabled: !musicEnabled
+		placement: 'sm:w-[26rem] xl:w-full xl:max-w-[26rem] sm:shrink-0'
 	},
 	{
 		id: 'ambience',

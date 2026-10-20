@@ -34,15 +34,9 @@ describe('обои', () => {
 		expect(parseSaved({ id: 'youtube/dQw4w9WgXcQ' })).toEqual({ id: 'youtube/dQw4w9WgXcQ' });
 	});
 
-	it('читает эфир Rutube по id вида rutube/<id эфира>', () => {
-		const id = 'rutube/546602986e6a424d74d594876ddb3f04';
-		expect(parseSaved({ id })).toEqual({ id });
-	});
-
-	it('плохие id Rutube отбрасывает', () => {
+	it('удалённый Rutube: id rutube/<id> превращается в обои по умолчанию', () => {
+		expect(parseSaved({ id: 'rutube/546602986e6a424d74d594876ddb3f04' })).toBeUndefined();
 		expect(parseSaved({ id: 'rutube/' })).toBeUndefined();
-		expect(parseSaved({ id: 'rutube/short' })).toBeUndefined();
-		expect(parseSaved({ id: 'rutube/546602986e6a424d74d594876ddb3f04/x' })).toBeUndefined();
 	});
 
 	it('старый телеканал tv/<id> превращается в обои по умолчанию', () => {

@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 
-import { RutubeLayer } from '@/widgets/rutube/RutubeLayer';
 import { setYouTubeTitle } from '@/widgets/youtube/useYouTubeHistory';
 import { YouTubeLayer } from '@/widgets/youtube/YouTubeLayer';
 
@@ -125,10 +124,10 @@ function Layer({ wallpaper, onReady, onShown, className }: LayerProps) {
 	);
 }
 
-// Фон на весь экран: картинка, зацикленное видео без звука, видео с YouTube или эфир Rutube.
+// Фон на весь экран: картинка, зацикленное видео без звука, видео с YouTube.
 // Новые обои кладутся поверх старых и проявляются, когда загрузились, — без чёрной вспышки между ними
 export function WallpaperBackground() {
-	const { current: wallpaper, fail, select } = useWallpaper();
+	const { current: wallpaper, fail } = useWallpaper();
 	// Обои, которые уже полностью видны. Пока новые грузятся, они остаются под ними
 	const [shown, setShown] = useState(wallpaper);
 	const [readyId, setReadyId] = useState<string | null>(null);
@@ -173,20 +172,6 @@ export function WallpaperBackground() {
 							soundAllowed={item.id === wallpaper.id && readyId === item.id}
 							onError={(message, permanent) => handleError(item, message, permanent)}
 							onTitle={(title) => setYouTubeTitle(item.videoId, title)}
-							{...common}
-						/>
-					);
-				}
-				if (item.kind === 'rutube') {
-					return (
-						<RutubeLayer
-							key={item.id}
-							wallpaper={item}
-							// Звучит только главный слой: выбранный и уже проявившийся
-							soundAllowed={item.id === wallpaper.id && readyId === item.id}
-							onError={(message) => handleError(item, message, true)}
-							// Запуск отменён: прежние обои, а если слой и был фоном (после перезагрузки) — обои по умолчанию
-							onCancel={() => select(item.id !== shown.id ? shown.id : defaultWallpaperId)}
 							{...common}
 						/>
 					);

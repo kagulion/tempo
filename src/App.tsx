@@ -28,7 +28,6 @@ import { useFocusMode } from '@/widgets/focus/useFocusMode';
 import { hotkeyBindings } from '@/widgets/hotkeys/bindings';
 import { HotkeysButton, HotkeysDialog } from '@/widgets/hotkeys/HotkeysDialog';
 import {
-	BackgroundMusic,
 	preloadWidget,
 	widgets,
 	type WidgetColumn,
@@ -249,11 +248,6 @@ export default function App() {
 						</div>
 					))}
 				</div>
-				{BackgroundMusic && (
-					<Suspense>
-						<BackgroundMusic />
-					</Suspense>
-				)}
 
 				<div className={cn(dockRowClass, !visibility.dock && 'hidden sm:hidden')}>
 					{dockPanels.map((panel) => (

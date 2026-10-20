@@ -49,10 +49,3 @@ export function placeStation(sorted: RecordStation[], first: RecordStation) {
 	if (existing !== -1) return { list: sorted, index: existing };
 	return { list: [first, ...sorted], index: 0 };
 }
-
-// Локальный поиск по названию без учёта регистра и пробелов по краям
-export function filterStations(stations: RecordStation[], query: string) {
-	const text = query.trim().toLowerCase();
-	if (!text) return stations;
-	return stations.filter((item) => item.title.toLowerCase().includes(text));
-}

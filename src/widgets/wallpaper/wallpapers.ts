@@ -27,7 +27,6 @@ import {
 	type ImageSources,
 	type VideoSource
 } from './variants';
-import { rutubeWallpaperId } from '@/widgets/rutube/rutube';
 import {
 	type YouTubeHistoryItem,
 	youtubeThumb,
@@ -67,15 +66,6 @@ export type YouTubeWallpaper = {
 	thumb: string;
 };
 
-// Эфир или видео Rutube: iframe плеера. Как и YouTube, живёт не в списке обоев
-export type RutubeWallpaper = {
-	// rutube/<id эфира>
-	id: string;
-	title: string;
-	kind: 'rutube';
-	streamId: string;
-};
-
 // Файл, который посетитель загрузил сам. Лежит в IndexedDB его браузера, см. customStore.ts
 export type CustomWallpaper = {
 	// custom/<ключ>
@@ -88,7 +78,7 @@ export type CustomWallpaper = {
 	url: string;
 };
 
-export type Wallpaper = FileWallpaper | CustomWallpaper | YouTubeWallpaper | RutubeWallpaper;
+export type Wallpaper = FileWallpaper | CustomWallpaper | YouTubeWallpaper;
 
 const youtubeTitle = 'Видео YouTube';
 
@@ -101,15 +91,6 @@ export function youtubeWallpaper(item: YouTubeHistoryItem): YouTubeWallpaper {
 		videoId: item.videoId,
 		start: item.start,
 		thumb: youtubeThumb(item.videoId)
-	};
-}
-
-export function rutubeWallpaper(streamId: string): RutubeWallpaper {
-	return {
-		id: rutubeWallpaperId(streamId),
-		title: 'Эфир Rutube',
-		kind: 'rutube',
-		streamId
 	};
 }
 
