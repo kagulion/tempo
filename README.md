@@ -90,11 +90,16 @@ docs/                подробные описания виджетов
 - [Радио](docs/radio.md)
 - [Звуки](docs/ambience.md)
 - [Таймер](docs/timer.md)
+- [Задачи](docs/tasks.md)
 - [Статистика](docs/stats.md)
 - [Обои](docs/wallpaper.md)
 - [YouTube-фон](docs/youtube.md)
 - [Окно Twitch](docs/twitch.md)
 - [Эффекты](docs/effects.md)
+- [Затемнение](docs/dimmer.md)
+- [Сцены и первый экран](docs/scenes.md)
+- [Режим фокуса и крупные часы](docs/focus.md)
+- [Горячие клавиши](docs/hotkeys.md)
 
 ## Лицензия и источники
 
