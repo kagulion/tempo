@@ -2,4 +2,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://tempo.onrender.com/sitemap.xml
+Sitemap: https://tempo-1qlr.onrender.com/sitemap.xml
