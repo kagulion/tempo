@@ -2,29 +2,35 @@ import { useEffect, useRef } from 'react';
 
 import { cn } from '@/lib/utils';
 
-import type { EffectRenderer } from './renderers/types';
+import { type EffectId, effects } from './effects';
+import { createLayerRenderers } from './layerRenderers';
 
 type EffectCanvasProps = {
-	create: () => EffectRenderer;
+	// Включённые эффекты этого слоя
+	ids: EffectId[];
 	layer: 'front' | 'back';
 	// Заморозить частицы на месте: последний кадр остаётся на экране, цикл не крутится
 	paused: boolean;
 };
 
-// Холст на весь экран для одного эффекта: размер под окно и плотность пикселей, цикл requestAnimationFrame,
-// пауза в скрытой вкладке. Что рисовать, решает renderer
-export function EffectCanvas({ create, layer, paused }: EffectCanvasProps) {
+// Один холст на весь экран для всех эффектов слоя: полноэкранные холсты дорого компоновать на GPU, поэтому
+// их не больше двух. Размер под окно и плотность пикселей, цикл requestAnimationFrame, пауза в скрытой вкладке.
+// Что рисовать, решают renderer-ы
+export function EffectCanvas({ ids, layer, paused }: EffectCanvasProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	// Цикл живёт в эффекте ниже и читает паузу через ref, чтобы не пересоздавать частицы при каждом нажатии
+	// Цикл живёт в эффекте ниже и читает список и паузу через ref: он не перезапускается при их смене,
+	// а частицы остальных эффектов не сбрасываются
+	const idsRef = useRef(ids);
 	const pausedRef = useRef(paused);
 	const resumeRef = useRef(() => {});
+	const syncRef = useRef(() => {});
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		const ctx = canvas?.getContext('2d');
 		if (!canvas || !ctx) return;
 
-		const renderer = create();
+		const layerRenderers = createLayerRenderers(effects.filter((effect) => effect.layer === layer));
 		let animationId = 0;
 		let lastTime = performance.now();
 		let lastNow = lastTime;
@@ -45,10 +51,16 @@ export function EffectCanvas({ create, layer, paused }: EffectCanvasProps) {
 
 		function drawFrame(dt: number, now: number) {
 			if (!ctx) return;
-			ctx.clearRect(0, 0, width, height);
-			ctx.globalCompositeOperation = 'source-over';
-			renderer.draw(ctx, dt, now, width, height);
+			layerRenderers.drawLayer(ctx, dt, now, width, height);
 		}
+
+		// Включённые эффекты изменились: новые создаём, выключенные убираем. На паузе кадр не крутится,
+		// поэтому новый эффект рисуем одним кадром без движения, чтобы он был виден
+		function sync() {
+			layerRenderers.sync(idsRef.current, width, height);
+			if (!animationId) drawFrame(0, lastNow);
+		}
+		syncRef.current = sync;
 
 		function render(now: number) {
 			// После долгой паузы (вкладка была в фоне) не даём частицам прыгнуть
@@ -75,7 +87,7 @@ export function EffectCanvas({ create, layer, paused }: EffectCanvasProps) {
 		}
 
 		resize();
-		renderer.init(width, height);
+		layerRenderers.sync(idsRef.current, width, height);
 		// Первый кадр рисуем всегда, даже на паузе, — иначе после перезагрузки эффекта не было бы видно
 		animationId = requestAnimationFrame(render);
 
@@ -87,7 +99,12 @@ export function EffectCanvas({ create, layer, paused }: EffectCanvasProps) {
 			window.removeEventListener('resize', resize);
 			document.removeEventListener('visibilitychange', handleVisibilityChange);
 		};
-	}, [create]);
+	}, [layer]);
+
+	useEffect(() => {
+		idsRef.current = ids;
+		syncRef.current();
+	}, [ids]);
 
 	useEffect(() => {
 		pausedRef.current = paused;

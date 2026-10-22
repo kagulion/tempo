@@ -1,3 +1,4 @@
+import { createGlowSprite } from './glowSprite';
 import type { EffectRenderer } from './types';
 
 type Ember = {
@@ -18,6 +19,54 @@ type Ember = {
 };
 
 const count = 75;
+
+// Свечение до ~10 px в радиусе, при DPR 2 это ~20 px: спрайт 64 px (радиус 32) с запасом против мыла
+const spriteSize = 64;
+// Радиус ядра относительно радиуса свечения (radius * 0.5 против radius * 3.2)
+const coreRatio = 0.5 / 3.2;
+
+// Палитра: от белого-золотого центра до огненно-оранжевого ореола. В центре прозрачность 1,
+// настоящую задаёт кадр через globalAlpha
+function createEmberSprite(stops: [offset: number, color: string][]) {
+	return createGlowSprite(spriteSize, (ctx, size) => {
+		const c = size / 2;
+		const gradient = ctx.createRadialGradient(c, c, 0, c, c, c);
+		for (const [offset, color] of stops) gradient.addColorStop(offset, color);
+		ctx.fillStyle = gradient;
+		ctx.fillRect(0, 0, size, size);
+		// Яркое горячее ядро искры
+		ctx.globalCompositeOperation = 'lighter';
+		ctx.beginPath();
+		ctx.arc(c, c, c * coreRatio, 0, Math.PI * 2);
+		ctx.fillStyle = 'rgba(255, 255, 230, 0.9)';
+		ctx.fill();
+	});
+}
+
+// Индекс — colorVariant огонька
+const sprites = [
+	// Горячая золотистая искра
+	createEmberSprite([
+		[0, 'rgba(255, 250, 210, 1)'],
+		[0.3, 'rgba(255, 180, 50, 0.8)'],
+		[0.7, 'rgba(255, 90, 10, 0.3)'],
+		[1, 'rgba(255, 40, 0, 0)']
+	]),
+	// Тёплая янтарно-оранжевая искра
+	createEmberSprite([
+		[0, 'rgba(255, 240, 180, 1)'],
+		[0.35, 'rgba(255, 130, 20, 0.8)'],
+		[0.75, 'rgba(240, 60, 5, 0.3)'],
+		[1, 'rgba(200, 30, 0, 0)']
+	]),
+	// Багровая тлеющая искра
+	createEmberSprite([
+		[0, 'rgba(255, 220, 150, 1)'],
+		[0.4, 'rgba(240, 90, 15, 0.75)'],
+		[0.8, 'rgba(190, 35, 5, 0.25)'],
+		[1, 'rgba(140, 10, 0, 0)']
+	])
+];
 
 // Огоньки: искры поднимаются снизу, покачиваются, мерцают и гаснут
 export function createEmbers(): EffectRenderer {
@@ -85,40 +134,16 @@ export function createEmbers(): EffectRenderer {
 
 				if (alpha <= 0.005) continue;
 
-				// Цветовая палитра: от белого-золотого центра до огненно-оранжевого ореола
+				// Свечение и горячее ядро запечены в спрайт цвета: размер задаёт радиус, яркость — globalAlpha
 				const glowRadius = p.radius * 3.2;
-				const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius);
-
-				if (p.colorVariant === 0) {
-					// Горячая золотистая искра
-					gradient.addColorStop(0, `rgba(255, 250, 210, ${alpha})`);
-					gradient.addColorStop(0.3, `rgba(255, 180, 50, ${alpha * 0.8})`);
-					gradient.addColorStop(0.7, `rgba(255, 90, 10, ${alpha * 0.3})`);
-					gradient.addColorStop(1, `rgba(255, 40, 0, 0)`);
-				} else if (p.colorVariant === 1) {
-					// Теплая янтарно-оранжевая искра
-					gradient.addColorStop(0, `rgba(255, 240, 180, ${alpha})`);
-					gradient.addColorStop(0.35, `rgba(255, 130, 20, ${alpha * 0.8})`);
-					gradient.addColorStop(0.75, `rgba(240, 60, 5, ${alpha * 0.3})`);
-					gradient.addColorStop(1, `rgba(200, 30, 0, 0)`);
-				} else {
-					// Багровая тлеющая искра
-					gradient.addColorStop(0, `rgba(255, 220, 150, ${alpha})`);
-					gradient.addColorStop(0.4, `rgba(240, 90, 15, ${alpha * 0.75})`);
-					gradient.addColorStop(0.8, `rgba(190, 35, 5, ${alpha * 0.25})`);
-					gradient.addColorStop(1, `rgba(140, 10, 0, 0)`);
-				}
-
-				ctx.beginPath();
-				ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2);
-				ctx.fillStyle = gradient;
-				ctx.fill();
-
-				// Яркое горячее ядро искры
-				ctx.beginPath();
-				ctx.arc(p.x, p.y, p.radius * 0.5, 0, Math.PI * 2);
-				ctx.fillStyle = `rgba(255, 255, 230, ${alpha * 0.9})`;
-				ctx.fill();
+				ctx.globalAlpha = alpha;
+				ctx.drawImage(
+					sprites[p.colorVariant](),
+					p.x - glowRadius,
+					p.y - glowRadius,
+					glowRadius * 2,
+					glowRadius * 2
+				);
 			}
 		}
 	};
