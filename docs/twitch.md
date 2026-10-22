@@ -15,16 +15,7 @@
 
 ## Где код
 
-| Файл                                                                                  | Что внутри                                                                                               |
-| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| [`src/widgets/twitch/TwitchWidget.tsx`](../src/widgets/twitch/TwitchWidget.tsx)       | Окно: плеер 16:9, поле ссылки, тег темы, карточки каналов                                                |
-| [`src/widgets/twitch/useTwitchPlayer.ts`](../src/widgets/twitch/useTwitchPlayer.ts)   | Хук плеера: создание `Twitch.Player`, события, таймауты, пауза и звук, пауза при закрытии окна           |
-| [`src/widgets/twitch/TwitchControls.tsx`](../src/widgets/twitch/TwitchControls.tsx)   | Кнопки паузы и звука в шапке                                                                             |
-| [`src/widgets/twitch/useTwitch.ts`](../src/widgets/twitch/useTwitch.ts)               | Сохранённый канал (`tempo:twitch-channel`) и звук (`tempo:twitch-sound`)                                 |
-| [`src/widgets/twitch/player.ts`](../src/widgets/twitch/player.ts)                     | Загрузка `https://player.twitch.tv/js/embed/v1.js` (один раз, по требованию) и типы плеера               |
-| [`src/widgets/twitch/twitch.ts`](../src/widgets/twitch/twitch.ts)                     | Чистая логика: разбор ссылок и login, превью, темы, тексты ошибок, «эфир начался», таймауты. Тесты рядом |
-| [`src/widgets/twitch/channels.ts`](../src/widgets/twitch/channels.ts)                 | Ручной список каналов по темам                                                                           |
-| [`src/widgets/effects/frontSuppressed.ts`](../src/widgets/effects/frontSuppressed.ts) | Временное скрытие эффектов поверх окон, пока плеер открыт                                                |
+Код в [`src/widgets/twitch/`](../src/widgets/twitch/). Скрипт плеера `https://player.twitch.tv/js/embed/v1.js` загружается один раз и только по требованию (`player.ts`). Логика без React (разбор ссылок и login, превью, темы, тексты ошибок, таймауты) — `twitch.ts`, ручной список каналов — `channels.ts`. Канал и звук сохраняются в `tempo:twitch-channel` и `tempo:twitch-sound`. Пока плеер открыт, эффекты поверх окон временно скрываются: [`src/widgets/effects/frontSuppressed.ts`](../src/widgets/effects/frontSuppressed.ts).
 
 ## Как это работает
 

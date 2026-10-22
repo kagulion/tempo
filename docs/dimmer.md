@@ -6,12 +6,7 @@
 
 ## Где код
 
-| Файл                                                                            | Что внутри                                                                                         |
-| ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| [`src/widgets/dimmer/DimmerWidget.tsx`](../src/widgets/dimmer/DimmerWidget.tsx) | Окно: ползунок `SettingSlider` (тот же, что в [таймере](timer.md)), сброс, строка «Эффекты скрыты» |
-| [`src/widgets/dimmer/DimmerLayer.tsx`](../src/widgets/dimmer/DimmerLayer.tsx)   | Чёрный слой над обоями на всю страницу                                                             |
-| [`src/widgets/dimmer/useDimmer.ts`](../src/widgets/dimmer/useDimmer.ts)         | Общее состояние (`createPersistentStore`): нужно и окну, и слою                                    |
-| [`src/widgets/dimmer/dimmer.ts`](../src/widgets/dimmer/dimmer.ts)               | Диапазон, шаг, значение по умолчанию, `parseDimmer`, `dimmerOpacity`. Тесты — `dimmer.test.ts`     |
+Код в [`src/widgets/dimmer/`](../src/widgets/dimmer/). Значение нужно и окну, и слою `DimmerLayer`, поэтому оно хранится в `createPersistentStore` (`useDimmer.ts`). Ползунок — `SettingSlider`, тот же, что в [таймере](timer.md).
 
 ## Как это работает
 
@@ -24,7 +19,3 @@
 ## Что сохраняется
 
 Значение хранится в `localStorage` под ключом `tempo:dimmer` (`storageKeys.dimmer` в [`src/lib/storage.ts`](../src/lib/storage.ts)). `parseDimmer` принимает только конечное число в диапазоне 0–90 и округляет его до шага 5; всё остальное отбрасывается, и берётся значение по умолчанию.
-
-## Тесты
-
-[`src/widgets/dimmer/dimmer.test.ts`](../src/widgets/dimmer/dimmer.test.ts): разбор значений в диапазоне, округление до шага, отбрасывание неподходящего, перевод процента в `opacity`.

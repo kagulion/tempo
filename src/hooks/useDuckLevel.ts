@@ -5,7 +5,7 @@ import { audibleLevel, useSoundMuted } from '@/lib/soundMute';
 
 // Текущий множитель громкости из src/lib/ducking.ts. Пока таймер ничего не ждёт, не тикает.
 // В режиме «без звука» (src/lib/soundMute.ts) всегда 0: так глохнут сразу все, кто умножает громкость на него —
-// радио, фоновые звуки, YouTube и ТВ, а их собственные настройки остаются как были
+// радио, фоновые звуки, YouTube и Twitch, а их собственные настройки остаются как были
 export function useDuckLevel() {
 	const [level, setLevel] = useState(() => duckLevel(Date.now()));
 	const muted = useSoundMuted();

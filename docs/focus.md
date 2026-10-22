@@ -22,7 +22,7 @@
 | `all`           | скрыты | скрыты | `hide` — скрыты                 |
 
 - Кнопка переключает `off` ↔ `clock`; из `all` кнопка и `Esc` возвращают в `off`. В `all` попадают через меню «Скрыть всё».
-- Окна и панели только прячутся (`hidden`), а не размонтируются: радио, звуки и таймер продолжают работать, список открытых окон в [панели](widgets.md#панель) не меняется. См. [правило 7](widgets.md#правила-для-виджетов).
+- Окна и панели только прячутся (`hidden`), а не размонтируются: радио, звуки и таймер продолжают работать, список открытых окон в [панели](widgets.md#панель) не меняется. Почему так, см. [правила для виджетов](widgets.md#правила-для-виджетов).
 - Логотип в углу в фокусе тоже скрыт.
 - В режиме `clock` часы показываются, даже если посетитель их выключал, и на телефоне тоже. Сохранённая настройка при этом не меняется. Положение (центр или свёрнутые наверху) — то, что выбрал посетитель.
 
@@ -45,17 +45,7 @@
 
 ## Где код
 
-| Файл                                                                        | Что внутри                                                                                  |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| [`src/widgets/focus/focus.ts`](../src/widgets/focus/focus.ts)               | `FocusMode`, `focusVisibility`. Логика без React, тесты — `focus.test.ts`                   |
-| [`src/widgets/focus/useFocusMode.ts`](../src/widgets/focus/useFocusMode.ts) | Состояние режима, `toggle`, `enterHideAll`, `exit`, выход по `Esc`                          |
-| [`src/widgets/focus/FocusButton.tsx`](../src/widgets/focus/FocusButton.tsx) | Разделённая кнопка и меню «Скрыть всё»                                                      |
-| [`src/widgets/clock/BigClock.tsx`](../src/widgets/clock/BigClock.tsx)       | Крупные часы: два варианта, дата, строка станции, кнопка позиции                            |
-| [`src/widgets/clock/useBigClock.ts`](../src/widgets/clock/useBigClock.ts)   | Показаны ли часы (`useBigClock`) и позиция (`useBigClockPosition`), `parsePosition`         |
-| [`src/widgets/clock/useNow.ts`](../src/widgets/clock/useNow.ts)             | Текущее время, обновление в начале каждой минуты                                            |
-| [`src/widgets/clock/time.ts`](../src/widgets/clock/time.ts)                 | Форматы времени и даты                                                                      |
-| [`src/widgets/dock/DockClock.tsx`](../src/widgets/dock/DockClock.tsx)       | Кнопка часов на панели                                                                      |
-| [`src/App.tsx`](../src/App.tsx)                                             | Собирает вместе: `focusVisibility`, оба варианта `BigClock`, слой выхода из фокуса по клику |
+Режим фокуса — [`src/widgets/focus/`](../src/widgets/focus/), крупные часы — [`src/widgets/clock/`](../src/widgets/clock/), кнопка часов на панели — `DockClock.tsx` в [`src/widgets/dock/`](../src/widgets/dock/). Всё собирается в [`src/App.tsx`](../src/App.tsx): `focusVisibility`, оба варианта `BigClock` и слой выхода из фокуса по клику.
 
 ## Что сохраняется
 
@@ -68,6 +58,6 @@
 
 ## Тесты
 
-[`src/widgets/focus/focus.test.ts`](../src/widgets/focus/focus.test.ts): в обычном режиме всё видно, часы по настройке; в `all` скрыты окна, панели и часы; в `clock` скрыты окна и панели, часы показаны всегда. Для часов и `useFocusMode` отдельных тестов нет.
+Логика режима (`focusVisibility`) проверяется в `focus.test.ts`, для часов и `useFocusMode` тестов нет.
 
 Клавиши `Z` и `C` описаны в [hotkeys.md](hotkeys.md).

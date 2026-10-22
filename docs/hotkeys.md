@@ -4,14 +4,7 @@
 
 ## Где код
 
-| Файл                                                                                | Что внутри                                                                                                                                                                    |
-| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`src/lib/hotkeys.ts`](../src/lib/hotkeys.ts)                                       | Описание и сопоставление клавиш без React: `staticHotkeys`, `widgetHotkeys`, `matchHotkey`, `duplicateBindings`, подписи `keyName` и `bindingName`. Тесты — `hotkeys.test.ts` |
-| [`src/lib/siteHotkeys.ts`](../src/lib/siteHotkeys.ts)                               | Переключатель «Клавиши сайта»: `siteHotkeysStore` и `useSiteHotkeys`                                                                                                          |
-| [`src/hooks/useHotkeys.ts`](../src/hooks/useHotkeys.ts)                             | Один слушатель `keydown` на странице: находит действие и вызывает обработчик                                                                                                  |
-| [`src/widgets/hotkeys/bindings.ts`](../src/widgets/hotkeys/bindings.ts)             | `hotkeyBindings` — все клавиши (окна из реестра и общие действия) и `hotkeyLabel(action)` для подсказок                                                                       |
-| [`src/widgets/hotkeys/HotkeysDialog.tsx`](../src/widgets/hotkeys/HotkeysDialog.tsx) | Диалог со списком клавиш и переключателем, кнопка `HotkeysButton`                                                                                                             |
-| [`src/App.tsx`](../src/App.tsx)                                                     | `useHotkeys(hotkeyBindings, …)`: что делает каждое действие                                                                                                                   |
+Описание и сопоставление клавиш без React — [`src/lib/hotkeys.ts`](../src/lib/hotkeys.ts), переключатель «Клавиши сайта» — [`src/lib/siteHotkeys.ts`](../src/lib/siteHotkeys.ts), единственный слушатель `keydown` на странице — [`src/hooks/useHotkeys.ts`](../src/hooks/useHotkeys.ts). Список всех клавиш (окна из реестра и общие действия) собирает [`src/widgets/hotkeys/bindings.ts`](../src/widgets/hotkeys/bindings.ts), а что делает каждое действие, задано в `useHotkeys(hotkeyBindings, …)` в [`src/App.tsx`](../src/App.tsx).
 
 ## Все клавиши
 
@@ -85,7 +78,3 @@
 ## Что сохраняется
 
 Только `tempo:site-hotkeys`. Список клавиш и окон в `localStorage` не хранится.
-
-## Тесты
-
-[`src/lib/hotkeys.test.ts`](../src/lib/hotkeys.test.ts): сопоставление по `code` независимо от раскладки, `?` как `Shift+Slash`, Ctrl/Alt/Meta, автоповтор, поле ввода (включая `role="textbox"` и `role="combobox"`), выключенные «Клавиши сайта», отсутствие повторов в `hotkeyBindings`, `duplicateBindings`, `widgetHotkeys`, подписи клавиш.

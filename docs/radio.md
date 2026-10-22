@@ -2,32 +2,11 @@
 
 Виджет, в котором играют станции «Радио Рекорд» (117 станций). Данные берутся из внутреннего неофициального API Рекорда: он закрыт для браузера по CORS, поэтому запросы идут через Edge Function на Supabase, а при её недоступности виджет работает на снимке станций из репозитория.
 
-Положение виджета задаёт реестр [`src/widgets/registry.ts`](../src/widgets/registry.ts): он отвечает только за место на экране (левый нижний угол, над [панелью](widgets.md#панель)), всё остальное внутри `src/widgets/radio/`. Если закрыть окно радио на панели, радио продолжит играть. Поверх радио можно включить [фоновые звуки](ambience.md).
+Где окно стоит на экране, см. [раскладку](widgets.md#раскладка-на-разных-экранах). Если закрыть окно радио на панели, радио продолжит играть. Поверх радио можно включить [фоновые звуки](ambience.md).
 
 ## Где код
 
-| Файл                                                                                      | Что внутри                                                                                                      |
-| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [`src/widgets/radio/RadioWidget.tsx`](../src/widgets/radio/RadioWidget.tsx)               | Разметка виджета и элемент `<audio>`. Логики нет, только вызовы хуков                                           |
-| [`src/widgets/radio/useRadio.ts`](../src/widgets/radio/useRadio.ts)                       | Вся логика: загрузка станций, источник, очередь, воспроизведение, громкость, перебор неработающих станций       |
-| [`src/widgets/radio/useFavoriteStations.ts`](../src/widgets/radio/useFavoriteStations.ts) | Избранное: хранение в `localStorage`, добавление и удаление                                                     |
-| [`src/widgets/radio/record.ts`](../src/widgets/radio/record.ts)                           | Тип `RecordStation` и приведение ответа API к нему                                                              |
-| [`src/widgets/radio/recordApi.ts`](../src/widgets/radio/recordApi.ts)                     | Клиент: `fetchRecordStations` (прокси, затем снимок) и `fetchRecordNow` (что играет сейчас)                     |
-| [`src/widgets/radio/record-stations.json`](../src/widgets/radio/record-stations.json)     | Снимок станций (`pnpm record:snapshot`)                                                                         |
-| [`src/widgets/radio/genres.ts`](../src/widgets/radio/genres.ts)                           | Пресеты для фокуса: списки `prefix` станций Рекорда                                                             |
-| [`src/widgets/radio/stations.ts`](../src/widgets/radio/stations.ts)                       | Источники (`stationsForSource`), сортировка, место станции в очереди, локальный поиск                           |
-| [`src/widgets/radio/saved.ts`](../src/widgets/radio/saved.ts)                             | Разбор и миграция сохранённого в `localStorage`                                                                 |
-| [`src/widgets/radio/useRecordTrack.ts`](../src/widgets/radio/useRecordTrack.ts)           | Хук: опрашивает `fetchRecordNow` и отдаёт трек текущей станции                                                  |
-| [`src/widgets/radio/trackPolling.ts`](../src/widgets/radio/trackPolling.ts)               | Расписание опроса трека и пауза после неудач (чистая логика)                                                    |
-| [`src/widgets/radio/audioAnalyser.ts`](../src/widgets/radio/audioAnalyser.ts)             | Анализатор звука для эквалайзера: один на `<audio>`, общий цикл кадров                                          |
-| [`src/widgets/radio/soundLevels.ts`](../src/widgets/radio/soundLevels.ts)                 | Уровни полосок по спектру и определение «анализатор молчит» (чистая логика)                                     |
-| [`src/widgets/radio/SoundBars.tsx`](../src/widgets/radio/SoundBars.tsx)                   | Полоски эквалайзера: живые уровни или запасная CSS-анимация                                                     |
-| [`src/widgets/radio/mediaSession.ts`](../src/widgets/radio/mediaSession.ts)               | Данные для системного плеера (Media Session API)                                                                |
-| [`src/widgets/radio/nowPlaying.ts`](../src/widgets/radio/nowPlaying.ts)                   | Текущая станция для строки под крупными часами и переключатель радио                                            |
-| [`src/hooks/useAutoplay.ts`](../src/hooks/useAutoplay.ts)                                 | Запуск звука, в том числе после первого клика, если браузер заблокировал автозапуск.                            |
-| [`src/widgets/Widget.tsx`](../src/widgets/Widget.tsx)                                     | Общая «стеклянная» оболочка виджетов                                                                            |
-| [`src/components/ui/combobox.tsx`](../src/components/ui/combobox.tsx)                     | `Combobox` (поле с локальным поиском, выбор станции) и `ComboboxButton` (список за кнопкой-шевроном, избранное) |
-| [`src/components/ui/slider.tsx`](../src/components/ui/slider.tsx)                         | Слайдер громкости на Base UI                                                                                    |
+Код в [`src/widgets/radio/`](../src/widgets/radio/). `RadioWidget.tsx` — только разметка и элемент `<audio>`, вся логика в `useRadio.ts`. Логика без React (источники и очередь, разбор сохранённого, опрос трека, уровни эквалайзера) лежит в отдельных модулях с тестами рядом. Снимок станций `record-stations.json` обновляется командой `pnpm record:snapshot`. Из общих частей радио использует [`useAutoplay`](../src/hooks/useAutoplay.ts) (запуск после первого клика, если браузер заблокировал автозапуск) и `Combobox` / `ComboboxButton` из [`src/components/ui/combobox.tsx`](../src/components/ui/combobox.tsx) (выбор станции и избранное).
 
 ## Откуда берутся станции
 
