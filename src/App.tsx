@@ -1,8 +1,5 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { Disc3 } from 'lucide-react';
 
-import { Hint } from '@/components/Hint';
-import { Logo } from '@/components/Logo';
 import { Toaster } from '@/components/ui/toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useHotkeys } from '@/hooks/useHotkeys';
@@ -48,21 +45,21 @@ import { WallpaperBackground } from '@/widgets/wallpaper/WallpaperBackground';
 // С sm окно стоит в своём столбце (до xl окно на экране одно, с xl окна трёх столбцов стоят рядом, см. columnClass): не выше столбца, может сжаться (min-h-0) и прокручиваться внутри.
 // Столбец не ловит клики, а окно — ловит
 const windowClass =
-	'absolute inset-x-4 bottom-[15rem] max-h-[calc(100dvh-20rem)] scrollbar-glass overflow-y-auto sm:pointer-events-auto sm:static sm:max-h-full sm:min-h-0';
+	'absolute inset-x-4 bottom-[15rem] max-h-[calc(100cqh-20rem)] scrollbar-glass overflow-y-auto sm:pointer-events-auto sm:static sm:max-h-full sm:min-h-0';
 
 // Столбцы с брейкпоинта sm. Окна с anchor: 'top' прижаты к верху (mb-auto), остальные — к низу, к кнопкам панели,
 // даже когда верхнее окно закрыто. На телефоне столбцов нет (contents): окна встают по общему windowClass.
 // sm–xl: до lg на экране одно окно, столбцы — три абсолютных блока по краям и в центре (центр сдвинут translate-x-1/2).
 // С xl: столбцы — три колонки сетки (gridClass): боковые и центр делят ширину пропорционально потолкам ширины окон,
 // а окно внутри — w-full с max-w из реестра, поэтому окна не наезжают друг на друга при любой ширине.
-// Верхний отступ задаёт каждый столбец (xl:pt-*): левый ниже логотипа, правый ниже кнопки полного экрана.
+// Верхний отступ задаёт каждый столбец (xl:pt-*): центральный и левый от верха, правый ниже кнопки полного экрана.
 // Сам столбец не ловит клики, иначе перекрыл бы фон между окнами.
 // У столбца свой z-10 (над крупными часами): transform у центрального столбца создаёт слой,
 // и без z-index окна внутри него оказывались бы под часами
 const columnClass =
 	'contents sm:pointer-events-none sm:absolute sm:z-10 sm:top-4 sm:bottom-24 sm:flex sm:flex-col sm:justify-end sm:gap-4 xl:static xl:inset-auto xl:min-h-0 xl:translate-x-0';
 
-// Сетка столбцов с xl: от верха до панели, поля по краям как у логотипа. Боковые колонки равны,
+// Сетка столбцов с xl: от верха до панели, поля по краям как у кнопок в углу. Боковые колонки равны,
 // поэтому центр стоит по середине экрана
 const gridClass =
 	'contents xl:pointer-events-none xl:absolute xl:inset-x-8 xl:top-0 xl:bottom-28 xl:grid xl:grid-cols-[minmax(0,1fr)_28rem_minmax(0,1fr)] xl:grid-rows-[minmax(0,1fr)] xl:gap-x-8';
@@ -74,8 +71,8 @@ const dockRowClass =
 	'pointer-events-none absolute inset-x-4 bottom-4 flex flex-col items-start gap-2 *:pointer-events-auto sm:contents';
 
 const columns: { id: WidgetColumn; className: string }[] = [
-	// Начинается ниже логотипа в левом верхнем углу
-	{ id: 'left', className: 'sm:top-16 sm:left-4 sm:items-start xl:pt-24' },
+	// Левый верхний угол свободен (логотип в верхней панели сайта): отступ как у центрального
+	{ id: 'left', className: 'sm:top-16 sm:left-4 sm:items-start xl:pt-8' },
 	// До xl начинается ниже ряда кнопок в правом верхнем углу: на узком экране окно иначе уходит под них.
 	// С xl кнопки в углу короче окна и стоят правее, столбец снова от верха
 	{ id: 'center', className: 'sm:top-16 sm:left-1/2 sm:-translate-x-1/2 sm:items-center xl:pt-8' },
@@ -207,7 +204,7 @@ export default function App() {
 
 	return (
 		<TooltipProvider>
-			<main className="relative h-dvh w-full overflow-hidden bg-black text-white">
+			<main className="relative h-full w-full overflow-hidden bg-black text-white">
 				<h1 className="sr-only">Tempo</h1>
 				<WallpaperBackground />
 				{/* Затемнение только обоев: эффекты, часы и окна выше */}
@@ -219,8 +216,6 @@ export default function App() {
 				{focus.mode !== 'off' && (
 					<div aria-hidden="true" className="absolute inset-0 z-[15]" onClick={focus.exit} />
 				)}
-				{/* В фокусе логотипа нет: страница остаётся чистой */}
-				{focus.mode === 'off' && <Logo className="absolute top-4 left-4 z-20 lg:top-8 lg:left-8" />}
 				<div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-8 lg:right-8">
 					{/* С xl: уже, при 1024 с оценкой настроения, пилюля наезжает на окно статистики в центральном столбце. В фокусе её нет */}
 					{focus.mode === 'off' && <StatsHighlights className="hidden xl:flex" />}
@@ -228,17 +223,6 @@ export default function App() {
 					<QuietButtons />
 					<FocusButton mode={focus.mode} onToggle={focus.toggle} onHideAll={focus.enterHideAll} />
 					{!touchOnly && <HotkeysButton onClick={() => setHelpOpen(true)} />}
-					{/* Обычная ссылка с полной загрузкой страницы: на /player рабочий стол не продолжает работать */}
-					<Hint label="Проигрыватель" side="bottom">
-						<a
-							href="/player"
-							aria-label="Проигрыватель"
-							title="Проигрыватель"
-							className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/65 text-white/70 shadow-2xl backdrop-blur-md transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20"
-						>
-							<Disc3 className="size-4" />
-						</a>
-					</Hint>
 					<FullscreenButton />
 				</div>
 

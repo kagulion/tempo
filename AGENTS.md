@@ -14,6 +14,8 @@
 - Page-specific React code goes in `src/views/<id>/`, root component `<Name>View.tsx`. The desk page keeps `src/App.tsx` for now.
 - Pages share nothing at runtime. Shared state goes only through saved keys in `src/lib/storage.ts`, read with a `Parse` as usual. Reusable UI (wallpaper background, effects, clock, widgets) is imported by the page that shows it; a page never imports another page's root.
 - A new page goes into `public/sitemap.xml` and gets `docs/<id>.md`, linked from `README.md`. `public/404.html` stays the hosting's 404 for unknown paths.
+- The page sits in a frame (`.app-frame`, a size container) under the top bar from `BaseLayout`. The page root fills it (`h-full`, scroll inside if needed), never `h-dvh`/`min-h-dvh`. Size things relative to the frame with container units (`cqh`/`cqw`/`cqmin`), not the viewport (`dvh`/`vw`/`vmin`). Full-screen overlays (canvases, video) are `absolute` inside the frame, not `fixed`; only toasts and dialogs stay `fixed`. Measure size from the element (`ResizeObserver`), not `window.innerWidth`. Full screen removes the bar and the frame in CSS only.
+- A new page is added to the nav list in `src/layouts/navItems.ts`.
 - Image imports from TS/TSX need `?url` when a plain URL string is expected: Astro turns plain image imports into metadata objects.
 
 ## Widgets

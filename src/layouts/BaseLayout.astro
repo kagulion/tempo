@@ -1,6 +1,7 @@
 ---
 import '@/index.css';
 import { getSupabaseUrl } from '@/lib/supabase';
+import { navItems } from './navItems';
 
 interface Props {
 	title: string;
@@ -28,7 +29,7 @@ const supabaseUrl = getSupabaseUrl(import.meta.env.VITE_SUPABASE_URL);
 		<link rel="canonical" href={url} />
 		<title>{title}</title>
 		<meta name="description" content={description} />
-		<meta name="theme-color" content="#000000" />
+		<meta name="theme-color" content="#151517" />
 		<meta property="og:type" content="website" />
 		<meta property="og:site_name" content="Tempo" />
 		<meta property="og:url" content={url} />
@@ -49,6 +50,40 @@ const supabaseUrl = getSupabaseUrl(import.meta.env.VITE_SUPABASE_URL);
 		<meta name="twitter:image" content={image} />
 	</head>
 	<body>
-		<slot />
+		<div class="app-shell">
+			<header class="app-bar">
+				<a
+					href="/"
+					data-astro-prefetch="hover"
+					aria-label="Tempo — главная"
+					class="flex items-center gap-2 rounded-full outline-none select-none focus-visible:ring-3 focus-visible:ring-white/30"
+				>
+					<img src="/logotype.svg" alt="" width={293} height={88} class="h-5 w-auto" />
+					<span class="hidden text-[0.6875rem] leading-none text-white/50 sm:inline">бета 0.2</span>
+				</a>
+				<nav aria-label="Основная навигация" class="flex items-center gap-1">
+					{navItems.map((item) => {
+						const current = item.href === path;
+						return (
+							<a
+								href={item.href}
+								data-astro-prefetch="hover"
+								aria-current={current ? 'page' : undefined}
+								class:list={[
+									'rounded-full px-3 py-1.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-white/30',
+									current ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white'
+								]}
+							>
+								{item.label}
+							</a>
+						);
+					})}
+				</nav>
+			</header>
+			<!-- Рамка: страница живёт внутри неё и мерит себя по ней (см. .app-frame в index.css) -->
+			<div class="app-frame">
+				<slot />
+			</div>
+		</div>
 	</body>
 </html>

@@ -114,7 +114,7 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 			dateTime={now.toISOString()}
 			className={cn(
 				'block font-light tracking-tight tabular-nums',
-				corner ? 'text-6xl lg:text-7xl' : 'text-[min(15vw,10rem)]',
+				corner ? 'text-6xl lg:text-7xl' : 'text-[min(15cqw,10rem)]',
 				// После размера шрифта: tailwind-merge иначе выкинул бы leading-none
 				'leading-none'
 			)}
@@ -154,7 +154,7 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 				    по ширине цифр от названия станции почти ничего не оставалось */}
 				<div
 					ref={stationRef}
-					className="mt-1 flex h-8 w-[22rem] max-w-[calc(100vw-2rem)] items-center justify-center"
+					className="mt-1 flex h-8 w-[22rem] max-w-[calc(100cqw-2rem)] items-center justify-center"
 				>
 					<StationRow corner />
 				</div>
@@ -176,7 +176,7 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 			<div data-big-clock className={cn('group relative', !forced && 'pointer-events-auto')}>
 				<div
 					ref={dateRef}
-					className="pointer-events-none absolute bottom-full left-1/2 flex w-[min(80vw,28rem)] -translate-x-1/2 justify-center"
+					className="pointer-events-none absolute bottom-full left-1/2 flex w-[min(80cqw,28rem)] -translate-x-1/2 justify-center"
 				>
 					{date}
 				</div>
@@ -184,7 +184,7 @@ function BigClockFace({ variant, forced, phoneOnly, className }: BigClockFacePro
 				{!forced && <PositionButton />}
 				<div
 					ref={stationRef}
-					className="pointer-events-none absolute top-full left-1/2 mt-3 flex h-8 w-[min(80vw,28rem)] -translate-x-1/2 items-center justify-center"
+					className="pointer-events-none absolute top-full left-1/2 mt-3 flex h-8 w-[min(80cqw,28rem)] -translate-x-1/2 items-center justify-center"
 				>
 					<StationRow />
 				</div>

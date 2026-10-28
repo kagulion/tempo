@@ -237,3 +237,78 @@
 		transition-duration: 1ms !important;
 	}
 }
+
+/* Каркас сайта (src/layouts/BaseLayout.astro): тёмный фон, узкая верхняя панель и страница в скруглённой рамке.
+   Рамка — контейнер размера: страницы мерят себя в cqh/cqw/cqmin, а не в dvh/vw/vmin, потому что
+   вьюпорт больше рамки на панель и поля */
+:root {
+	--app-bar-height: 3rem;
+	--app-inset: 0.75rem;
+	--app-radius: 1rem;
+}
+
+@media (max-width: 39.999rem) {
+	:root {
+		--app-inset: 0.5rem;
+		--app-radius: 0.75rem;
+	}
+}
+
+@layer components {
+	.app-shell {
+		display: flex;
+		flex-direction: column;
+		height: 100dvh;
+		background: #151517;
+	}
+
+	.app-bar {
+		display: flex;
+		flex: none;
+		align-items: center;
+		justify-content: space-between;
+		height: var(--app-bar-height);
+		padding-inline: var(--app-inset);
+	}
+
+	.app-frame {
+		position: relative;
+		flex: 1;
+		min-height: 0;
+		margin: 0 var(--app-inset) var(--app-inset);
+		overflow: hidden;
+		border: 1px solid rgb(255 255 255 / 0.1);
+		border-radius: var(--app-radius);
+		container-type: size;
+	}
+
+	/* Контейнер острова React между рамкой и корнем страницы тоже занимает всю рамку, иначе h-full корня даст 0 */
+	.app-frame > #root {
+		height: 100%;
+	}
+}
+
+/* Полный экран (кнопка в углу рабочего стола запрашивает его у документа, F11 — у окна браузера):
+   панель и поля уходят, рамка встаёт на весь экран. Условия повторены дважды: селектор с :fullscreen
+   нельзя объединить с медиазапросом в одном правиле. Режим фокуса рамку не трогает */
+html:fullscreen .app-bar {
+	display: none;
+}
+
+html:fullscreen .app-frame {
+	margin: 0;
+	border-width: 0;
+	border-radius: 0;
+}
+
+@media (display-mode: fullscreen) {
+	.app-bar {
+		display: none;
+	}
+
+	.app-frame {
+		margin: 0;
+		border-width: 0;
+		border-radius: 0;
+	}
+}

@@ -14,7 +14,7 @@ type EffectCanvasProps = {
 };
 
 // Один холст на весь экран для всех эффектов слоя: полноэкранные холсты дорого компоновать на GPU, поэтому
-// их не больше двух. Размер под окно и плотность пикселей, цикл requestAnimationFrame, пауза в скрытой вкладке.
+// их не больше двух. Размер под рамку страницы и плотность пикселей, цикл requestAnimationFrame, пауза в скрытой вкладке.
 // Что рисовать, решают renderer-ы
 export function EffectCanvas({ ids, layer, paused }: EffectCanvasProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,8 +40,9 @@ export function EffectCanvas({ ids, layer, paused }: EffectCanvasProps) {
 		function resize() {
 			if (!canvas || !ctx) return;
 			const dpr = Math.min(window.devicePixelRatio || 1, 2);
-			width = window.innerWidth;
-			height = window.innerHeight;
+			// Размер холста — размер рамки страницы, а не окна браузера
+			width = canvas.clientWidth;
+			height = canvas.clientHeight;
 			canvas.width = Math.floor(width * dpr);
 			canvas.height = Math.floor(height * dpr);
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -91,12 +92,14 @@ export function EffectCanvas({ ids, layer, paused }: EffectCanvasProps) {
 		// Первый кадр рисуем всегда, даже на паузе, — иначе после перезагрузки эффекта не было бы видно
 		animationId = requestAnimationFrame(render);
 
-		window.addEventListener('resize', resize);
+		// Рамка меняется не только с окном (полный экран убирает панель и поля), поэтому следим за самим холстом
+		const observer = new ResizeObserver(resize);
+		observer.observe(canvas);
 		document.addEventListener('visibilitychange', handleVisibilityChange);
 
 		return () => {
 			cancelAnimationFrame(animationId);
-			window.removeEventListener('resize', resize);
+			observer.disconnect();
 			document.removeEventListener('visibilitychange', handleVisibilityChange);
 		};
 	}, [layer]);
@@ -116,7 +119,7 @@ export function EffectCanvas({ ids, layer, paused }: EffectCanvasProps) {
 			ref={canvasRef}
 			// Окна — z-10, панель — z-20: задний слой между обоями и окнами, передний поверх всего
 			className={cn(
-				'pointer-events-none fixed inset-0 h-full w-full',
+				'pointer-events-none absolute inset-0 h-full w-full',
 				layer === 'front' ? 'z-50' : 'z-[1]'
 			)}
 			aria-hidden="true"

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { type RefObject, useEffect, useRef, useState } from 'react';
 
 import { useDuckLevel } from '@/hooks/useDuckLevel';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -19,22 +19,23 @@ const startTimeoutMs = 10_000;
 // Iframe растягиваем как object-cover: 16:9, не меньше экрана по обеим сторонам, по центру
 const iframeClass = cn(
 	'[&_iframe]:absolute [&_iframe]:top-1/2 [&_iframe]:left-1/2 [&_iframe]:max-w-none [&_iframe]:-translate-1/2',
-	'[&_iframe]:h-[max(100dvh,56.25vw)] [&_iframe]:w-[max(100vw,177.78dvh)]'
+	'[&_iframe]:h-[max(100cqh,56.25cqw)] [&_iframe]:w-[max(100cqw,177.78cqh)]'
 );
 
-// Размер окна для масштаба iframe с потолком качества. Строка, чтобы useSyncExternalStore видел, что ничего не менялось
-function subscribeResize(listener: () => void) {
-	window.addEventListener('resize', listener);
-	return () => window.removeEventListener('resize', listener);
-}
-
-function viewportKey() {
-	return `${window.innerWidth}x${window.innerHeight}`;
-}
-
-function useViewport() {
-	const [width, height] = useSyncExternalStore(subscribeResize, viewportKey).split('x').map(Number);
-	return { width, height };
+// Размер слоя (то есть рамки страницы) для масштаба iframe с потолком качества. Следим за самим элементом:
+// рамка меньше окна браузера на панель и поля, а в полном экране равна ему
+function useElementSize(ref: RefObject<HTMLElement | null>) {
+	const [size, setSize] = useState({ width: 0, height: 0 });
+	useEffect(() => {
+		const element = ref.current;
+		if (!element) return;
+		const observer = new ResizeObserver(() =>
+			setSize({ width: element.clientWidth, height: element.clientHeight })
+		);
+		observer.observe(element);
+		return () => observer.disconnect();
+	}, [ref]);
+	return size;
 }
 
 type YouTubeLayerProps = {
@@ -70,7 +71,8 @@ export function YouTubeLayer({
 	const { paused, soundOn, quality } = useYouTubePlayback();
 	const duck = useDuckLevel();
 	const unlocked = useUserActivation();
-	const viewport = useViewport();
+	const layerRef = useRef<HTMLDivElement>(null);
+	const viewport = useElementSize(layerRef);
 	// Потолок качества: iframe своего размера, растянутый на экран. undefined — «Авто», iframe во весь экран
 	const frame = qualityFrameSize(quality);
 	// Плеер выбирает качество при загрузке и потом размер iframe не замечает, поэтому смена качества пересоздаёт плеер
@@ -301,6 +303,7 @@ export function YouTubeLayer({
 
 	return (
 		<div
+			ref={layerRef}
 			// Слой только для просмотра: клики и фокус не должны попадать в плеер
 			aria-hidden
 			onAnimationEnd={(event) => {

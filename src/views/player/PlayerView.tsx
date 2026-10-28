@@ -1,4 +1,4 @@
-import { ArrowLeft, LayoutGrid } from 'lucide-react';
+import { LayoutGrid } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -179,116 +179,110 @@ export default function PlayerView() {
 	const style = current?.style ?? 'label';
 
 	return (
-		<main className="relative min-h-dvh w-full overflow-x-clip bg-black text-white">
+		<main className="relative h-full w-full overflow-hidden bg-black text-white">
 			<h1 className="sr-only">Проигрыватель</h1>
 			<Background videoId={current?.videoId} image={current?.image} />
 
-			<header className="relative z-20 flex items-center justify-between gap-2 p-4 lg:px-8 lg:pt-8">
-				{/* Обычная ссылка с полной загрузкой: страницы друг с другом не связаны, звук и таймеры останавливаются */}
-				<a
-					href="/"
-					className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 bg-black/65 px-3 text-sm text-white/80 shadow-2xl backdrop-blur-md transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20"
-				>
-					<ArrowLeft className="size-4" aria-hidden />
-					Рабочий стол
-				</a>
-
-				<DropdownMenu>
-					<DropdownMenuTrigger
-						render={
-							<Button
-								variant="glass-solid"
-								className="h-9 rounded-full border border-white/10 bg-black/65 px-3 backdrop-blur-md"
-								title="Виджеты поверх пластинки"
-								aria-label="Виджеты поверх пластинки"
-							/>
-						}
-					>
-						<LayoutGrid />
-						Виджеты
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuGroup>
-							<DropdownMenuLabel>Поверх пластинки</DropdownMenuLabel>
-							{overlayList.map((overlay) => (
-								<DropdownMenuCheckboxItem
-									key={overlay.id}
-									checked={settings.overlays.includes(overlay.id)}
-									onCheckedChange={() =>
-										updateSettings({ overlays: toggleOverlay(settings.overlays, overlay.id) })
-									}
-								>
-									{overlay.label}
-								</DropdownMenuCheckboxItem>
-							))}
-						</DropdownMenuGroup>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</header>
-
-			<div className="relative z-10 mx-auto flex w-full max-w-[100rem] flex-col items-center gap-6 px-4 pb-8 xl:grid xl:grid-cols-[minmax(0,1fr)_26rem] xl:items-start xl:gap-10 xl:px-8">
-				<section
-					aria-label="Пластинка"
-					className="flex w-full flex-col items-center gap-6 xl:sticky xl:top-4 xl:min-h-[calc(100dvh-5rem)] xl:justify-center"
-				>
-					{settings.overlays.map((id) => {
-						const Overlay = overlayComponents[id];
-						return <Overlay key={id} />;
-					})}
-
-					<div className="relative w-[clamp(18rem,70vmin,36rem)] max-w-full xl:w-[clamp(18rem,min(70vmin,100dvh-24rem),36rem)]">
-						{/* Плеер YouTube нельзя прятать совсем: он стоит под пластинкой и закрыт платформой.
-						    Кнопка «Показать видео» переносит его окошком в угол */}
-						<div
-							ref={hostRef}
-							className={cn(
-								'absolute size-[200px] [&_iframe]:size-full',
-								settings.showVideo
-									? '-top-3 -right-3 z-30 overflow-hidden rounded-xl shadow-2xl ring-1 ring-white/20'
-									: 'top-1/2 left-1/2 z-0 -translate-1/2'
-							)}
-						/>
-						<span aria-hidden className="absolute inset-0 z-10 rounded-full bg-neutral-950" />
-						<button
-							type="button"
-							onClick={current ? togglePlay : undefined}
-							disabled={!current}
-							title={playing ? 'Пауза' : 'Играть'}
-							aria-label={current ? (playing ? 'Пауза' : 'Играть') : 'Нет пластинки'}
-							className="relative z-20 block w-full cursor-pointer rounded-full outline-none focus-visible:ring-4 focus-visible:ring-white/40 disabled:cursor-default"
+			{/* Прокручивается этот слой, а не main: фон остаётся на месте, пока листается содержимое */}
+			<div className="relative h-full scrollbar-glass overflow-x-clip overflow-y-auto">
+				<header className="relative z-20 flex items-center justify-end gap-2 p-4 lg:px-8 lg:pt-8">
+					<DropdownMenu>
+						<DropdownMenuTrigger
+							render={
+								<Button
+									variant="glass-solid"
+									className="h-9 rounded-full border border-white/10 bg-black/65 px-3 backdrop-blur-md"
+									title="Виджеты поверх пластинки"
+									aria-label="Виджеты поверх пластинки"
+								/>
+							}
 						>
-							<Disc style={style} videoId={current?.videoId} image={current?.image} spin={spin} />
-						</button>
-					</div>
+							<LayoutGrid />
+							Виджеты
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuGroup>
+								<DropdownMenuLabel>Поверх пластинки</DropdownMenuLabel>
+								{overlayList.map((overlay) => (
+									<DropdownMenuCheckboxItem
+										key={overlay.id}
+										checked={settings.overlays.includes(overlay.id)}
+										onCheckedChange={() =>
+											updateSettings({ overlays: toggleOverlay(settings.overlays, overlay.id) })
+										}
+									>
+										{overlay.label}
+									</DropdownMenuCheckboxItem>
+								))}
+							</DropdownMenuGroup>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</header>
 
-					{!current && (
-						<p className="max-w-xs text-center text-sm text-white/80">
-							Вставьте ссылку на видео YouTube в коллекции, чтобы поставить первую пластинку.
-						</p>
-					)}
+				<div className="relative z-10 mx-auto flex w-full max-w-[100rem] flex-col items-center gap-6 px-4 pb-8 xl:grid xl:grid-cols-[minmax(0,1fr)_26rem] xl:items-start xl:gap-10 xl:px-8">
+					<section
+						aria-label="Пластинка"
+						className="flex w-full flex-col items-center gap-6 xl:sticky xl:top-4 xl:min-h-[calc(100cqh-5rem)] xl:justify-center"
+					>
+						{settings.overlays.map((id) => {
+							const Overlay = overlayComponents[id];
+							return <Overlay key={id} />;
+						})}
 
-					<Controls
-						title={title}
-						status={player.status}
-						time={player.time}
-						duration={player.duration}
-						settings={settings}
-						canSkip={discs.length > 1 || (wrapAll && discs.length > 0)}
-						onToggle={togglePlay}
-						onSeek={player.seek}
-						onPrevious={() => step(-1)}
-						onNext={() => step(1)}
-						onChange={updateSettings}
+						<div className="relative w-[clamp(18rem,70cqmin,36rem)] max-w-full xl:w-[clamp(18rem,min(70cqmin,100cqh-24rem),36rem)]">
+							{/* Плеер YouTube нельзя прятать совсем: он стоит под пластинкой и закрыт платформой.
+						    Кнопка «Показать видео» переносит его окошком в угол */}
+							<div
+								ref={hostRef}
+								className={cn(
+									'absolute size-[200px] [&_iframe]:size-full',
+									settings.showVideo
+										? '-top-3 -right-3 z-30 overflow-hidden rounded-xl shadow-2xl ring-1 ring-white/20'
+										: 'top-1/2 left-1/2 z-0 -translate-1/2'
+								)}
+							/>
+							<span aria-hidden className="absolute inset-0 z-10 rounded-full bg-neutral-950" />
+							<button
+								type="button"
+								onClick={current ? togglePlay : undefined}
+								disabled={!current}
+								title={playing ? 'Пауза' : 'Играть'}
+								aria-label={current ? (playing ? 'Пауза' : 'Играть') : 'Нет пластинки'}
+								className="relative z-20 block w-full cursor-pointer rounded-full outline-none focus-visible:ring-4 focus-visible:ring-white/40 disabled:cursor-default"
+							>
+								<Disc style={style} videoId={current?.videoId} image={current?.image} spin={spin} />
+							</button>
+						</div>
+
+						{!current && (
+							<p className="max-w-xs text-center text-sm text-white/80">
+								Вставьте ссылку на видео YouTube в коллекции, чтобы поставить первую пластинку.
+							</p>
+						)}
+
+						<Controls
+							title={title}
+							status={player.status}
+							time={player.time}
+							duration={player.duration}
+							settings={settings}
+							canSkip={discs.length > 1 || (wrapAll && discs.length > 0)}
+							onToggle={togglePlay}
+							onSeek={player.seek}
+							onPrevious={() => step(-1)}
+							onNext={() => step(1)}
+							onChange={updateSettings}
+						/>
+					</section>
+
+					<CollectionPanel
+						discs={discs}
+						currentId={current?.id}
+						spin={spin}
+						onSelect={onSelect}
+						className="w-full max-w-xl xl:sticky xl:top-4 xl:max-h-[calc(100cqh-2rem)] xl:max-w-none"
 					/>
-				</section>
-
-				<CollectionPanel
-					discs={discs}
-					currentId={current?.id}
-					spin={spin}
-					onSelect={onSelect}
-					className="w-full max-w-xl xl:sticky xl:top-4 xl:max-h-[calc(100dvh-2rem)] xl:max-w-none"
-				/>
+				</div>
 			</div>
 
 			{/* Уведомления (src/components/ui/toast.tsx): один раз на всю страницу */}
