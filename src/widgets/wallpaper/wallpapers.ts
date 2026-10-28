@@ -27,11 +27,8 @@ import {
 	type ImageSources,
 	type VideoSource
 } from './variants';
-import {
-	type YouTubeHistoryItem,
-	youtubeThumb,
-	youtubeWallpaperId
-} from '@/widgets/youtube/youtube';
+import { youtubeThumb } from '@/lib/youtube/thumbs';
+import { type YouTubeHistoryItem, youtubeWallpaperId } from '@/widgets/youtube/youtube';
 
 export type Category = 'alliance' | 'horde' | 'warcraft' | 'japan';
 

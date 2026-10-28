@@ -14,6 +14,15 @@ export type YouTubePlayer = {
 	// Секунды от начала видео
 	getCurrentTime: () => number;
 	// isLive нет в документации, но плеер его отдаёт: true у прямой трансляции
+	// Длительность в секундах; до загрузки метаданных 0
+	getDuration: () => number;
+	setPlaybackRate: (rate: number) => void;
+	getPlaybackRate: () => number;
+	getAvailablePlaybackRates: () => number[];
+	// Одно из значений PlayerState; -1 — ещё не начинал
+	getPlayerState: () => number;
+	isMuted: () => boolean;
+	getVolume: () => number;
 	getVideoData: () => { title?: string; isLive?: boolean };
 };
 
@@ -32,7 +41,13 @@ export type YouTubePlayerOptions = {
 
 export type YouTubeApi = {
 	Player: new (element: HTMLElement, options: YouTubePlayerOptions) => YouTubePlayer;
-	PlayerState: { ENDED: number; PLAYING: number; PAUSED: number };
+	PlayerState: {
+		ENDED: number;
+		PLAYING: number;
+		PAUSED: number;
+		BUFFERING: number;
+		CUED: number;
+	};
 };
 
 declare global {

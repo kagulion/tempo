@@ -18,7 +18,9 @@ import { Widget, WidgetHeader } from '@/widgets/Widget';
 
 import { streamCollections, streams } from './streams';
 import { addYouTubeVideo, removeYouTubeVideo, useYouTubeHistory } from './useYouTubeHistory';
-import { parseYouTubeUrl, youtubeThumb, youtubeWallpaperId } from './youtube';
+import { parseYouTubeUrl } from '@/lib/youtube/links';
+import { youtubeThumb } from '@/lib/youtube/thumbs';
+import { youtubeWallpaperId } from './youtube';
 import { YouTubeControls } from './YouTubeControls';
 
 type YouTubeWidgetProps = {

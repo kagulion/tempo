@@ -1,14 +1,14 @@
 import { useSyncExternalStore } from 'react';
 
 import { createPersistentStore, storageKeys } from '@/lib/storage';
+import type { YouTubeVideo } from '@/lib/youtube/links';
 
 import {
 	addToHistory,
 	parseHistory,
 	removeFromHistory,
 	setHistoryTitle,
-	type YouTubeHistoryItem,
-	type YouTubeVideo
+	type YouTubeHistoryItem
 } from './youtube';
 
 // История ссылок нужна и галерее, и фону (название узнаёт плеер), поэтому хранилище общее

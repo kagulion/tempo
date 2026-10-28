@@ -10,7 +10,7 @@ import { audioTarget, pauseFromPlayer, shouldPause, wantsSound } from './playbac
 import { coverScale, qualityFrameSize } from './quality';
 import type { YouTubeWallpaper } from '@/widgets/wallpaper/wallpapers';
 import { youtubeErrorMessage } from './youtube';
-import { loadYouTubeApi, type YouTubePlayer } from './youtubeApi';
+import { loadYouTubeApi, type YouTubePlayer } from '@/lib/youtube/api';
 import { setPaused, useYouTubePlayback } from './youtubePlayback';
 
 // Если видео не заиграло за это время (автозапуск запрещён, плохая сеть), показываем хотя бы превью
