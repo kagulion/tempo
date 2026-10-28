@@ -7,6 +7,15 @@
   - `migrate-radix-to-base`: migrating components from Radix UI to Base UI.
 - The project is fully on Base UI (`@base-ui/react`): `components.json` uses the `base-nova` style, and `radix-ui` is not installed. Add components with `shadcn add`; they arrive as `base-nova` variants. Don't add Radix back.
 
+## Pages
+
+- The site is Astro with static output and several pages: each page is a separate HTML document. Navigation is a plain `<a href>` with a full page load, so audio, timers and players stop on purpose. Don't add `<ClientRouter />`, `transition:persist` or a client-side router to keep things alive between pages.
+- A page is `src/pages/<route>.astro`: a thin wrapper that renders `BaseLayout` with its own `title`, `description` and `path` (`path` must match the route) and one React root with `client:only="react"`, because the app reads `localStorage` and `window` on the first render.
+- Page-specific React code goes in `src/views/<id>/`, root component `<Name>View.tsx`. The desk page keeps `src/App.tsx` for now.
+- Pages share nothing at runtime. Shared state goes only through saved keys in `src/lib/storage.ts`, read with a `Parse` as usual. Reusable UI (wallpaper background, effects, clock, widgets) is imported by the page that shows it; a page never imports another page's root.
+- A new page goes into `public/sitemap.xml` and gets `docs/<id>.md`, linked from `README.md`. `public/404.html` stays the hosting's 404 for unknown paths.
+- Image imports from TS/TSX need `?url` when a plain URL string is expected: Astro turns plain image imports into metadata objects.
+
 ## Widgets
 
 A widget is a window that a dock button opens. Read the comments in `src/widgets/registry.ts` and `src/App.tsx` first: they explain the layout fields. When adding a widget:
@@ -30,5 +39,7 @@ A widget is a window that a dock button opens. Read the comments in `src/widgets
 ## Checks
 
 - Before finishing a change, run `pnpm check`, `pnpm lint` and `pnpm test`; CI runs the same plus `pnpm build`.
+- Node >= 22.23.4 is required. `.node-version` pins 24, and Render reads it.
+- Don't run `astro check`: it doesn't support TypeScript 7, so keep `.astro` files thin and put logic in `.ts`/`.tsx`.
 - Linting uses oxlint (`.oxlintrc.json`), not ESLint: typescript-eslint doesn't support TypeScript 7 yet. Warnings fail `pnpm lint`.
 - Tests are Vitest, in Node, next to the code (`phases.ts` → `phases.test.ts`). Keep logic that is worth testing in plain modules without React (like `src/widgets/timer/phases.ts`, `src/widgets/stats/visits.ts`) and test those.

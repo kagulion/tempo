@@ -90,6 +90,7 @@ docs/                подробные описания виджетов
 ## Документация
 
 - [Виджеты и панель](docs/widgets.md)
+- [Страницы](docs/pages.md)
 - [Радио](docs/radio.md)
 - [Звуки](docs/ambience.md)
 - [Таймер](docs/timer.md)
