@@ -1,5 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
+import { Disc3 } from 'lucide-react';
 
+import { Hint } from '@/components/Hint';
 import { Logo } from '@/components/Logo';
 import { Toaster } from '@/components/ui/toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -226,6 +228,17 @@ export default function App() {
 					<QuietButtons />
 					<FocusButton mode={focus.mode} onToggle={focus.toggle} onHideAll={focus.enterHideAll} />
 					{!touchOnly && <HotkeysButton onClick={() => setHelpOpen(true)} />}
+					{/* Обычная ссылка с полной загрузкой страницы: на /player рабочий стол не продолжает работать */}
+					<Hint label="Проигрыватель" side="bottom">
+						<a
+							href="/player"
+							aria-label="Проигрыватель"
+							title="Проигрыватель"
+							className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/65 text-white/70 shadow-2xl backdrop-blur-md transition-colors outline-none hover:bg-white/15 hover:text-white focus-visible:ring-3 focus-visible:ring-white/20"
+						>
+							<Disc3 className="size-4" />
+						</a>
+					</Hint>
 					<FullscreenButton />
 				</div>
 

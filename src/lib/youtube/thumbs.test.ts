@@ -9,7 +9,10 @@ describe('youtubeThumb', () => {
 		expect(youtubeThumb(id)).toBe(`https://i.ytimg.com/vi/${id}/hqdefault.jpg`);
 	});
 
-	it.each(['maxresdefault', 'hqdefault', '1', '2', '3'] as const)('даёт вариант %s', (variant) => {
-		expect(youtubeThumb(id, variant)).toBe(`https://i.ytimg.com/vi/${id}/${variant}.jpg`);
-	});
+	it.each(['maxresdefault', 'hqdefault', 'hq1', 'hq2', 'hq3', '1', '2', '3'] as const)(
+		'даёт вариант %s',
+		(variant) => {
+			expect(youtubeThumb(id, variant)).toBe(`https://i.ytimg.com/vi/${id}/${variant}.jpg`);
+		}
+	);
 });

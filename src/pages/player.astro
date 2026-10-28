@@ -1,0 +1,14 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlayerRoot from '@/views/player/PlayerRoot';
+---
+
+<BaseLayout
+	title="Проигрыватель — Tempo"
+	description="Проигрыватель для длинных видео и миксов с YouTube: обложка крутится как пластинка, а звук идёт из плеера YouTube."
+	path="/player"
+>
+	<div id="root">
+		<PlayerRoot client:only="react" />
+	</div>
+</BaseLayout>

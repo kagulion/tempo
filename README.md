@@ -98,6 +98,7 @@ docs/                подробные описания виджетов
 - [Статистика](docs/stats.md)
 - [Обои](docs/wallpaper.md)
 - [YouTube-фон](docs/youtube.md)
+- [Проигрыватель](docs/player.md)
 - [Окно Twitch](docs/twitch.md)
 - [Эффекты](docs/effects.md)
 - [Затемнение](docs/dimmer.md)
