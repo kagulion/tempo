@@ -1,5 +1,5 @@
 import { EllipsisVertical, History, Plus, Trash2 } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type Ref } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -42,6 +42,8 @@ type CollectionProps = {
 	spin: SpinParams;
 	// Выбрать пластинку: она встаёт на стол и играет
 	onSelect: (id: string) => void;
+	// Поле для ссылки: страница ставит в него фокус, когда открывает окно кнопкой
+	inputRef?: Ref<HTMLInputElement>;
 	className?: string;
 };
 
@@ -144,8 +146,15 @@ function DiscTile({ disc, current, spin, onSelect }: DiscTileProps) {
 	);
 }
 
-// Окно коллекции: поле для ссылки, сетка мини-пластинок, добавление из «Моих видео» фона YouTube
-export function CollectionPanel({ discs, currentId, spin, onSelect, className }: CollectionProps) {
+// Окно коллекции (положение задаёт страница через className, закрытое окно получает hidden и остаётся в DOM): поле для ссылки, сетка мини-пластинок, добавление из «Моих видео» фона YouTube
+export function CollectionPanel({
+	discs,
+	currentId,
+	spin,
+	onSelect,
+	inputRef,
+	className
+}: CollectionProps) {
 	const [link, setLink] = useState('');
 	const [error, setError] = useState<string>();
 	const history = useYouTubeHistory();
@@ -171,6 +180,7 @@ export function CollectionPanel({ discs, currentId, spin, onSelect, className }:
 			<form onSubmit={submit} className="flex flex-col gap-1.5" noValidate>
 				<div className="flex gap-2">
 					<Input
+						ref={inputRef}
 						variant="glass"
 						type="text"
 						inputMode="url"
@@ -241,7 +251,7 @@ export function CollectionPanel({ discs, currentId, spin, onSelect, className }:
 					Пока пусто. Вставьте ссылку на длинное видео или микс, и оно станет пластинкой.
 				</p>
 			) : (
-				<ul className="-mx-2 grid min-h-0 scrollbar-glass grid-cols-2 gap-1 overflow-y-auto sm:grid-cols-3 xl:grid-cols-2">
+				<ul className="-mx-2 grid min-h-0 scrollbar-glass grid-cols-2 gap-1 overflow-y-auto">
 					{discs.map((disc) => (
 						<DiscTile
 							key={disc.id}

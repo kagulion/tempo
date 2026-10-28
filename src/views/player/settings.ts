@@ -23,6 +23,8 @@ export type PlayerSettings = {
 	discId?: string;
 	// Показывать ли плеер YouTube окошком в углу пластинки
 	showVideo: boolean;
+	// Открыто ли окно коллекции
+	collectionOpen: boolean;
 };
 
 export const defaultSettings: PlayerSettings = {
@@ -30,14 +32,16 @@ export const defaultSettings: PlayerSettings = {
 	muted: false,
 	rate: 1,
 	repeat: 'off',
-	showVideo: false
+	showVideo: false,
+	// При первом заходе коллекция пуста, и поле для ссылки нужно сразу
+	collectionOpen: true
 };
 
 // Старые поля не читаем: rpm (обороты; скорость зависит от вида пластинки) и overlays (виджеты поверх пластинки убраны).
 // Каждое поле проверяем отдельно: одно испорченное не должно сбрасывать остальные
 export function parseSettings(saved: unknown): PlayerSettings | undefined {
 	if (!isRecord(saved)) return undefined;
-	const { volume, muted, rate, repeat, discId, showVideo } = saved;
+	const { volume, muted, rate, repeat, discId, showVideo, collectionOpen } = saved;
 
 	const result: PlayerSettings = { ...defaultSettings };
 	if (typeof volume === 'number' && Number.isFinite(volume)) {
@@ -50,6 +54,7 @@ export function parseSettings(saved: unknown): PlayerSettings | undefined {
 	if (repeat === 'off' || repeat === 'one' || repeat === 'all') result.repeat = repeat;
 	if (typeof discId === 'string' && discId !== '') result.discId = discId;
 	if (typeof showVideo === 'boolean') result.showVideo = showVideo;
+	if (typeof collectionOpen === 'boolean') result.collectionOpen = collectionOpen;
 	return result;
 }
 

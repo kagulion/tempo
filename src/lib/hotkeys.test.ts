@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { playerHotkeys } from '@/views/player/hotkeys';
+import { playerHotkeyGroups, playerHotkeys } from '@/views/player/hotkeys';
 import { hotkeyBindings } from '@/widgets/hotkeys/bindings';
 
 import {
@@ -150,10 +150,27 @@ describe('список клавиш сайта', () => {
 	it('у клавиш проигрывателя свои коды, стрелки подписаны', () => {
 		const codes = playerHotkeys.map((item) => item.code);
 		expect(codes).toEqual(
-			expect.arrayContaining(['Space', 'ArrowLeft', 'ArrowRight', 'KeyN', 'KeyP', 'KeyF', 'Slash'])
+			expect.arrayContaining([
+				'Digit1',
+				'Space',
+				'ArrowLeft',
+				'ArrowRight',
+				'KeyN',
+				'KeyP',
+				'KeyF',
+				'Slash'
+			])
 		);
 		expect(keyName('ArrowLeft')).toBe('←');
 		expect(keyName('ArrowRight')).toBe('→');
+	});
+
+	it('коллекция проигрывателя открывается клавишей 1', () => {
+		expect(playerHotkeys.find((item) => item.action === 'collection')).toMatchObject({
+			code: 'Digit1',
+			group: 'windows'
+		});
+		expect(playerHotkeyGroups).toContain('windows');
 	});
 
 	it('duplicateBindings находит повтор', () => {

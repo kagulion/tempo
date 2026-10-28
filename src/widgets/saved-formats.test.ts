@@ -297,6 +297,11 @@ describe('эффекты по умолчанию', () => {
 });
 
 describe('настройки проигрывателя', () => {
+	it('настройки без поля collectionOpen читаются, окно коллекции открыто', () => {
+		const result = parsePlayerSettings({ volume: 30, repeat: 'all', showVideo: true });
+		expect(result).toMatchObject({ volume: 30, repeat: 'all', collectionOpen: true });
+	});
+
 	it('старый формат с rpm читается, rpm игнорируется', () => {
 		const result = parsePlayerSettings({ volume: 30, muted: true, rpm: 45, rate: 1.25 });
 		expect(result).toMatchObject({ volume: 30, muted: true, rate: 1.25 });

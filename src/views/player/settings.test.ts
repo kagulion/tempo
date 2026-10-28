@@ -20,7 +20,8 @@ describe('parseSettings', () => {
 			rate: 1.5,
 			repeat: 'all',
 			discId: 'aaaaaaaaaaa',
-			showVideo: true
+			showVideo: true,
+			collectionOpen: false
 		};
 		expect(parseSettings(saved)).toEqual(saved);
 	});
@@ -31,9 +32,22 @@ describe('parseSettings', () => {
 			muted: 'да',
 			rate: 3,
 			repeat: 'x',
-			discId: ''
+			discId: '',
+			collectionOpen: 'нет'
 		});
 		expect(result).toEqual({ ...defaultSettings, volume: 100 });
+	});
+});
+
+describe('collectionOpen', () => {
+	it('по умолчанию окно коллекции открыто, в том числе у старых настроек без поля', () => {
+		expect(defaultSettings.collectionOpen).toBe(true);
+		expect(parseSettings({ volume: 40, repeat: 'all' })?.collectionOpen).toBe(true);
+	});
+
+	it('закрытое окно сохраняется, не булево значение сбрасывается', () => {
+		expect(parseSettings({ collectionOpen: false })?.collectionOpen).toBe(false);
+		expect(parseSettings({ collectionOpen: 0 })?.collectionOpen).toBe(true);
 	});
 });
 

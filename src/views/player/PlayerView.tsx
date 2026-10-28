@@ -1,5 +1,7 @@
+import { Disc3 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { Button } from '@/components/ui/button';
 import { Toaster, toast } from '@/components/ui/toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useHotkeys } from '@/hooks/useHotkeys';
@@ -7,6 +9,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { mediaQueries } from '@/lib/media';
 import { cn } from '@/lib/utils';
 import { youtubeThumb } from '@/lib/youtube/thumbs';
+import { DockBar } from '@/widgets/dock/DockBar';
 import { FullscreenButton, toggleFullscreen } from '@/widgets/dock/FullscreenButton';
 import { HotkeysButton, HotkeysDialog } from '@/widgets/hotkeys/HotkeysDialog';
 
@@ -16,7 +19,13 @@ import { CollectionPanel } from './CollectionPanel';
 import { Controls } from './Controls';
 import { Disc } from './Disc';
 import { bindMediaHandlers, clearMedia, setMediaPlaying, showMedia } from './mediaSession';
-import { playerHotkeyGroups, playerHotkeys, seekStep, skipPlayerHotkey } from './hotkeys';
+import {
+	collectionHotkeyLabel,
+	playerHotkeyGroups,
+	playerHotkeys,
+	seekStep,
+	skipPlayerHotkey
+} from './hotkeys';
 import { seekTarget } from './progress';
 import { afterEnd } from './settings';
 import { updateInCollection, useCollection } from './useCollection';
@@ -25,6 +34,19 @@ import { updateSettings, usePlayerSettings } from './usePlayerSettings';
 
 const noDiscTitle = 'Пластинки нет';
 
+// Окно коллекции стоит над панелью в правом нижнем углу, как окна столбца «Вид» на рабочем столе. Ширина как у правого
+// столбца (26rem), на телефоне — на всю ширину рамки с отступами 1rem. Высота: рамка минус кнопки сверху и панель снизу
+// (по 6,5rem снизу и 4,25rem сверху с sm, 7,5rem и 5,25rem с lg), внутри прокручивается сетка пластинок
+const collectionWindowClass =
+	'widget-window absolute inset-x-4 bottom-[6.5rem] z-10 max-h-[calc(100cqh-10.75rem)] sm:inset-x-auto sm:right-4 sm:w-full sm:max-w-[26rem] lg:right-8 lg:bottom-[7.5rem] lg:max-h-[calc(100cqh-12.75rem)]';
+
+// Панель с кнопкой коллекции: положение как у панели «Вид» на рабочем столе, на телефоне тоже справа внизу
+const dockClass = 'absolute right-4 bottom-4 lg:right-8 lg:bottom-8';
+
+// С xl окно коллекции не накрывает пластинку, а стоит рядом: пластинка с пультом сдвигается на половину места,
+// занятого окном (26rem ширина + 2rem поле справа + 2rem зазор = 30rem), и остаётся по центру свободной части
+const discShiftClass = 'xl:-translate-x-60';
+
 // Страница /player: проигрыватель для длинных видео YouTube. Звук идёт из плеера YouTube, а на экране он
 // выглядит как вращающаяся пластинка с обложкой или кадром видео
 export default function PlayerView() {
@@ -32,6 +54,7 @@ export default function PlayerView() {
 	const settings = usePlayerSettings();
 	const hostRef = useRef<HTMLDivElement>(null);
 	const [helpOpen, setHelpOpen] = useState(false);
+	const linkRef = useRef<HTMLInputElement>(null);
 	// Клавиатуры на телефоне нет: кнопку со списком клавиш прячем
 	const touchOnly = useMediaQuery(mediaQueries.coarsePointer);
 
@@ -149,6 +172,21 @@ export default function PlayerView() {
 		setMediaPlaying(playing);
 	}, [playing]);
 
+	const collectionOpen = settings.collectionOpen;
+	const toggleCollection = useCallback(() => {
+		updateSettings({ collectionOpen: !collectionOpen });
+	}, [collectionOpen]);
+	// Кнопка в подсказке пустой коллекции: открывает окно и ставит курсор в поле для ссылки. Закрытое окно
+	// скрыто (display: none), фокус в него встаёт только после перерисовки, поэтому только просьба, а фокус — в эффекте
+	const [linkFocusRequest, setLinkFocusRequest] = useState(0);
+	const openCollection = useCallback(() => {
+		updateSettings({ collectionOpen: true });
+		setLinkFocusRequest((count) => count + 1);
+	}, []);
+	useEffect(() => {
+		if (linkFocusRequest > 0) linkRef.current?.focus();
+	}, [linkFocusRequest]);
+
 	// Клавиши страницы (hotkeys.ts): общий механизм с рабочим столом, поэтому «Клавиши сайта», поля ввода и
 	// Ctrl/Alt/Cmd работают так же. Пока открыт список клавиш, остальные клавиши ждут
 	useHotkeys(
@@ -156,6 +194,7 @@ export default function PlayerView() {
 		(action) => {
 			if (action === 'help') return setHelpOpen((open) => !open);
 			if (helpOpen) return;
+			if (action === 'collection') return toggleCollection();
 			if (action === 'togglePlay') return togglePlay();
 			if (action === 'seekBack') return seekBy(-seekStep);
 			if (action === 'seekForward') return seekBy(seekStep);
@@ -183,12 +222,27 @@ export default function PlayerView() {
 				</div>
 
 				<div className="relative h-full scrollbar-glass overflow-x-clip overflow-y-auto">
-					<div className="relative z-10 mx-auto flex w-full max-w-[100rem] flex-col items-center gap-6 px-4 pt-[4.25rem] pb-8 lg:pt-[5.25rem] xl:grid xl:grid-cols-[minmax(0,1fr)_26rem] xl:items-start xl:gap-10 xl:px-8">
+					{/* Внизу запас под панель, чтобы пульт не уходил под неё */}
+					<div className="relative z-10 mx-auto flex min-h-full w-full max-w-[100rem] flex-col items-center justify-center px-4 pt-[4.25rem] pb-28 lg:pt-[5.25rem] lg:pb-28 xl:px-8">
 						<section
 							aria-label="Пластинка"
-							className="flex w-full flex-col items-center gap-6 xl:sticky xl:top-4 xl:min-h-[calc(100cqh-5rem)] xl:justify-center"
+							className={cn(
+								'flex w-full flex-col items-center gap-6',
+								// Сдвиг только transform-ом (translate), без пересчёта раскладки; при уменьшенном движении сразу
+								'motion-reduce:transition-none xl:transition-[translate] xl:duration-300 xl:ease-[cubic-bezier(0.23,1,0.32,1)]',
+								collectionOpen && discShiftClass
+							)}
 						>
-							<div className="relative w-[clamp(18rem,70cqmin,36rem)] max-w-full xl:w-[clamp(18rem,min(70cqmin,100cqh-24rem),36rem)]">
+							<div
+								className={cn(
+									'relative w-[clamp(18rem,70cqmin,36rem)] max-w-full',
+									// С lg пластинка, пульт и запас под панель помещаются в рамку без прокрутки: ширина считается от высоты.
+									// Без пластинки плеера нет, нижняя граница ширины не нужна, а место нужно ещё подсказке с кнопкой
+									current
+										? 'lg:w-[clamp(18rem,min(70cqmin,100cqh-25rem),36rem)]'
+										: 'lg:w-[clamp(10rem,min(70cqmin,100cqh-32rem),36rem)]'
+								)}
+							>
 								{/* Плеер YouTube нельзя прятать совсем: он стоит под пластинкой и закрыт платформой.
 						    Кнопка «Показать видео» переносит его окошком в угол */}
 								<div
@@ -219,9 +273,16 @@ export default function PlayerView() {
 							</div>
 
 							{!current && (
-								<p className="max-w-xs text-center text-sm text-white/80">
-									Вставьте ссылку на видео YouTube в коллекции, чтобы поставить первую пластинку.
-								</p>
+								<div className="flex max-w-xs flex-col items-center gap-3">
+									<p className="text-center text-sm text-white/80">
+										Вставьте ссылку на видео YouTube в коллекции, чтобы поставить первую пластинку.
+									</p>
+									{!collectionOpen && (
+										<Button variant="glass-solid" size="sm" onClick={openCollection}>
+											Открыть коллекцию
+										</Button>
+									)}
+								</div>
 							)}
 
 							<Controls
@@ -238,16 +299,39 @@ export default function PlayerView() {
 								onChange={updateSettings}
 							/>
 						</section>
-
-						<CollectionPanel
-							discs={discs}
-							currentId={current?.id}
-							spin={spin}
-							onSelect={onSelect}
-							className="w-full max-w-xl xl:sticky xl:top-[5.25rem] xl:max-h-[calc(100cqh-6.5rem)] xl:max-w-none"
-						/>
 					</div>
 				</div>
+
+				{/* Закрытое окно скрыто (hidden), а не убрано: введённая ссылка и прокрутка сохраняются */}
+				<CollectionPanel
+					discs={discs}
+					currentId={current?.id}
+					spin={spin}
+					onSelect={onSelect}
+					inputRef={linkRef}
+					className={cn(collectionWindowClass, !collectionOpen && 'hidden')}
+				/>
+
+				<DockBar
+					label="Пластинки"
+					className={dockClass}
+					groups={[
+						{
+							id: 'discs',
+							label: 'Пластинки',
+							buttons: [
+								{
+									id: 'collection',
+									label: 'Коллекция',
+									icon: Disc3,
+									hotkey: collectionHotkeyLabel,
+									pressed: collectionOpen,
+									onClick: toggleCollection
+								}
+							]
+						}
+					]}
+				/>
 
 				<HotkeysDialog
 					open={helpOpen}
