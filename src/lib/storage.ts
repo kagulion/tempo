@@ -103,6 +103,17 @@ export function createPersistentStore<T>(
 		return value;
 	}
 
+	// Другая вкладка изменила ключ: перечитываем значение (через parse). Иначе устаревшая вкладка
+	// при следующей записи затрёт чужие изменения своей копией из памяти. key === null — хранилище очищено
+	if (typeof addEventListener === 'function') {
+		addEventListener('storage', (event: StorageEvent) => {
+			if (event.key !== null && event.key !== key) return;
+			value = loadStored(key, fallback, parse);
+			loaded = true;
+			listeners.forEach((listener) => listener());
+		});
+	}
+
 	return {
 		get,
 		set(next) {

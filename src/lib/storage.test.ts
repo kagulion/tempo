@@ -96,6 +96,75 @@ describe('createPersistentStore', () => {
 		expect(listener).toHaveBeenCalledTimes(2);
 	});
 
+	describe('событие storage из другой вкладки', () => {
+		// Окно с одним обработчиком: dispatch зовёт его так же, как браузер зовёт его при изменении в другой вкладке
+		function stubWindowEvents() {
+			const handlers: ((event: { key: string | null }) => void)[] = [];
+			vi.stubGlobal(
+				'addEventListener',
+				(type: string, handler: (event: { key: string | null }) => void) => {
+					if (type === 'storage') handlers.push(handler);
+				}
+			);
+			return (eventKey: string | null) => handlers.forEach((handler) => handler({ key: eventKey }));
+		}
+
+		it('перечитывает значение и сообщает подписчикам', () => {
+			const storage = memoryStorage();
+			vi.stubGlobal('localStorage', storage);
+			const dispatch = stubWindowEvents();
+			const store = createPersistentStore(key, 0, parseNumber);
+			const listener = vi.fn();
+			store.subscribe(listener);
+			store.set(1);
+
+			storage.data.set(key, '8');
+			dispatch(key);
+			expect(store.get()).toBe(8);
+			expect(listener).toHaveBeenCalledTimes(2);
+		});
+
+		it('следующая запись строится от чужого значения, а не от старой копии', () => {
+			const storage = memoryStorage();
+			vi.stubGlobal('localStorage', storage);
+			const dispatch = stubWindowEvents();
+			const store = createPersistentStore(key, 0, parseNumber);
+			store.set(1);
+
+			storage.data.set(key, '10');
+			dispatch(key);
+			store.set((current) => current + 1);
+			expect(storage.data.get(key)).toBe('11');
+		});
+
+		it('игнорирует чужие ключи, а очистку хранилища читает как значение по умолчанию', () => {
+			const storage = memoryStorage();
+			vi.stubGlobal('localStorage', storage);
+			const dispatch = stubWindowEvents();
+			const store = createPersistentStore(key, 0, parseNumber);
+			store.set(4);
+
+			dispatch(storageKeys.dimmer);
+			expect(store.get()).toBe(4);
+
+			storage.data.clear();
+			dispatch(null);
+			expect(store.get()).toBe(0);
+		});
+
+		it('испорченное чужое значение заменяет значением по умолчанию', () => {
+			const storage = memoryStorage();
+			vi.stubGlobal('localStorage', storage);
+			const dispatch = stubWindowEvents();
+			const store = createPersistentStore(key, 0, parseNumber);
+			store.set(4);
+
+			storage.data.set(key, '"text"');
+			dispatch(key);
+			expect(store.get()).toBe(0);
+		});
+	});
+
 	it('работает в памяти, когда хранилище недоступно', () => {
 		vi.stubGlobal('localStorage', brokenStorage);
 		const store = createPersistentStore(key, 0, parseNumber);
