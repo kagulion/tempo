@@ -1,7 +1,5 @@
 import { isRecord } from '@/lib/storage';
 
-import type { Rpm } from './spin';
-
 // Настройки самого проигрывателя (без коллекции). Чистый модуль без React
 
 export type RepeatMode = 'off' | 'one' | 'all';
@@ -23,7 +21,6 @@ export type PlayerSettings = {
 	// 0..100
 	volume: number;
 	muted: boolean;
-	rpm: Rpm;
 	rate: number;
 	repeat: RepeatMode;
 	// Включённые виджеты поверх пластинки
@@ -37,7 +34,6 @@ export type PlayerSettings = {
 export const defaultSettings: PlayerSettings = {
 	volume: 70,
 	muted: false,
-	rpm: 33,
 	rate: 1,
 	repeat: 'off',
 	overlays: [],
@@ -48,17 +44,17 @@ function isOverlayId(value: unknown): value is OverlayId {
 	return overlayList.some((overlay) => overlay.id === value);
 }
 
+// Старое поле rpm (обороты) больше не читаем: скорость зависит от вида пластинки.
 // Каждое поле проверяем отдельно: одно испорченное не должно сбрасывать остальные
 export function parseSettings(saved: unknown): PlayerSettings | undefined {
 	if (!isRecord(saved)) return undefined;
-	const { volume, muted, rpm, rate, repeat, overlays, discId, showVideo } = saved;
+	const { volume, muted, rate, repeat, overlays, discId, showVideo } = saved;
 
 	const result: PlayerSettings = { ...defaultSettings, overlays: [] };
 	if (typeof volume === 'number' && Number.isFinite(volume)) {
 		result.volume = Math.round(Math.min(100, Math.max(0, volume)));
 	}
 	if (typeof muted === 'boolean') result.muted = muted;
-	if (rpm === 33 || rpm === 45) result.rpm = rpm;
 	if (typeof rate === 'number' && (playbackRates as readonly number[]).includes(rate)) {
 		result.rate = rate;
 	}

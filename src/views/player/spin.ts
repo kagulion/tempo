@@ -1,31 +1,28 @@
 // Вращение пластинки. Чистый модуль без React: числа для Web Animations API
 
-// Обороты в минуту: 33 означает 33⅓
-export type Rpm = 33 | 45;
-export const rpmValues: readonly Rpm[] = [33, 45];
+import type { DiscStyle } from './collection';
 
-export const rpmLabels: Record<Rpm, string> = {
-	33: '33⅓',
-	45: '45'
+// Сколько секунд занимает один оборот при обычной скорости видео. Зависит от вида пластинки:
+// компакт-диск крутится быстрее (33⅓ об/мин), виниловые пластинки и «белая этикетка» — вдвое медленнее.
+// Record по типу вида: новый вид без записи в таблице не соберётся
+export const styleRevolutionSeconds: Record<DiscStyle, number> = {
+	cd: 1.8,
+	vinyl: 3.6,
+	label: 3.6
 };
 
 // Проигрыватель набирает ход примерно за 0,8 с и останавливается примерно за 1,2 с
 export const spinUpMs = 800;
 export const spinDownMs = 1200;
 
-// Настоящее число оборотов в минуту
-export function rpmNumber(rpm: Rpm) {
-	return rpm === 33 ? 100 / 3 : rpm;
-}
-
 // Сколько секунд занимает один оборот. Скорость видео ускоряет пластинку так же
-export function secondsPerRevolution(rpm: Rpm, rate: number) {
-	return 60 / (rpmNumber(rpm) * rate);
+export function secondsPerRevolution(style: DiscStyle, rate: number) {
+	return styleRevolutionSeconds[style] / rate;
 }
 
 // Обороты в секунду, к которым стремится пластинка. Не играет — стоит
-export function targetSpeed(rpm: Rpm, rate: number, playing: boolean) {
-	return playing ? 1 / secondsPerRevolution(rpm, rate) : 0;
+export function targetSpeed(style: DiscStyle, rate: number, playing: boolean) {
+	return playing ? 1 / secondsPerRevolution(style, rate) : 0;
 }
 
 // Сколько мс нужно на переход от одной скорости к другой: разгон и торможение занимают разное время

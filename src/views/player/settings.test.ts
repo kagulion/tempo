@@ -17,7 +17,6 @@ describe('parseSettings', () => {
 		const saved = {
 			volume: 40,
 			muted: true,
-			rpm: 45,
 			rate: 1.5,
 			repeat: 'all',
 			overlays: ['clock'],
@@ -31,13 +30,20 @@ describe('parseSettings', () => {
 		const result = parseSettings({
 			volume: 500,
 			muted: 'да',
-			rpm: 78,
 			rate: 3,
 			repeat: 'x',
 			overlays: ['clock', 'clock', 'неизвестный'],
 			discId: ''
 		});
 		expect(result).toEqual({ ...defaultSettings, volume: 100, overlays: ['clock'] });
+	});
+});
+
+describe('старое поле rpm', () => {
+	it('принимается и игнорируется, остальные поля остаются', () => {
+		const result = parseSettings({ volume: 40, rpm: 45, rate: 1.5, repeat: 'all' });
+		expect(result).toEqual({ ...defaultSettings, volume: 40, rate: 1.5, repeat: 'all' });
+		expect(result).not.toHaveProperty('rpm');
 	});
 });
 

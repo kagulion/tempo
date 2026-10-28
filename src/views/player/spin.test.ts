@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
 	rampDuration,
 	rampSpeed,
-	rpmNumber,
 	scaledRampDuration,
 	secondsPerRevolution,
 	spinDownMs,
@@ -12,26 +11,23 @@ import {
 } from './spin';
 
 describe('secondsPerRevolution', () => {
-	it('33⅓ об/мин — 1,8 с на оборот, 45 — 1,333 с', () => {
-		expect(secondsPerRevolution(33, 1)).toBeCloseTo(1.8, 5);
-		expect(secondsPerRevolution(45, 1)).toBeCloseTo(4 / 3, 5);
+	it('компакт-диск — 1,8 с на оборот, винил и белая этикетка — 3,6 с', () => {
+		expect(secondsPerRevolution('cd', 1)).toBeCloseTo(1.8, 5);
+		expect(secondsPerRevolution('vinyl', 1)).toBeCloseTo(3.6, 5);
+		expect(secondsPerRevolution('label', 1)).toBeCloseTo(3.6, 5);
 	});
 
 	it('скорость видео ускоряет вращение', () => {
-		expect(secondsPerRevolution(33, 2)).toBeCloseTo(0.9, 5);
-		expect(secondsPerRevolution(45, 0.5)).toBeCloseTo(8 / 3, 5);
-	});
-
-	it('rpmNumber: 33 — это 33⅓', () => {
-		expect(rpmNumber(33)).toBeCloseTo(33.3333, 3);
-		expect(rpmNumber(45)).toBe(45);
+		expect(secondsPerRevolution('cd', 2)).toBeCloseTo(0.9, 5);
+		expect(secondsPerRevolution('vinyl', 0.5)).toBeCloseTo(7.2, 5);
 	});
 });
 
 describe('targetSpeed', () => {
 	it('играет — обороты в секунду, иначе ноль', () => {
-		expect(targetSpeed(33, 1, true)).toBeCloseTo(1 / 1.8, 5);
-		expect(targetSpeed(33, 1, false)).toBe(0);
+		expect(targetSpeed('cd', 1, true)).toBeCloseTo(1 / 1.8, 5);
+		expect(targetSpeed('vinyl', 1, true)).toBeCloseTo(1 / 3.6, 5);
+		expect(targetSpeed('cd', 1, false)).toBe(0);
 	});
 });
 

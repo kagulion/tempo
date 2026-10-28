@@ -91,7 +91,7 @@ export function Disc({
 	className
 }: DiscProps) {
 	const spinRef = useRef<HTMLDivElement>(null);
-	useSpin(spinRef, spin);
+	useSpin(spinRef, spin, style);
 
 	// При смене видео или картинки цепочка вариантов начинается заново
 	const imageKey = `${videoId ?? ''}/${image}`;

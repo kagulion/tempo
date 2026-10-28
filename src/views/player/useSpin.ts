@@ -3,12 +3,12 @@ import { useEffect, useRef, useSyncExternalStore, type RefObject } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { mediaQueries } from '@/lib/media';
 
-import { rampSpeed, scaledRampDuration, targetSpeed, type Rpm } from './spin';
+import type { DiscStyle } from './collection';
+import { rampSpeed, scaledRampDuration, targetSpeed } from './spin';
 
 export type SpinParams = {
 	// Пластинка играет: разгоняется, иначе тормозит
 	playing: boolean;
-	rpm: Rpm;
 	// Скорость воспроизведения видео
 	rate: number;
 };
@@ -25,7 +25,12 @@ function isHidden() {
 // Крутит элемент через Web Animations API. Анимация одна, бесконечная, один оборот за секунду, а скорость
 // меняется через playbackRate: так угол не прыгает при разгоне и торможении. Анимируется только transform.
 // spin = undefined — пластинка стоит, анимации нет. «Уменьшить движение» — не крутим вовсе
-export function useSpin(ref: RefObject<HTMLElement | null>, spin: SpinParams | undefined) {
+export function useSpin(
+	ref: RefObject<HTMLElement | null>,
+	spin: SpinParams | undefined,
+	// Вид пластинки задаёт базовую скорость; при его смене скорость плавно меняется
+	style: DiscStyle
+) {
 	const reduced = useMediaQuery(mediaQueries.reducedMotion);
 	const hidden = useSyncExternalStore(subscribeVisibility, isHidden);
 	const enabled = spin !== undefined && !reduced;
@@ -51,7 +56,6 @@ export function useSpin(ref: RefObject<HTMLElement | null>, spin: SpinParams | u
 	}, [ref, enabled]);
 
 	const playing = spin?.playing ?? false;
-	const rpm = spin?.rpm ?? 33;
 	const rate = spin?.rate ?? 1;
 
 	useEffect(() => {
@@ -79,8 +83,8 @@ export function useSpin(ref: RefObject<HTMLElement | null>, spin: SpinParams | u
 		}
 
 		const from = speed.current;
-		const to = targetSpeed(rpm, rate, playing);
-		const full = targetSpeed(rpm, rate, true);
+		const to = targetSpeed(style, rate, playing);
+		const full = targetSpeed(style, rate, true);
 		const duration = scaledRampDuration(from, to, full);
 		const startedAt = performance.now();
 
@@ -94,5 +98,5 @@ export function useSpin(ref: RefObject<HTMLElement | null>, spin: SpinParams | u
 			if (frame.current !== undefined) cancelAnimationFrame(frame.current);
 			frame.current = undefined;
 		};
-	}, [enabled, playing, rpm, rate, hidden]);
+	}, [enabled, playing, style, rate, hidden]);
 }

@@ -14,6 +14,7 @@ import { parseMood } from './stats/mood';
 import { parseLiveWallpaper, resolveLive } from './wallpaper/liveWallpaper';
 import { parseSaved } from './wallpaper/useWallpaper';
 import { parseSavedChannel } from './twitch/twitch';
+import { parseSettings as parsePlayerSettings } from '@/views/player/settings';
 import { parseSoundOn } from './youtube/playback';
 import { parseVideoQuality } from './youtube/quality';
 import { parseHistory } from './youtube/youtube';
@@ -292,5 +293,13 @@ describe('эффекты по умолчанию', () => {
 	it('с «уменьшить движение» эффектов нет', () => {
 		expect(initialState(false).active).toEqual(['embers']);
 		expect(initialState(true).active).toEqual([]);
+	});
+});
+
+describe('настройки проигрывателя', () => {
+	it('старый формат с rpm читается, rpm игнорируется', () => {
+		const result = parsePlayerSettings({ volume: 30, muted: true, rpm: 45, rate: 1.25 });
+		expect(result).toMatchObject({ volume: 30, muted: true, rate: 1.25 });
+		expect(result).not.toHaveProperty('rpm');
 	});
 });

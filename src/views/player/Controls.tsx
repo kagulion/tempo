@@ -27,7 +27,6 @@ import { Widget } from '@/widgets/Widget';
 
 import { formatTime } from './progress';
 import { playbackRates, repeatLabels, type PlayerSettings, type RepeatMode } from './settings';
-import { rpmLabels, rpmValues, type Rpm } from './spin';
 import type { PlayerStatus } from './usePlayer';
 
 type ControlsProps = {
@@ -166,36 +165,6 @@ export function Controls({
 								{playbackRates.map((rate) => (
 									<DropdownMenuRadioItem key={rate} value={String(rate)}>
 										{rateLabel(rate)}
-									</DropdownMenuRadioItem>
-								))}
-							</DropdownMenuRadioGroup>
-						</DropdownMenuGroup>
-					</DropdownMenuContent>
-				</DropdownMenu>
-
-				<DropdownMenu>
-					<DropdownMenuTrigger
-						render={
-							<Button
-								variant="glass"
-								size="sm"
-								title="Обороты пластинки"
-								aria-label={`Обороты пластинки: ${rpmLabels[settings.rpm]} в минуту`}
-							/>
-						}
-					>
-						{rpmLabels[settings.rpm]} об/мин
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="center" side="top">
-						<DropdownMenuGroup>
-							<DropdownMenuLabel>Обороты в минуту</DropdownMenuLabel>
-							<DropdownMenuRadioGroup
-								value={String(settings.rpm)}
-								onValueChange={(value) => onChange({ rpm: Number(value) as Rpm })}
-							>
-								{rpmValues.map((rpm) => (
-									<DropdownMenuRadioItem key={rpm} value={String(rpm)}>
-										{rpmLabels[rpm]}
 									</DropdownMenuRadioItem>
 								))}
 							</DropdownMenuRadioGroup>

@@ -175,7 +175,7 @@ export default function PlayerView() {
 		return () => document.removeEventListener('keydown', onKeyDown);
 	}, [seekBy]);
 
-	const spin = { playing, rpm: settings.rpm, rate: settings.rate };
+	const spin = { playing, rate: settings.rate };
 	const style = current?.style ?? 'label';
 
 	return (
