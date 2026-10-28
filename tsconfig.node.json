@@ -18,5 +18,5 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true
 	},
-	"include": ["vite.config.ts", "scripts"]
+	"include": ["astro.config.ts", "vitest.config.ts", "scripts"]
 }

@@ -1,0 +1,14 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Root from '@/Root';
+---
+
+<BaseLayout
+	title="Tempo — уютная таверна для фокуса: радио, звуки и помидоро-таймер"
+	description="Уютная атмосферная таверна для учёбы и работы: фэнтези-обои, радио со всего мира, фоновые звуки, помидоро-таймер, задачи и статистика фокуса."
+	path="/"
+>
+	<div id="root">
+		<Root client:only="react" />
+	</div>
+</BaseLayout>

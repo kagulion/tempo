@@ -14,7 +14,7 @@
 ## Стек
 
 - [React 19](https://react.dev) + [TypeScript 7](https://www.typescriptlang.org)
-- [Vite 8](https://vite.dev), [Tailwind CSS 4](https://tailwindcss.com)
+- [Astro 7](https://astro.build) (статика, React-остров), [Vite 8](https://vite.dev), [Tailwind CSS 4](https://tailwindcss.com)
 - [shadcn/ui](https://ui.shadcn.com) на [Base UI](https://base-ui.com), иконки [Lucide](https://lucide.dev)
 - [dnd-kit](https://dndkit.com) — перетаскивание на доске задач
 - [Supabase](https://supabase.com) — счётчик «Сейчас на сайте» (Realtime Presence) и прокси к API радио (Edge Function)
@@ -51,7 +51,7 @@ supabase functions deploy record --no-verify-jwt
 | `pnpm dev`                | dev-сервер с HMR                                                |
 | `pnpm build`              | проверка типов и сборка в `dist/`                               |
 | `pnpm preview`            | локальный просмотр собранной версии                             |
-| `pnpm check`              | только проверка типов                                           |
+| `pnpm check`              | только проверка типов (`astro sync` и `tsc -b`)                 |
 | `pnpm lint`               | oxlint и проверка форматирования Prettier                       |
 | `pnpm format`             | форматирование Prettier                                         |
 | `pnpm test`               | тесты Vitest один раз                                           |
@@ -67,6 +67,9 @@ supabase functions deploy record --no-verify-jwt
 
 ```
 src/
+  pages/             страницы Astro: index.astro выводит приложение островом client:only
+  layouts/           BaseLayout.astro: общий head (SEO, Open Graph, canonical)
+  Root.tsx           корень острова: StrictMode и App
   App.tsx            раскладка: фон, окна, панель, слои эффектов
   widgets/
     registry.ts      реестр окон: кнопка, клавиша, место на экране

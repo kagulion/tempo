@@ -6,7 +6,7 @@
 
 ```mermaid
 flowchart TD
-    main[main.tsx] --> App[App.tsx<br/>фон и раскладка]
+    page[pages/index.astro<br/>остров client:only] --> Root[Root.tsx<br/>StrictMode] --> App[App.tsx<br/>фон и раскладка]
     App --> Img[WallpaperBackground<br/>картинка или видео на весь экран]
     App --> Dock[Dock<br/>панель внизу]
     App --> Reg[registry.ts<br/>список окон]

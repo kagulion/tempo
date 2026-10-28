@@ -11,5 +11,5 @@
 		"react-hooks/rules-of-hooks": "error",
 		"react-hooks/exhaustive-deps": "warn"
 	},
-	"ignorePatterns": ["dist", ".agents", ".claude"]
+	"ignorePatterns": ["dist", ".astro", ".agents", ".claude"]
 }

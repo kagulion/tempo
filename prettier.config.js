@@ -4,7 +4,8 @@ const config = {
 	singleQuote: true,
 	trailingComma: 'none',
 	printWidth: 100,
-	plugins: ['prettier-plugin-tailwindcss'],
+	plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
+	overrides: [{ files: '*.astro', options: { parser: 'astro' } }],
 	tailwindStylesheet: './src/index.css'
 };
 

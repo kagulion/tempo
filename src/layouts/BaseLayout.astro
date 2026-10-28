@@ -1,0 +1,54 @@
+---
+import '@/index.css';
+import { getSupabaseUrl } from '@/lib/supabase';
+
+interface Props {
+	title: string;
+	description: string;
+	// Путь страницы от корня сайта, например «/». Из него и из `site` строятся canonical и og:url
+	path: string;
+}
+
+const { title, description, path } = Astro.props;
+const url = new URL(path, Astro.site).href;
+const image = new URL('/og.png', Astro.site).href;
+// Адрес Supabase берём тем же разбором, что и в приложении (там может лежать и один ref проекта):
+// preconnect не тратит время на соединение для запроса станций и счётчика. Нет адреса — тега нет
+const supabaseUrl = getSupabaseUrl(import.meta.env.VITE_SUPABASE_URL);
+---
+
+<!doctype html>
+<html lang="ru">
+	<head>
+		{supabaseUrl && <link rel="preconnect" href={supabaseUrl} crossorigin="" />}
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="text-scale" content="scale" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="canonical" href={url} />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#000000" />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Tempo" />
+		<meta property="og:url" content={url} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={image} />
+		<meta property="og:image:type" content="image/png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta
+			property="og:image:alt"
+			content="Tempo: розовый логотип и название на фоне уютной таверны у камина"
+		/>
+		<meta property="og:locale" content="ru_RU" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={image} />
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
