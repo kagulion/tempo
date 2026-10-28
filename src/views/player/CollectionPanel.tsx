@@ -26,20 +26,16 @@ import {
 	discLimit,
 	discStyleLabels,
 	discStyles,
-	previewVariant,
 	type Disc as DiscData,
 	type DiscImage,
 	type DiscStyle
 } from './collection';
-import { Disc } from './Disc';
-import type { SpinParams } from './useSpin';
+import { Sleeve } from './Sleeve';
 import { addToCollection, removeFromCollection, updateInCollection } from './useCollection';
 
 type CollectionProps = {
 	discs: DiscData[];
 	currentId: string | undefined;
-	// Вращение для текущей пластинки; остальные стоят
-	spin: SpinParams;
 	// Выбрать пластинку: она встаёт на стол и играет
 	onSelect: (id: string) => void;
 	// Поле для ссылки: страница ставит в него фокус, когда открывает окно кнопкой
@@ -54,12 +50,11 @@ function discTitle(disc: DiscData) {
 type DiscTileProps = {
 	disc: DiscData;
 	current: boolean;
-	spin: SpinParams;
 	onSelect: (id: string) => void;
 };
 
-// Мини-пластинка с подписью и меню настроек. Кнопка меню лежит рядом с кнопкой выбора, а не внутри неё
-function DiscTile({ disc, current, spin, onSelect }: DiscTileProps) {
+// Упаковка пластинки (вид меняется сразу вместе с `disc.style`) с подписью и меню настроек. Кнопка меню лежит рядом с кнопкой выбора, а не внутри неё
+function DiscTile({ disc, current, onSelect }: DiscTileProps) {
 	const title = discTitle(disc);
 	return (
 		<li className="relative">
@@ -73,12 +68,10 @@ function DiscTile({ disc, current, spin, onSelect }: DiscTileProps) {
 					current && 'bg-white/10 ring-1 ring-white/30'
 				)}
 			>
-				<Disc
-					small
+				<Sleeve
 					style={disc.style}
 					videoId={disc.videoId}
 					image={disc.image}
-					spin={current ? spin : undefined}
 					className="shadow-[0_6px_16px_rgba(0,0,0,0.5)]"
 				/>
 				<span className="line-clamp-2 text-xs text-white/80" title={title}>
@@ -120,15 +113,20 @@ function DiscTile({ disc, current, spin, onSelect }: DiscTileProps) {
 						<DropdownMenuRadioGroup
 							value={disc.image}
 							onValueChange={(value) => updateInCollection(disc.id, { image: value as DiscImage })}
+							className="grid grid-cols-2 gap-1"
 						>
 							{discImages.map((image) => (
-								<DropdownMenuRadioItem key={image} value={image}>
-									<img
-										src={youtubeThumb(disc.videoId, previewVariant(image))}
-										alt=""
-										loading="lazy"
-										draggable={false}
-										className="h-6 w-8 rounded-sm bg-white/10 object-cover"
+								<DropdownMenuRadioItem
+									key={image}
+									value={image}
+									// Ячейка сетки: упаковка и подпись; галочку прячем, выбранную отмечает кольцо
+									className="w-24 flex-col gap-1 p-1.5 text-xs data-checked:ring-2 data-checked:ring-white/70 [&>[data-slot=dropdown-menu-radio-item-indicator]]:hidden"
+								>
+									<Sleeve
+										style={disc.style}
+										videoId={disc.videoId}
+										image={image}
+										className="w-full"
 									/>
 									{discImageLabels[image]}
 								</DropdownMenuRadioItem>
@@ -150,7 +148,6 @@ function DiscTile({ disc, current, spin, onSelect }: DiscTileProps) {
 export function CollectionPanel({
 	discs,
 	currentId,
-	spin,
 	onSelect,
 	inputRef,
 	className
@@ -257,7 +254,6 @@ export function CollectionPanel({
 							key={disc.id}
 							disc={disc}
 							current={disc.id === currentId}
-							spin={spin}
 							onSelect={onSelect}
 						/>
 					))}

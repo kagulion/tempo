@@ -306,7 +306,6 @@ export default function PlayerView() {
 				<CollectionPanel
 					discs={discs}
 					currentId={current?.id}
-					spin={spin}
 					onSelect={onSelect}
 					inputRef={linkRef}
 					className={cn(collectionWindowClass, !collectionOpen && 'hidden')}
