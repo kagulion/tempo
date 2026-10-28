@@ -5,23 +5,27 @@ import { Hint, Kbd } from '@/components/Hint';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { bindingName, hotkeyGroupLabels, type HotkeyGroup } from '@/lib/hotkeys';
+import {
+	bindingName,
+	hotkeyGroupLabels,
+	type HotkeyBinding,
+	type HotkeyGroup
+} from '@/lib/hotkeys';
 import { useSiteHotkeys } from '@/lib/siteHotkeys';
 import { cn } from '@/lib/utils';
 import { WidgetHeader } from '@/widgets/Widget';
 
-import { hotkeyBindings } from './bindings';
-
 type HotkeysDialogProps = {
 	open: boolean;
 	onClose: () => void;
+	// Клавиши страницы и порядок их групп: у рабочего стола и проигрывателя свои наборы
+	bindings: readonly HotkeyBinding[];
+	groups: readonly HotkeyGroup[];
 };
-
-const groups: HotkeyGroup[] = ['windows', 'view', 'other'];
 
 // Окно со списком горячих клавиш. Закрывается по Esc, по клику мимо и по крестику.
 // Фокус, Esc и возврат фокуса на кнопку, что открыла окно, ведёт Base UI
-export function HotkeysDialog({ open, onClose }: HotkeysDialogProps) {
+export function HotkeysDialog({ open, onClose, bindings, groups }: HotkeysDialogProps) {
 	const closeRef = useRef<HTMLButtonElement>(null);
 	const siteHotkeys = useSiteHotkeys();
 	return (
@@ -55,7 +59,7 @@ export function HotkeysDialog({ open, onClose }: HotkeysDialogProps) {
 				/>
 
 				{groups.map((group) => {
-					const items = hotkeyBindings.filter((binding) => binding.group === group);
+					const items = bindings.filter((binding) => binding.group === group);
 					if (items.length === 0) return null;
 					return (
 						<section

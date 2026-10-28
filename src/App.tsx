@@ -24,7 +24,7 @@ import { toggleEffectsOff } from '@/widgets/effects/effectsOff';
 import { focusVisibility } from '@/widgets/focus/focus';
 import { FocusButton } from '@/widgets/focus/FocusButton';
 import { useFocusMode } from '@/widgets/focus/useFocusMode';
-import { hotkeyBindings } from '@/widgets/hotkeys/bindings';
+import { hotkeyBindings, hotkeyGroups } from '@/widgets/hotkeys/bindings';
 import { HotkeysButton, HotkeysDialog } from '@/widgets/hotkeys/HotkeysDialog';
 import {
 	preloadWidget,
@@ -251,7 +251,12 @@ export default function App() {
 						<Dock key={panel.label} panel={panel} isOpen={dock.isOpen} onToggle={dock.toggle} />
 					))}
 				</div>
-				<HotkeysDialog open={helpOpen} onClose={closeHelp} />
+				<HotkeysDialog
+					open={helpOpen}
+					onClose={closeHelp}
+					bindings={hotkeyBindings}
+					groups={hotkeyGroups}
+				/>
 				<ScenesDialog open={onboarding.visible} onFinish={onboarding.finish} />
 			</main>
 			{/* Уведомления (src/components/ui/toast.tsx): один раз на всю страницу */}

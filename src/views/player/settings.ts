@@ -13,18 +13,12 @@ export const repeatLabels: Record<RepeatMode, string> = {
 // Скорость воспроизведения из меню
 export const playbackRates = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
 
-// Виджеты поверх пластинки. Список, чтобы добавлять новые: id хранится в настройках
-export const overlayList = [{ id: 'clock', label: 'Часы' }] as const;
-export type OverlayId = (typeof overlayList)[number]['id'];
-
 export type PlayerSettings = {
 	// 0..100
 	volume: number;
 	muted: boolean;
 	rate: number;
 	repeat: RepeatMode;
-	// Включённые виджеты поверх пластинки
-	overlays: OverlayId[];
 	// Какая пластинка на столе
 	discId?: string;
 	// Показывать ли плеер YouTube окошком в углу пластинки
@@ -36,21 +30,16 @@ export const defaultSettings: PlayerSettings = {
 	muted: false,
 	rate: 1,
 	repeat: 'off',
-	overlays: [],
 	showVideo: false
 };
 
-function isOverlayId(value: unknown): value is OverlayId {
-	return overlayList.some((overlay) => overlay.id === value);
-}
-
-// Старое поле rpm (обороты) больше не читаем: скорость зависит от вида пластинки.
+// Старые поля не читаем: rpm (обороты; скорость зависит от вида пластинки) и overlays (виджеты поверх пластинки убраны).
 // Каждое поле проверяем отдельно: одно испорченное не должно сбрасывать остальные
 export function parseSettings(saved: unknown): PlayerSettings | undefined {
 	if (!isRecord(saved)) return undefined;
-	const { volume, muted, rate, repeat, overlays, discId, showVideo } = saved;
+	const { volume, muted, rate, repeat, discId, showVideo } = saved;
 
-	const result: PlayerSettings = { ...defaultSettings, overlays: [] };
+	const result: PlayerSettings = { ...defaultSettings };
 	if (typeof volume === 'number' && Number.isFinite(volume)) {
 		result.volume = Math.round(Math.min(100, Math.max(0, volume)));
 	}
@@ -59,16 +48,9 @@ export function parseSettings(saved: unknown): PlayerSettings | undefined {
 		result.rate = rate;
 	}
 	if (repeat === 'off' || repeat === 'one' || repeat === 'all') result.repeat = repeat;
-	if (Array.isArray(overlays)) {
-		result.overlays = [...new Set(overlays.filter(isOverlayId))];
-	}
 	if (typeof discId === 'string' && discId !== '') result.discId = discId;
 	if (typeof showVideo === 'boolean') result.showVideo = showVideo;
 	return result;
-}
-
-export function toggleOverlay(list: OverlayId[], id: OverlayId): OverlayId[] {
-	return list.includes(id) ? list.filter((item) => item !== id) : [...list, id];
 }
 
 // Что делать, когда пластинка доиграла: повторить её, перейти к следующей или остановиться.

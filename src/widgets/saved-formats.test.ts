@@ -302,4 +302,10 @@ describe('настройки проигрывателя', () => {
 		expect(result).toMatchObject({ volume: 30, muted: true, rate: 1.25 });
 		expect(result).not.toHaveProperty('rpm');
 	});
+
+	it('старое поле overlays игнорируется, остальные поля остаются', () => {
+		const result = parsePlayerSettings({ volume: 30, overlays: ['clock'], repeat: 'all' });
+		expect(result).toMatchObject({ volume: 30, repeat: 'all' });
+		expect(result).not.toHaveProperty('overlays');
+	});
 });

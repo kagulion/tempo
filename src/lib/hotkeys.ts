@@ -1,11 +1,12 @@
 // Горячие клавиши сайта: описание и сопоставление с событием. Без React, чтобы можно было тестировать.
 // Клавиши сравниваем по event.code (KeyR, Digit1), а не по event.key: так они работают в любой раскладке
 
-export type HotkeyGroup = 'windows' | 'view' | 'other';
+export type HotkeyGroup = 'windows' | 'view' | 'player' | 'other';
 
 export const hotkeyGroupLabels: Record<HotkeyGroup, string> = {
 	windows: 'Окна',
 	view: 'Вид',
+	player: 'Плеер',
 	other: 'Прочее'
 };
 
@@ -57,6 +58,8 @@ export function keyName(code: string): string {
 	const names: Record<string, string> = {
 		Slash: '/',
 		Escape: 'Esc',
+		ArrowLeft: '←',
+		ArrowRight: '→',
 		Space: 'Пробел'
 	};
 	return names[code] ?? code;

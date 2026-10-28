@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { afterEnd, defaultSettings, parseSettings, toggleOverlay } from './settings';
+import { afterEnd, defaultSettings, parseSettings } from './settings';
 
 describe('parseSettings', () => {
 	it('не объект — undefined', () => {
@@ -19,7 +19,6 @@ describe('parseSettings', () => {
 			muted: true,
 			rate: 1.5,
 			repeat: 'all',
-			overlays: ['clock'],
 			discId: 'aaaaaaaaaaa',
 			showVideo: true
 		};
@@ -32,10 +31,9 @@ describe('parseSettings', () => {
 			muted: 'да',
 			rate: 3,
 			repeat: 'x',
-			overlays: ['clock', 'clock', 'неизвестный'],
 			discId: ''
 		});
-		expect(result).toEqual({ ...defaultSettings, volume: 100, overlays: ['clock'] });
+		expect(result).toEqual({ ...defaultSettings, volume: 100 });
 	});
 });
 
@@ -47,10 +45,16 @@ describe('старое поле rpm', () => {
 	});
 });
 
-describe('toggleOverlay', () => {
-	it('включает и выключает', () => {
-		expect(toggleOverlay([], 'clock')).toEqual(['clock']);
-		expect(toggleOverlay(['clock'], 'clock')).toEqual([]);
+describe('старое поле overlays', () => {
+	it('принимается и игнорируется, остальные поля остаются', () => {
+		const result = parseSettings({
+			volume: 40,
+			overlays: ['clock'],
+			repeat: 'one',
+			showVideo: true
+		});
+		expect(result).toEqual({ ...defaultSettings, volume: 40, repeat: 'one', showVideo: true });
+		expect(result).not.toHaveProperty('overlays');
 	});
 });
 

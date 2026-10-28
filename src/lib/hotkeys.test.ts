@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { playerHotkeys } from '@/views/player/hotkeys';
 import { hotkeyBindings } from '@/widgets/hotkeys/bindings';
 
 import {
@@ -132,6 +133,27 @@ describe('поля ввода', () => {
 describe('список клавиш сайта', () => {
 	it('в реестре и общих действиях нет одинаковых сочетаний', () => {
 		expect(duplicateBindings(hotkeyBindings)).toEqual([]);
+	});
+
+	it('в клавишах проигрывателя нет одинаковых сочетаний', () => {
+		expect(duplicateBindings(playerHotkeys)).toEqual([]);
+	});
+
+	it('«На весь экран» и «?» на проигрывателе те же, что на рабочем столе', () => {
+		for (const action of ['fullscreen', 'help']) {
+			expect(playerHotkeys.find((item) => item.action === action)).toEqual(
+				hotkeyBindings.find((item) => item.action === action)
+			);
+		}
+	});
+
+	it('у клавиш проигрывателя свои коды, стрелки подписаны', () => {
+		const codes = playerHotkeys.map((item) => item.code);
+		expect(codes).toEqual(
+			expect.arrayContaining(['Space', 'ArrowLeft', 'ArrowRight', 'KeyN', 'KeyP', 'KeyF', 'Slash'])
+		);
+		expect(keyName('ArrowLeft')).toBe('←');
+		expect(keyName('ArrowRight')).toBe('→');
 	});
 
 	it('duplicateBindings находит повтор', () => {
