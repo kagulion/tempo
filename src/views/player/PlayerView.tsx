@@ -17,7 +17,7 @@ import { Background } from './Background';
 import { neighbourDisc, previewVariant } from './collection';
 import { CollectionPanel } from './CollectionPanel';
 import { Controls } from './Controls';
-import { Disc } from './Disc';
+import { DiscStage } from './DiscStage';
 import { bindMediaHandlers, clearMedia, setMediaPlaying, showMedia } from './mediaSession';
 import {
 	collectionHotkeyLabel,
@@ -27,6 +27,7 @@ import {
 	skipPlayerHotkey
 } from './hotkeys';
 import { seekTarget } from './progress';
+import { StyleMenu } from './StyleMenu';
 import { afterEnd } from './settings';
 import { updateInCollection, useCollection } from './useCollection';
 import { usePlayer } from './usePlayer';
@@ -206,7 +207,11 @@ export default function PlayerView() {
 	);
 
 	const spin = { playing, rate: settings.rate };
-	const style = current?.style ?? 'label';
+	const style = settings.style;
+	// Диск выдвинут на 20 %, при наведении мыши на 30 %, после клика на 60 %
+	const [spread, setSpread] = useState(false);
+	const [hovered, setHovered] = useState(false);
+	const reach = spread ? 'open' : hovered ? 'hover' : 'rest';
 
 	return (
 		<TooltipProvider>
@@ -217,6 +222,7 @@ export default function PlayerView() {
 				{/* Прокручивается этот слой, а не main: фон остаётся на месте, пока листается содержимое */}
 				{/* Кнопки в углу там же, где на рабочем столе (App.tsx) */}
 				<div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-8 lg:right-8">
+					<StyleMenu value={settings.style} onChange={(style) => updateSettings({ style })} />
 					{!touchOnly && <HotkeysButton onClick={() => setHelpOpen(true)} />}
 					<FullscreenButton />
 				</div>
@@ -235,41 +241,37 @@ export default function PlayerView() {
 						>
 							<div
 								className={cn(
-									'relative w-[clamp(18rem,70cqmin,36rem)] max-w-full',
+									// Упаковка с диском: ширина 1,504 высоты. Упаковка (66,5 %) не уже 213 px, иначе плеер 200×200 выглядывает из-под неё
+									'relative aspect-[1.504] w-[clamp(20rem,85cqmin,44rem)] max-w-full',
 									// С lg пластинка, пульт и запас под панель помещаются в рамку без прокрутки: ширина считается от высоты.
 									// Без пластинки плеера нет, нижняя граница ширины не нужна, а место нужно ещё подсказке с кнопкой
 									current
-										? 'lg:w-[clamp(18rem,min(70cqmin,100cqh-25rem),36rem)]'
-										: 'lg:w-[clamp(10rem,min(70cqmin,100cqh-32rem),36rem)]'
+										? 'lg:w-[clamp(20rem,min(85cqmin,(100cqh-25rem)*1.504),44rem)]'
+										: 'lg:w-[clamp(10rem,min(85cqmin,(100cqh-32rem)*1.504),44rem)]'
 								)}
 							>
-								{/* Плеер YouTube нельзя прятать совсем: он стоит под пластинкой и закрыт платформой.
-						    Кнопка «Показать видео» переносит его окошком в угол */}
-								<div
-									ref={hostRef}
-									className={cn(
-										'absolute size-[200px] [&_iframe]:size-full',
-										settings.showVideo
-											? '-top-3 -right-3 z-30 overflow-hidden rounded-xl shadow-2xl ring-1 ring-white/20'
-											: 'top-1/2 left-1/2 z-0 -translate-1/2'
-									)}
+								<DiscStage
+									className="absolute inset-0 z-10"
+									style={style}
+									videoId={current?.videoId}
+									image={current?.image}
+									spin={spin}
+									reach={reach}
+									hostRef={hostRef}
+									showVideo={settings.showVideo}
 								/>
-								<span aria-hidden className="absolute inset-0 z-10 rounded-full bg-neutral-950" />
+								{/* Клик раздвигает упаковку и диск, ещё один — сдвигает обратно; играет и ставит на паузу кнопка пульта */}
 								<button
 									type="button"
-									onClick={current ? togglePlay : undefined}
+									onClick={() => setSpread((value) => !value)}
+									onPointerEnter={(event) => setHovered(event.pointerType === 'mouse')}
+									onPointerLeave={() => setHovered(false)}
 									disabled={!current}
-									title={playing ? 'Пауза' : 'Играть'}
-									aria-label={current ? (playing ? 'Пауза' : 'Играть') : 'Нет пластинки'}
-									className="relative z-20 block w-full cursor-pointer rounded-full outline-none focus-visible:ring-4 focus-visible:ring-white/40 disabled:cursor-default"
-								>
-									<Disc
-										style={style}
-										videoId={current?.videoId}
-										image={current?.image}
-										spin={spin}
-									/>
-								</button>
+									title={spread ? 'Сдвинуть диск' : 'Выдвинуть диск'}
+									aria-label={spread ? 'Сдвинуть диск' : 'Выдвинуть диск'}
+									aria-expanded={spread}
+									className="absolute inset-0 z-20 block cursor-pointer rounded-[3px] outline-none focus-visible:ring-4 focus-visible:ring-white/40 disabled:cursor-default"
+								/>
 							</div>
 
 							{!current && (
@@ -305,6 +307,7 @@ export default function PlayerView() {
 				{/* Закрытое окно скрыто (hidden), а не убрано: введённая ссылка и прокрутка сохраняются */}
 				<CollectionPanel
 					discs={discs}
+					style={settings.style}
 					currentId={current?.id}
 					onSelect={onSelect}
 					inputRef={linkRef}

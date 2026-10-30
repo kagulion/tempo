@@ -17,22 +17,22 @@ const b = 'bbbbbbbbbbb';
 const c = 'ccccccccccc';
 
 function disc(videoId: string, extra: Partial<Disc> = {}): Disc {
-	return { id: videoId, videoId, style: 'label', image: 'cover', ...extra };
+	return { id: videoId, videoId, image: 'cover', ...extra };
 }
 
 describe('addDisc', () => {
 	it('новая пластинка встаёт наверх с настройками по умолчанию', () => {
 		const list = addDisc([disc(a)], { videoId: b, start: 30 });
 		expect(list.map((d) => d.id)).toEqual([b, a]);
-		expect(list[0]).toEqual({ id: b, videoId: b, style: 'label', image: 'cover', start: 30 });
+		expect(list[0]).toEqual({ id: b, videoId: b, image: 'cover', start: 30 });
 	});
 
 	it('повторное добавление поднимает пластинку и сохраняет настройки и место', () => {
-		const list = addDisc([disc(a), disc(b, { style: 'cd', image: 'frame2', position: 99 })], {
+		const list = addDisc([disc(a), disc(b, { image: 'frame2', position: 99 })], {
 			videoId: b
 		});
 		expect(list.map((d) => d.id)).toEqual([b, a]);
-		expect(list[0]).toMatchObject({ style: 'cd', image: 'frame2', position: 99 });
+		expect(list[0]).toMatchObject({ image: 'frame2', position: 99 });
 	});
 
 	it('название: новое заменяет старое, без нового остаётся старое', () => {
@@ -55,13 +55,13 @@ describe('removeDisc и updateDisc', () => {
 
 	it('меняет поля', () => {
 		const list = [disc(a), disc(b)];
-		expect(updateDisc(list, b, { style: 'vinyl' })[1].style).toBe('vinyl');
+		expect(updateDisc(list, b, { image: 'frame1' })[1].image).toBe('frame1');
 	});
 
 	it('без изменений или без пластинки отдаёт тот же список', () => {
 		const list = [disc(a)];
-		expect(updateDisc(list, a, { style: 'label' })).toBe(list);
-		expect(updateDisc(list, b, { style: 'cd' })).toBe(list);
+		expect(updateDisc(list, a, { image: 'cover' })).toBe(list);
+		expect(updateDisc(list, b, { image: 'frame1' })).toBe(list);
 		// Место 0 — то же, что нет места
 		expect(updateDisc(list, a, { position: 0 })).toBe(list);
 		expect(updateDisc(list, a, { position: 30 })).not.toBe(list);
@@ -120,24 +120,23 @@ describe('parseCollection', () => {
 
 	it('отбрасывает плохие и повторные элементы, чинит поля', () => {
 		const result = parseCollection([
-			{ videoId: a, title: 'Микс', style: 'cd', image: 'frame3', start: 10, position: 12.5 },
+			{ videoId: a, title: 'Микс', image: 'frame3', start: 10, position: 12.5 },
 			{ videoId: a },
 			{ videoId: 'short' },
 			null,
 			'строка',
-			{ videoId: b, style: 'неизвестный', image: 5, title: '  ', start: -1, position: -3 }
+			{ videoId: b, image: 5, title: '  ', start: -1, position: -3 }
 		]);
 		expect(result).toEqual([
 			{
 				id: a,
 				videoId: a,
 				title: 'Микс',
-				style: 'cd',
 				image: 'frame3',
 				start: 10,
 				position: 12.5
 			},
-			{ id: b, videoId: b, style: 'label', image: 'cover' }
+			{ id: b, videoId: b, image: 'cover' }
 		]);
 	});
 

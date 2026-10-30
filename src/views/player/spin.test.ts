@@ -11,22 +11,21 @@ import {
 } from './spin';
 
 describe('secondsPerRevolution', () => {
-	it('компакт-диск — 1,8 с на оборот, винил и белая этикетка — 3,6 с', () => {
-		expect(secondsPerRevolution('cd', 1)).toBeCloseTo(1.8, 5);
-		expect(secondsPerRevolution('vinyl', 1)).toBeCloseTo(3.6, 5);
-		expect(secondsPerRevolution('label', 1)).toBeCloseTo(3.6, 5);
+	it('компакт-диск и винил — по 7,2 с на оборот', () => {
+		expect(secondsPerRevolution('cd', 1)).toBeCloseTo(7.2, 5);
+		expect(secondsPerRevolution('vinyl', 1)).toBeCloseTo(7.2, 5);
 	});
 
 	it('скорость видео ускоряет вращение', () => {
-		expect(secondsPerRevolution('cd', 2)).toBeCloseTo(0.9, 5);
-		expect(secondsPerRevolution('vinyl', 0.5)).toBeCloseTo(7.2, 5);
+		expect(secondsPerRevolution('cd', 2)).toBeCloseTo(3.6, 5);
+		expect(secondsPerRevolution('vinyl', 0.5)).toBeCloseTo(14.4, 5);
 	});
 });
 
 describe('targetSpeed', () => {
 	it('играет — обороты в секунду, иначе ноль', () => {
-		expect(targetSpeed('cd', 1, true)).toBeCloseTo(1 / 1.8, 5);
-		expect(targetSpeed('vinyl', 1, true)).toBeCloseTo(1 / 3.6, 5);
+		expect(targetSpeed('cd', 1, true)).toBeCloseTo(1 / 7.2, 5);
+		expect(targetSpeed('vinyl', 1, true)).toBeCloseTo(1 / 7.2, 5);
 		expect(targetSpeed('cd', 1, false)).toBe(0);
 	});
 });

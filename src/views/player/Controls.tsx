@@ -182,27 +182,29 @@ export function Controls({
 				>
 					<Tv className={settings.showVideo ? undefined : 'opacity-50'} />
 				</Button>
-			</div>
 
-			<div className="flex items-center gap-2">
-				<Button
-					variant="glass"
-					size="icon-sm"
-					title={silent ? 'Включить звук' : 'Выключить звук'}
-					aria-label={silent ? 'Включить звук' : 'Выключить звук'}
-					aria-pressed={settings.muted}
-					onClick={() => onChange({ muted: !settings.muted })}
-				>
-					{silent ? <VolumeX /> : <Volume2 />}
-				</Button>
-				<Slider
-					label="Громкость"
-					min={0}
-					max={100}
-					step={1}
-					value={settings.volume}
-					onValueChange={(value) => onChange({ volume: value, muted: false })}
-				/>
+				{/* Громкость справа от всех кнопок; маленький ползунок, как в радио */}
+				<div className="flex items-center gap-1">
+					<Button
+						variant="glass"
+						size="icon-sm"
+						title={silent ? 'Включить звук' : 'Выключить звук'}
+						aria-label={silent ? 'Включить звук' : 'Выключить звук'}
+						aria-pressed={settings.muted}
+						onClick={() => onChange({ muted: !settings.muted })}
+					>
+						{silent ? <VolumeX /> : <Volume2 />}
+					</Button>
+					<Slider
+						label="Громкость"
+						min={0}
+						max={100}
+						step={1}
+						value={settings.muted ? 0 : settings.volume}
+						onValueChange={(value) => onChange({ volume: value, muted: false })}
+						className="w-16 min-w-8 sm:w-20"
+					/>
+				</div>
 			</div>
 		</Widget>
 	);

@@ -3,16 +3,15 @@ import type { YouTubeThumbVariant } from '@/lib/youtube/thumbs';
 
 // Коллекция пластинок проигрывателя. Чистый модуль без React: его легко тестировать
 
-// Вид пластинки: белый лейбл, чёрный винил с наклейкой, компакт-диск
-export type DiscStyle = 'label' | 'vinyl' | 'cd';
+// Вид пластинки: чёрный винил с наклейкой, компакт-диск. Один на все пластинки (настройка проигрывателя)
+export type DiscStyle = 'vinyl' | 'cd';
 // Что на картинке: обложка видео или один из трёх кадров, которые YouTube выбрал сам
 export type DiscImage = 'cover' | 'frame1' | 'frame2' | 'frame3';
 
-export const discStyles: readonly DiscStyle[] = ['label', 'vinyl', 'cd'];
+export const discStyles: readonly DiscStyle[] = ['vinyl', 'cd'];
 export const discImages: readonly DiscImage[] = ['cover', 'frame1', 'frame2', 'frame3'];
 
 export const discStyleLabels: Record<DiscStyle, string> = {
-	label: 'Белый лейбл',
 	vinyl: 'Винил',
 	cd: 'CD'
 };
@@ -29,7 +28,6 @@ export type Disc = {
 	id: string;
 	videoId: string;
 	title?: string;
-	style: DiscStyle;
 	image: DiscImage;
 	// Секунда, с которой начинать, если запомненного места ещё нет (из ссылки с ?t=)
 	start?: number;
@@ -40,7 +38,7 @@ export type Disc = {
 // Сколько пластинок помнит коллекция
 export const discLimit = 50;
 
-export const defaultStyle: DiscStyle = 'label';
+export const defaultStyle: DiscStyle = 'vinyl';
 export const defaultImage: DiscImage = 'cover';
 
 function isOneOf<T extends string>(list: readonly T[], value: unknown): value is T {
@@ -57,7 +55,7 @@ export function addDisc(
 	const previous = list.find((disc) => disc.id === video.videoId);
 	const disc: Disc = previous
 		? { ...previous }
-		: { id: video.videoId, videoId: video.videoId, style: defaultStyle, image: defaultImage };
+		: { id: video.videoId, videoId: video.videoId, image: defaultImage };
 	if (video.title) disc.title = video.title;
 	if (video.start !== undefined) disc.start = video.start;
 	return [disc, ...list.filter((item) => item.id !== video.videoId)].slice(0, max);
@@ -71,7 +69,7 @@ export function removeDisc(list: Disc[], id: string) {
 export function updateDisc(
 	list: Disc[],
 	id: string,
-	patch: Partial<Pick<Disc, 'style' | 'image' | 'title' | 'position'>>
+	patch: Partial<Pick<Disc, 'image' | 'title' | 'position'>>
 ): Disc[] {
 	const index = list.findIndex((disc) => disc.id === id);
 	if (index === -1) return list;
@@ -140,14 +138,13 @@ export function parseCollection(saved: unknown): Disc[] | undefined {
 	const result: Disc[] = [];
 	for (const entry of saved) {
 		if (typeof entry !== 'object' || entry === null) continue;
-		const { videoId, title, style, image, start, position } = entry as Record<string, unknown>;
+		const { videoId, title, image, start, position } = entry as Record<string, unknown>;
 		if (typeof videoId !== 'string' || !videoIdPattern.test(videoId)) continue;
 		if (result.some((disc) => disc.id === videoId)) continue;
 
 		const disc: Disc = {
 			id: videoId,
 			videoId,
-			style: isOneOf(discStyles, style) ? style : defaultStyle,
 			image: isOneOf(discImages, image) ? image : defaultImage
 		};
 		if (typeof title === 'string' && title.trim() !== '') disc.title = title;

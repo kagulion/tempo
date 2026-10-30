@@ -1,5 +1,7 @@
 import { isRecord } from '@/lib/storage';
 
+import { defaultStyle, discStyles, type DiscStyle } from './collection';
+
 // Настройки самого проигрывателя (без коллекции). Чистый модуль без React
 
 export type RepeatMode = 'off' | 'one' | 'all';
@@ -25,6 +27,8 @@ export type PlayerSettings = {
 	showVideo: boolean;
 	// Открыто ли окно коллекции
 	collectionOpen: boolean;
+	// Вид пластинок: один на всю коллекцию и большую пластинку
+	style: DiscStyle;
 };
 
 export const defaultSettings: PlayerSettings = {
@@ -34,14 +38,15 @@ export const defaultSettings: PlayerSettings = {
 	repeat: 'off',
 	showVideo: false,
 	// При первом заходе коллекция пуста, и поле для ссылки нужно сразу
-	collectionOpen: true
+	collectionOpen: true,
+	style: defaultStyle
 };
 
 // Старые поля не читаем: rpm (обороты; скорость зависит от вида пластинки) и overlays (виджеты поверх пластинки убраны).
 // Каждое поле проверяем отдельно: одно испорченное не должно сбрасывать остальные
 export function parseSettings(saved: unknown): PlayerSettings | undefined {
 	if (!isRecord(saved)) return undefined;
-	const { volume, muted, rate, repeat, discId, showVideo, collectionOpen } = saved;
+	const { volume, muted, rate, repeat, discId, showVideo, collectionOpen, style } = saved;
 
 	const result: PlayerSettings = { ...defaultSettings };
 	if (typeof volume === 'number' && Number.isFinite(volume)) {
@@ -55,6 +60,9 @@ export function parseSettings(saved: unknown): PlayerSettings | undefined {
 	if (typeof discId === 'string' && discId !== '') result.discId = discId;
 	if (typeof showVideo === 'boolean') result.showVideo = showVideo;
 	if (typeof collectionOpen === 'boolean') result.collectionOpen = collectionOpen;
+	if (typeof style === 'string' && (discStyles as readonly string[]).includes(style)) {
+		result.style = style as DiscStyle;
+	}
 	return result;
 }
 

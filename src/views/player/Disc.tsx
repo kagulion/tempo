@@ -29,42 +29,27 @@ type DiscProps = {
 	image?: DiscImage;
 	// Крутить (разгон и торможение сами). Без него пластинка стоит
 	spin?: SpinParams;
-	// Мини-пластинка в коллекции
-	small?: boolean;
 	className?: string;
 };
 
-// Пластинка в трёх видах. Размер задаёт родитель через className (ширина), высота равна ширине.
+// Пластинка в двух видах. Размер задаёт родитель через className (ширина), высота равна ширине.
 // Вращается только слой с картинкой и бороздками; блик лежит сверху и стоит на месте, как свет над диском
-export function Disc({
-	style,
-	videoId,
-	image = 'cover',
-	spin,
-	small = false,
-	className
-}: DiscProps) {
+export function Disc({ style, videoId, image = 'cover', spin, className }: DiscProps) {
 	const spinRef = useRef<HTMLDivElement>(null);
 	useSpin(spinRef, spin, style);
 
 	// При смене видео или картинки цепочка вариантов начинается заново
 	const imageKey = `${videoId ?? ''}/${image}`;
 	const layer = videoId ? (
-		<DiscImageLayer key={imageKey} videoId={videoId} image={image} small={small} />
+		<DiscImageLayer key={imageKey} videoId={videoId} image={image} small={false} />
 	) : null;
 
 	return (
-		<div
-			className={cn(
-				'relative aspect-square w-full rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.6)]',
-				className
-			)}
-		>
+		<div className={cn('relative aspect-square w-full rounded-full', className)}>
 			<div
 				ref={spinRef}
 				className={cn(
 					'absolute inset-0 overflow-hidden rounded-full',
-					style === 'label' && 'bg-neutral-200',
 					style === 'vinyl' && 'bg-neutral-950'
 				)}
 				style={
@@ -73,27 +58,13 @@ export function Disc({
 								backgroundImage:
 									'repeating-radial-gradient(circle at center, #0b0b0b 0 1px, #1b1b1b 1px 2px)'
 							}
-						: style === 'cd'
-							? {
-									backgroundImage:
-										'conic-gradient(from 30deg, #e5e7eb, #9ca3af, #f3f4f6, #6b7280, #e5e7eb, #9ca3af, #f3f4f6, #e5e7eb)',
-									...cdClearMask
-								}
-							: undefined
+						: {
+								backgroundImage:
+									'conic-gradient(from 30deg, #e5e7eb, #9ca3af, #f3f4f6, #6b7280, #e5e7eb, #9ca3af, #f3f4f6, #e5e7eb)',
+								...cdClearMask
+							}
 				}
 			>
-				{style === 'label' && (
-					<>
-						{layer}
-						{/* Тонкое кольцо вокруг зоны этикетки */}
-						<span
-							aria-hidden
-							className="absolute inset-[33%] rounded-full border border-black/30 shadow-[0_0_0_1px_rgba(255,255,255,0.25)]"
-						/>
-						<Hole />
-					</>
-				)}
-
 				{style === 'vinyl' && (
 					<>
 						{/* Этикетка в центре: 38 % диаметра */}
@@ -130,14 +101,9 @@ export function Disc({
 					backgroundImage:
 						style === 'vinyl'
 							? 'conic-gradient(from 20deg, transparent 0 8%, rgba(255,255,255,0.2) 13%, transparent 19% 50%, rgba(255,255,255,0.2) 63%, transparent 69%)'
-							: style === 'cd'
-								? 'conic-gradient(from 0deg, rgba(255,0,128,0.28), rgba(255,200,0,0.22), rgba(0,255,200,0.28), rgba(80,120,255,0.3), rgba(255,0,128,0.28))'
-								: 'linear-gradient(135deg, rgba(255,255,255,0.22), transparent 40%, rgba(0,0,0,0.18))',
+							: 'conic-gradient(from 0deg, rgba(255,0,128,0.28), rgba(255,200,0,0.22), rgba(0,255,200,0.28), rgba(80,120,255,0.3), rgba(255,0,128,0.28))',
 					...(style === 'cd' ? cdClearMask : undefined),
-					boxShadow:
-						style === 'label'
-							? 'inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 12px rgba(0,0,0,0.25)'
-							: 'inset 0 0 0 1px rgba(255,255,255,0.2)'
+					boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.2)'
 				}}
 			/>
 		</div>

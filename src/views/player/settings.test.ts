@@ -21,7 +21,8 @@ describe('parseSettings', () => {
 			repeat: 'all',
 			discId: 'aaaaaaaaaaa',
 			showVideo: true,
-			collectionOpen: false
+			collectionOpen: false,
+			style: 'cd'
 		};
 		expect(parseSettings(saved)).toEqual(saved);
 	});

@@ -14,6 +14,7 @@ import { parseMood } from './stats/mood';
 import { parseLiveWallpaper, resolveLive } from './wallpaper/liveWallpaper';
 import { parseSaved } from './wallpaper/useWallpaper';
 import { parseSavedChannel } from './twitch/twitch';
+import { parseCollection as parsePlayerCollection } from '@/views/player/collection';
 import { parseSettings as parsePlayerSettings } from '@/views/player/settings';
 import { parseSoundOn } from './youtube/playback';
 import { parseVideoQuality } from './youtube/quality';
@@ -308,9 +309,29 @@ describe('настройки проигрывателя', () => {
 		expect(result).not.toHaveProperty('rpm');
 	});
 
+	it('настройки без поля style читаются, вид — винил; неизвестный вид сбрасывается', () => {
+		expect(parsePlayerSettings({ volume: 30 })).toMatchObject({ style: 'vinyl' });
+		expect(parsePlayerSettings({ style: 'cd' })).toMatchObject({ style: 'cd' });
+		expect(parsePlayerSettings({ style: 'label' })).toMatchObject({ style: 'vinyl' });
+	});
+
 	it('старое поле overlays игнорируется, остальные поля остаются', () => {
 		const result = parsePlayerSettings({ volume: 30, overlays: ['clock'], repeat: 'all' });
 		expect(result).toMatchObject({ volume: 30, repeat: 'all' });
 		expect(result).not.toHaveProperty('overlays');
+	});
+});
+
+describe('коллекция проигрывателя', () => {
+	it('старое поле style у пластинки игнорируется, остальное остаётся', () => {
+		const result = parsePlayerCollection([
+			{ videoId: 'dQw4w9WgXcQ', style: 'label', image: 'frame2', position: 12 }
+		]);
+		expect(result?.[0]).toEqual({
+			id: 'dQw4w9WgXcQ',
+			videoId: 'dQw4w9WgXcQ',
+			image: 'frame2',
+			position: 12
+		});
 	});
 });

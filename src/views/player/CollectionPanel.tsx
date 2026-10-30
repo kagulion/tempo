@@ -24,8 +24,6 @@ import {
 	discImageLabels,
 	discImages,
 	discLimit,
-	discStyleLabels,
-	discStyles,
 	type Disc as DiscData,
 	type DiscImage,
 	type DiscStyle
@@ -35,6 +33,8 @@ import { addToCollection, removeFromCollection, updateInCollection } from './use
 
 type CollectionProps = {
 	discs: DiscData[];
+	// Вид упаковок: один на все пластинки
+	style: DiscStyle;
 	currentId: string | undefined;
 	// Выбрать пластинку: она встаёт на стол и играет
 	onSelect: (id: string) => void;
@@ -49,12 +49,13 @@ function discTitle(disc: DiscData) {
 
 type DiscTileProps = {
 	disc: DiscData;
+	style: DiscStyle;
 	current: boolean;
 	onSelect: (id: string) => void;
 };
 
-// Упаковка пластинки (вид меняется сразу вместе с `disc.style`) с подписью и меню настроек. Кнопка меню лежит рядом с кнопкой выбора, а не внутри неё
-function DiscTile({ disc, current, onSelect }: DiscTileProps) {
+// Упаковка пластинки (вид общий, берётся из настроек) с подписью и меню настроек. Кнопка меню лежит рядом с кнопкой выбора, а не внутри неё
+function DiscTile({ disc, style, current, onSelect }: DiscTileProps) {
 	const title = discTitle(disc);
 	return (
 		<li className="relative">
@@ -69,7 +70,7 @@ function DiscTile({ disc, current, onSelect }: DiscTileProps) {
 				)}
 			>
 				<Sleeve
-					style={disc.style}
+					style={style}
 					videoId={disc.videoId}
 					image={disc.image}
 					className="shadow-[0_6px_16px_rgba(0,0,0,0.5)]"
@@ -95,20 +96,6 @@ function DiscTile({ disc, current, onSelect }: DiscTileProps) {
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					<DropdownMenuGroup>
-						<DropdownMenuLabel>Вид</DropdownMenuLabel>
-						<DropdownMenuRadioGroup
-							value={disc.style}
-							onValueChange={(value) => updateInCollection(disc.id, { style: value as DiscStyle })}
-						>
-							{discStyles.map((style) => (
-								<DropdownMenuRadioItem key={style} value={style}>
-									{discStyleLabels[style]}
-								</DropdownMenuRadioItem>
-							))}
-						</DropdownMenuRadioGroup>
-					</DropdownMenuGroup>
-					<DropdownMenuSeparator className="bg-white/10" />
-					<DropdownMenuGroup>
 						<DropdownMenuLabel>Изображение</DropdownMenuLabel>
 						<DropdownMenuRadioGroup
 							value={disc.image}
@@ -122,12 +109,7 @@ function DiscTile({ disc, current, onSelect }: DiscTileProps) {
 									// Ячейка сетки: упаковка и подпись; галочку прячем, выбранную отмечает кольцо
 									className="w-24 flex-col gap-1 p-1.5 text-xs data-checked:ring-2 data-checked:ring-white/70 [&>[data-slot=dropdown-menu-radio-item-indicator]]:hidden"
 								>
-									<Sleeve
-										style={disc.style}
-										videoId={disc.videoId}
-										image={image}
-										className="w-full"
-									/>
+									<Sleeve style={style} videoId={disc.videoId} image={image} className="w-full" />
 									{discImageLabels[image]}
 								</DropdownMenuRadioItem>
 							))}
@@ -147,6 +129,7 @@ function DiscTile({ disc, current, onSelect }: DiscTileProps) {
 // Окно коллекции (положение задаёт страница через className, закрытое окно получает hidden и остаётся в DOM): поле для ссылки, сетка мини-пластинок, добавление из «Моих видео» фона YouTube
 export function CollectionPanel({
 	discs,
+	style,
 	currentId,
 	onSelect,
 	inputRef,
@@ -253,6 +236,7 @@ export function CollectionPanel({
 						<DiscTile
 							key={disc.id}
 							disc={disc}
+							style={style}
 							current={disc.id === currentId}
 							onSelect={onSelect}
 						/>
