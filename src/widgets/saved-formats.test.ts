@@ -14,6 +14,7 @@ import { parseMood } from './stats/mood';
 import { parseLiveWallpaper, resolveLive } from './wallpaper/liveWallpaper';
 import { parseSaved } from './wallpaper/useWallpaper';
 import { parseSavedChannel } from './twitch/twitch';
+import { parseCategories as parsePlayerCategories } from '@/views/player/categories';
 import { parseCollection as parsePlayerCollection } from '@/views/player/collection';
 import { parseSettings as parsePlayerSettings } from '@/views/player/settings';
 import { parseSoundOn } from './youtube/playback';
@@ -333,5 +334,36 @@ describe('коллекция проигрывателя', () => {
 			image: 'frame2',
 			position: 12
 		});
+	});
+
+	it('пластинки без поля categoryId читаются как раньше, без категории', () => {
+		const result = parsePlayerCollection([{ videoId: 'dQw4w9WgXcQ', image: 'cover' }]);
+		expect(result?.[0]).toEqual({ id: 'dQw4w9WgXcQ', videoId: 'dQw4w9WgXcQ', image: 'cover' });
+	});
+
+	it('categoryId у пластинки читается', () => {
+		const result = parsePlayerCollection([{ videoId: 'dQw4w9WgXcQ', categoryId: 'jazz' }]);
+		expect(result?.[0].categoryId).toBe('jazz');
+	});
+});
+
+describe('категории проигрывателя', () => {
+	it('читает сохранённый список, плохие элементы отбрасывает', () => {
+		expect(
+			parsePlayerCategories([
+				{ id: 'j', name: 'Джаз' },
+				{ id: 'x' },
+				null,
+				{ id: 'r', name: 'Рок' }
+			])
+		).toEqual([
+			{ id: 'j', name: 'Джаз' },
+			{ id: 'r', name: 'Рок' }
+		]);
+	});
+
+	it('не список отбрасывает', () => {
+		expect(parsePlayerCategories({ id: 'j', name: 'Джаз' })).toBeUndefined();
+		expect(parsePlayerCategories(null)).toBeUndefined();
 	});
 });

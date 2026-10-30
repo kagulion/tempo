@@ -28,8 +28,16 @@ import {
 	type DiscImage,
 	type DiscStyle
 } from './collection';
+import { discCategoryId, discDragType, filterDiscs, type Category } from './categories';
+import { CategoryBar } from './CategoryBar';
 import { Sleeve } from './Sleeve';
-import { addToCollection, removeFromCollection, updateInCollection } from './useCollection';
+import { useCategories } from './useCategories';
+import {
+	addToCollection,
+	moveToCategory,
+	removeFromCollection,
+	updateInCollection
+} from './useCollection';
 
 type CollectionProps = {
 	discs: DiscData[];
@@ -49,23 +57,35 @@ function discTitle(disc: DiscData) {
 
 type DiscTileProps = {
 	disc: DiscData;
+	categories: Category[];
 	style: DiscStyle;
 	current: boolean;
 	onSelect: (id: string) => void;
 };
 
 // Упаковка пластинки (вид общий, берётся из настроек) с подписью и меню настроек. Кнопка меню лежит рядом с кнопкой выбора, а не внутри неё
-function DiscTile({ disc, style, current, onSelect }: DiscTileProps) {
+function DiscTile({ disc, categories, style, current, onSelect }: DiscTileProps) {
 	const title = discTitle(disc);
+	const [dragging, setDragging] = useState(false);
 	return (
-		<li className="relative">
+		// Плитку можно перетащить на вкладку категории; на сенсорных экранах перетаскивания нет, там работает меню
+		<li
+			draggable
+			onDragStart={(event) => {
+				event.dataTransfer.setData(discDragType, disc.id);
+				event.dataTransfer.effectAllowed = 'move';
+				setDragging(true);
+			}}
+			onDragEnd={() => setDragging(false)}
+			className={cn('relative transition-opacity', dragging && 'opacity-50')}
+		>
 			<button
 				type="button"
 				onClick={() => onSelect(disc.id)}
 				aria-label={`Играть: ${title}`}
 				aria-current={current || undefined}
 				className={cn(
-					'flex w-full flex-col gap-1.5 rounded-xl p-2 text-left transition-colors outline-none hover:bg-white/10 focus-visible:ring-3 focus-visible:ring-white/20',
+					'flex w-full flex-col gap-1.5 rounded-xl p-1.5 text-left transition-colors outline-none hover:bg-white/10 focus-visible:ring-3 focus-visible:ring-white/20',
 					current && 'bg-white/10 ring-1 ring-white/30'
 				)}
 			>
@@ -88,13 +108,13 @@ function DiscTile({ disc, style, current, onSelect }: DiscTileProps) {
 							size="icon-xs"
 							title={`Настройки: ${title}`}
 							aria-label={`Настройки: ${title}`}
-							className="absolute top-1.5 right-1.5 bg-black/50"
+							className="absolute top-2 right-2 bg-black/50 after:absolute after:-inset-2 after:content-['']"
 						/>
 					}
 				>
 					<EllipsisVertical />
 				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end">
+				<DropdownMenuContent align="end" className="max-w-[min(16rem,90vw)]">
 					<DropdownMenuGroup>
 						<DropdownMenuLabel>Изображение</DropdownMenuLabel>
 						<DropdownMenuRadioGroup
@@ -115,6 +135,27 @@ function DiscTile({ disc, style, current, onSelect }: DiscTileProps) {
 							))}
 						</DropdownMenuRadioGroup>
 					</DropdownMenuGroup>
+					{categories.length > 0 && (
+						<>
+							<DropdownMenuSeparator className="bg-white/10" />
+							<DropdownMenuGroup>
+								<DropdownMenuLabel>Категория</DropdownMenuLabel>
+								<DropdownMenuRadioGroup
+									value={discCategoryId(categories, disc) ?? ''}
+									onValueChange={(value) =>
+										moveToCategory(disc.id, value === '' ? undefined : value)
+									}
+								>
+									<DropdownMenuRadioItem value="">Без категории</DropdownMenuRadioItem>
+									{categories.map((category) => (
+										<DropdownMenuRadioItem key={category.id} value={category.id}>
+											<span className="truncate">{category.name}</span>
+										</DropdownMenuRadioItem>
+									))}
+								</DropdownMenuRadioGroup>
+							</DropdownMenuGroup>
+						</>
+					)}
 					<DropdownMenuSeparator className="bg-white/10" />
 					<DropdownMenuItem variant="destructive" onClick={() => removeFromCollection(disc.id)}>
 						<Trash2 />
@@ -138,6 +179,11 @@ export function CollectionPanel({
 	const [link, setLink] = useState('');
 	const [error, setError] = useState<string>();
 	const history = useYouTubeHistory();
+	const categories = useCategories();
+	// Открытая вкладка: undefined — «Все». Если выбранную категорию удалили, показываем «Все»
+	const [tab, setTab] = useState<string>();
+	const activeId = categories.some((category) => category.id === tab) ? tab : undefined;
+	const visible = filterDiscs(discs, categories, activeId);
 	const fresh = history.filter((item) => !discs.some((disc) => disc.id === item.videoId));
 
 	function submit(event: FormEvent) {
@@ -149,7 +195,7 @@ export function CollectionPanel({
 		}
 		setError(undefined);
 		setLink('');
-		addToCollection(video);
+		addToCollection({ ...video, categoryId: activeId });
 		onSelect(video.videoId);
 	}
 
@@ -208,7 +254,7 @@ export function CollectionPanel({
 							<DropdownMenuItem
 								key={item.videoId}
 								onClick={() => {
-									addToCollection(item);
+									addToCollection({ ...item, categoryId: activeId });
 									onSelect(item.videoId);
 								}}
 							>
@@ -226,16 +272,29 @@ export function CollectionPanel({
 				</DropdownMenuContent>
 			</DropdownMenu>
 
+			<CategoryBar
+				categories={categories}
+				selectedId={activeId}
+				onSelect={setTab}
+				onDropDisc={moveToCategory}
+			/>
+
 			{discs.length === 0 ? (
 				<p className="py-4 text-center text-sm text-white/80">
 					Пока пусто. Вставьте ссылку на длинное видео или микс, и оно станет пластинкой.
 				</p>
+			) : visible.length === 0 ? (
+				<p className="py-4 text-center text-sm text-white/80">
+					В этой категории пока пусто. Перетащите пластинку на вкладку или выберите категорию в меню
+					пластинки.
+				</p>
 			) : (
-				<ul className="-mx-2 grid min-h-0 scrollbar-glass grid-cols-2 gap-1 overflow-y-auto">
-					{discs.map((disc) => (
+				<ul className="-mx-1.5 grid min-h-0 scrollbar-glass grid-cols-3 gap-0.5 overflow-y-auto">
+					{visible.map((disc) => (
 						<DiscTile
 							key={disc.id}
 							disc={disc}
+							categories={categories}
 							style={style}
 							current={disc.id === currentId}
 							onSelect={onSelect}

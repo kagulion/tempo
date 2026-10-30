@@ -19,6 +19,8 @@ export const storageKeys = {
 	// Первый экран со сценами: 'pending' — ещё не выбрали, 'done' — закрыт навсегда
 	onboarding: 'tempo:onboarding',
 	openWidgets: 'tempo:open-widgets',
+	// Категории коллекции страницы /player: массив { id, name }, см. src/views/player/categories.ts
+	playerCategories: 'tempo:player-categories',
 	// Пластинки страницы /player: массив, см. src/views/player/collection.ts
 	playerCollection: 'tempo:player-collection',
 	// Настройки страницы /player: громкость, скорость, повтор, виджеты поверх, текущая пластинка, см. src/views/player/settings.ts

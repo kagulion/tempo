@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
 	addDisc,
+	clearCategory,
 	discLimit,
 	imageVariants,
 	isPlaceholderSize,
 	neighbourDisc,
 	parseCollection,
 	removeDisc,
+	setDiscCategory,
 	updateDisc,
 	type Disc
 } from './collection';
@@ -45,6 +47,49 @@ describe('addDisc', () => {
 		const list = addDisc([disc(a), disc(b)], { videoId: c }, 2);
 		expect(list.map((d) => d.id)).toEqual([c, a]);
 		expect(discLimit).toBe(50);
+	});
+});
+
+describe('категории пластинок', () => {
+	it('новая пластинка сразу попадает в категорию открытой вкладки', () => {
+		const list = addDisc([disc(a)], { videoId: b, categoryId: 'jazz' });
+		expect(list[0]).toEqual({ id: b, videoId: b, image: 'cover', categoryId: 'jazz' });
+	});
+
+	it('повторное добавление без категории (вкладка «Все») не меняет категорию', () => {
+		const list = addDisc([disc(a, { categoryId: 'jazz' })], { videoId: a });
+		expect(list[0].categoryId).toBe('jazz');
+	});
+
+	it('повторное добавление на вкладке категории переносит пластинку в неё', () => {
+		const list = addDisc([disc(a, { categoryId: 'jazz' })], { videoId: a, categoryId: 'rock' });
+		expect(list[0].categoryId).toBe('rock');
+	});
+
+	it('setDiscCategory кладёт в категорию и убирает из неё', () => {
+		const list = [disc(a), disc(b)];
+		const moved = setDiscCategory(list, b, 'jazz');
+		expect(moved[1].categoryId).toBe('jazz');
+		expect(moved[0]).toBe(list[0]);
+		const cleared = setDiscCategory(moved, b, undefined);
+		expect(cleared[1]).toEqual(disc(b));
+		expect('categoryId' in cleared[1]).toBe(false);
+	});
+
+	it('setDiscCategory без изменений или без пластинки отдаёт тот же список', () => {
+		const list = [disc(a, { categoryId: 'jazz' }), disc(b)];
+		expect(setDiscCategory(list, a, 'jazz')).toBe(list);
+		expect(setDiscCategory(list, b, undefined)).toBe(list);
+		expect(setDiscCategory(list, c, 'jazz')).toBe(list);
+	});
+
+	it('clearCategory оставляет пластинки, но убирает у них категорию', () => {
+		const list = [disc(a, { categoryId: 'jazz' }), disc(b, { categoryId: 'rock' }), disc(c)];
+		const next = clearCategory(list, 'jazz');
+		expect(next.map((d) => d.id)).toEqual([a, b, c]);
+		expect(next[0]).toEqual(disc(a));
+		expect(next[1].categoryId).toBe('rock');
+		expect(clearCategory(next, 'jazz')).toBe(next);
 	});
 });
 
@@ -138,6 +183,17 @@ describe('parseCollection', () => {
 			},
 			{ id: b, videoId: b, image: 'cover' }
 		]);
+	});
+
+	it('читает categoryId, старые данные без него читаются как раньше, мусор в нём отбрасывается', () => {
+		const result = parseCollection([
+			{ videoId: a, categoryId: 'jazz' },
+			{ videoId: b },
+			{ videoId: c, categoryId: 5 }
+		]);
+		expect(result?.[0].categoryId).toBe('jazz');
+		expect(result?.[1]).toEqual({ id: b, videoId: b, image: 'cover' });
+		expect(result?.[2]).toEqual({ id: c, videoId: c, image: 'cover' });
 	});
 
 	it('обрезает до лимита', () => {

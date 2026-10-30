@@ -33,6 +33,8 @@ export type Disc = {
 	start?: number;
 	// Где остановились, в секундах
 	position?: number;
+	// Категория, в которой лежит пластинка (одна или никакой). Если такой категории уже нет, пластинка считается без категории
+	categoryId?: string;
 };
 
 // Сколько пластинок помнит коллекция
@@ -46,10 +48,12 @@ function isOneOf<T extends string>(list: readonly T[], value: unknown): value is
 }
 
 // Новая пластинка — наверх. Повторное добавление того же видео поднимает её, не трогая настройки и место.
-// Название берём новое, если оно есть: иначе остаётся прежнее
+// Название берём новое, если оно есть: иначе остаётся прежнее.
+// categoryId — категория открытой вкладки: новая пластинка сразу кладётся в неё, а у существующей категория
+// меняется только если она передана (на вкладке «Все» её нет, и категория остаётся прежней)
 export function addDisc(
 	list: Disc[],
-	video: YouTubeVideo & { title?: string },
+	video: YouTubeVideo & { title?: string; categoryId?: string },
 	max = discLimit
 ): Disc[] {
 	const previous = list.find((disc) => disc.id === video.videoId);
@@ -58,7 +62,31 @@ export function addDisc(
 		: { id: video.videoId, videoId: video.videoId, image: defaultImage };
 	if (video.title) disc.title = video.title;
 	if (video.start !== undefined) disc.start = video.start;
+	if (video.categoryId !== undefined) disc.categoryId = video.categoryId;
 	return [disc, ...list.filter((item) => item.id !== video.videoId)].slice(0, max);
+}
+
+// Кладёт пластинку в категорию, а без categoryId убирает из категории. Если ничего не изменилось
+// или пластинки нет, отдаёт тот же список
+export function setDiscCategory(list: Disc[], id: string, categoryId: string | undefined): Disc[] {
+	const index = list.findIndex((disc) => disc.id === id);
+	if (index === -1 || list[index].categoryId === categoryId) return list;
+	return list.map((disc, i) => {
+		if (i !== index) return disc;
+		return categoryId === undefined ? withoutCategory(disc) : { ...disc, categoryId };
+	});
+}
+
+function withoutCategory(disc: Disc): Disc {
+	const copy = { ...disc };
+	delete copy.categoryId;
+	return copy;
+}
+
+// Удалили категорию: её пластинки остаются в коллекции, но становятся без категории
+export function clearCategory(list: Disc[], categoryId: string): Disc[] {
+	if (!list.some((disc) => disc.categoryId === categoryId)) return list;
+	return list.map((disc) => (disc.categoryId === categoryId ? withoutCategory(disc) : disc));
 }
 
 export function removeDisc(list: Disc[], id: string) {
@@ -138,7 +166,7 @@ export function parseCollection(saved: unknown): Disc[] | undefined {
 	const result: Disc[] = [];
 	for (const entry of saved) {
 		if (typeof entry !== 'object' || entry === null) continue;
-		const { videoId, title, image, start, position } = entry as Record<string, unknown>;
+		const { videoId, title, image, start, position, categoryId } = entry as Record<string, unknown>;
 		if (typeof videoId !== 'string' || !videoIdPattern.test(videoId)) continue;
 		if (result.some((disc) => disc.id === videoId)) continue;
 
@@ -152,6 +180,8 @@ export function parseCollection(saved: unknown): Disc[] | undefined {
 		if (typeof position === 'number' && Number.isFinite(position) && position > 0) {
 			disc.position = position;
 		}
+		// Есть ли такая категория, parse не знает (категории лежат в другом ключе): лишний id при показе игнорируется
+		if (typeof categoryId === 'string' && categoryId !== '') disc.categoryId = categoryId;
 		result.push(disc);
 	}
 	return result.slice(0, discLimit);
