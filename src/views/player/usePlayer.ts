@@ -48,6 +48,10 @@ export function usePlayer(options: UsePlayerOptions) {
 		latest.current = { ...options, unlocked, duck };
 	});
 	const syncRef = useRef({ audio: () => {}, rate: () => {} });
+	// Пластинка, с которой открыли страницу, сама не играет: автозапуск включается
+	// после нажатия «играть» или после смены пластинки
+	const firstDiscId = useRef(discId);
+	const autoplayAllowed = useRef(false);
 
 	useEffect(() => {
 		const host = hostRef.current;
@@ -149,7 +153,7 @@ export function usePlayer(options: UsePlayerOptions) {
 					width: '200',
 					height: '200',
 					playerVars: {
-						autoplay: 1,
+						autoplay: autoplayAllowed.current || discId !== firstDiscId.current ? 1 : 0,
 						mute: 1,
 						controls: 0,
 						disablekb: 1,
@@ -245,6 +249,7 @@ export function usePlayer(options: UsePlayerOptions) {
 	const play = useCallback(() => {
 		const player = playerRef.current;
 		if (!player) return;
+		autoplayAllowed.current = true;
 		if (player.getPlayerState() === 0) player.seekTo(0, true);
 		player.playVideo();
 	}, []);
